@@ -40,7 +40,7 @@ num_points_per_quadrant     = int32(3615 / num_quadrants);
 time_store = [];
 grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
 grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
-Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
+Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
 Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
 
@@ -90,7 +90,7 @@ feat_list_export            = cat(1, feat_list_pre_export{:});
 
 disp('Feature List Loaded!')
 
-%% Selecting ROOT Directory - where to store the stack
+%% Creating ROOT Directory
 
 % Current Time
 time_now                    = datetime("now","Format","uuuuMMddhhmmss");
@@ -118,6 +118,12 @@ addpath(PCD_STACK_FOLDER);
 CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
 mkdir(CLASSIFICATION_STACK_FOLDER);
 addpath(CLASSIFICATION_STACK_FOLDER);
+
+%% Creating Export Location
+
+RESULT_EXPORT_FOLDER = string(root_dir) + "/RESULT_EXPORT";
+mkdir(RESULT_EXPORT_FOLDER);
+addpath(RESULT_EXPORT_FOLDER);
 
 %% Grabbing Tform
 
@@ -779,7 +785,7 @@ load(Save_Gps_Loc_Filename);
 load(Save_LiDAR_Loc_Filename);
 
 %% Temp Debuging Thing
-% 
+
 % clear all
 % 
 % time_store = [];
@@ -789,16 +795,18 @@ load(Save_LiDAR_Loc_Filename);
 % Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 % 
 % 
-% temp_dir = "ROSBAG_2022-10-11-09-24-00_20220217161137";
-% CLASSIFICATION_STACK_FOLDER = string(temp_dir) + "/CLASSIFICATION_STACK";
-% tform_save_folder = string(temp_dir) + "/TFORM";
+% temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
+% CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
+% tform_save_folder               = string(temp_dir) + "/TFORM";
 % classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
 % tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
 % load(tform_file_loc);
+% 
+% num_pcds = length(classification_list);
 
 %% Applying Tform to each result
 
-Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
+Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
 Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
 for tform_idx = 1:1:num_pcds
@@ -862,7 +870,7 @@ for tform_idx = 1:1:num_pcds
     if ~isempty(grav_array_temp)
         grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
         grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Grav_Append_Array               = [Grav_Append_Array; grav_array_temp];
+        Grav_All_Append_Array               = [Grav_All_Append_Array; grav_array_temp];
     end
     
     if ~isempty(grav_avg_array_temp)
@@ -874,7 +882,7 @@ for tform_idx = 1:1:num_pcds
     if ~isempty(chip_array_temp)
         chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
         chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Chip_Append_Array               = [Chip_Append_Array; chip_array_temp];
+        Chip_All_Append_Array               = [Chip_All_Append_Array; chip_array_temp];
     end
     
     if ~isempty(chip_avg_array_temp)
@@ -886,7 +894,7 @@ for tform_idx = 1:1:num_pcds
     if ~isempty(foli_array_temp)
         foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
         foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Foli_Append_Array               = [Foli_Append_Array; foli_array_temp];
+        Foli_All_Append_Array               = [Foli_All_Append_Array; foli_array_temp];
     end
     
     if ~isempty(foli_avg_array_temp)
@@ -898,7 +906,7 @@ for tform_idx = 1:1:num_pcds
     if ~isempty(gras_array_temp)
         gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
         gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Gras_Append_Array               = [Gras_Append_Array; gras_array_temp];
+        Gras_All_Append_Array               = [Gras_All_Append_Array; gras_array_temp];
     end
     
     if ~isempty(gras_avg_array_temp)
@@ -916,10 +924,10 @@ figure
 
 hold all
 
-plot3(Grav_Append_Array(:,1), Grav_Append_Array(:,2), Grav_Append_Array(:,3), 'c.', 'MarkerSize', 3.5)
-plot3(Chip_Append_Array(:,1), Chip_Append_Array(:,2), Chip_Append_Array(:,3), 'k.', 'MarkerSize', 3.5)
-plot3(Foli_Append_Array(:,1), Foli_Append_Array(:,2), Foli_Append_Array(:,3), 'm.', 'MarkerSize', 3.5)
-plot3(Gras_Append_Array(:,1), Gras_Append_Array(:,2), Gras_Append_Array(:,3), 'g.', 'MarkerSize', 3.5)
+plot3(Grav_All_Append_Array(:,1), Grav_All_Append_Array(:,2), Grav_All_Append_Array(:,3), 'c.', 'MarkerSize', 3.5)
+plot3(Chip_All_Append_Array(:,1), Chip_All_Append_Array(:,2), Chip_All_Append_Array(:,3), 'k.', 'MarkerSize', 3.5)
+plot3(Foli_All_Append_Array(:,1), Foli_All_Append_Array(:,2), Foli_All_Append_Array(:,3), 'm.', 'MarkerSize', 3.5)
+plot3(Gras_All_Append_Array(:,1), Gras_All_Append_Array(:,2), Gras_All_Append_Array(:,3), 'g.', 'MarkerSize', 3.5)
 
 axis('equal')
 axis off
@@ -938,6 +946,26 @@ axis('equal')
 axis off
 view([0 0 90])
 
+%% Creating result structs
+
+RESULTS_ALL.grav = Grav_All_Append_Array;
+RESULTS_ALL.chip = Chip_All_Append_Array;
+RESULTS_ALL.foli = Foli_All_Append_Array;
+RESULTS_ALL.gras = Gras_All_Append_Array;
+
+RESULTS_AVG.grav = Grav_Avg_Append_Array;
+RESULTS_AVG.chip = Chip_Avg_Append_Array;
+RESULTS_AVG.foli = Foli_Avg_Append_Array;
+RESULTS_AVG.gras = Gras_Avg_Append_Array;
+
+
+%% Saving the Results
+
+Save_All_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/ALL_RESULTS.mat";
+Save_Avg_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/AVG_RESULTS.mat";
+
+save(Save_All_Results_Filename, 'RESULTS_ALL');
+save(Save_Avg_Results_Filename, 'RESULTS_AVG');
 
 %% End program
 

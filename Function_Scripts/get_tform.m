@@ -33,7 +33,7 @@ function get_tform(bag, tform_save_folder, ring_min, ring_max)
     %% Topics
     topics = bag.AvailableTopics;
 
-    lidar_topic = select(bag,'Topic','velodyne_points');
+    lidar_topic = select(bag,'Topic','velodyne_packets');
     lidar_msgs = readMessages(lidar_topic, 'DataFormat', 'struct');
 
     gps_topic = select(bag,'Topic','/gps/gps');
@@ -97,17 +97,17 @@ function get_tform(bag, tform_save_folder, ring_min, ring_max)
     lidar_pos_store(1,:)        = lidarTrajectory;
 
     % Reading the current cloud for xyz, intensity, and ring (channel) values
-    init_cloud                  = rosReadXYZ(matchedLidar);
-    intensities                 = rosReadField(matchedLidar, 'intensity');
-    ring                        = rosReadField(matchedLidar, 'ring');
-    init_cloud(:,4)             = intensities;
-    init_cloud(:,5)             = ring;
+%     init_cloud                  = rosReadXYZ(matchedLidar);
+%     intensities                 = rosReadField(matchedLidar, 'intensity');
+%     ring                        = rosReadField(matchedLidar, 'ring');
+%     init_cloud(:,4)             = intensities;
+%     init_cloud(:,5)             = ring;
 
     % Eliminate nans and zeros
-    init_cloud                   = init_cloud( ~any( isnan(init_cloud) | isinf(init_cloud), 2),:);
+%     init_cloud                   = init_cloud( ~any( isnan(init_cloud) | isinf(init_cloud), 2),:);
 
     % Sort rows
-    init_cloud = sortrows(init_cloud,5);
+%     init_cloud = sortrows(init_cloud,5);
     
     % Data Trimming
     
@@ -116,10 +116,10 @@ function get_tform(bag, tform_save_folder, ring_min, ring_max)
     tform(1)                    = rigid3d(init_rotate_offset, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
 
     % Creating the initial point cloud object
-    init_pcl                    = pointCloud([init_cloud(:,1), init_cloud(:,2), init_cloud(:,3)], 'Intensity',  init_cloud(:,4));
-    init_pcl                    = pctransform(init_pcl, tform);
+%     init_pcl                    = pointCloud([init_cloud(:,1), init_cloud(:,2), init_cloud(:,3)], 'Intensity',  init_cloud(:,4));
+%     init_pcl                    = pctransform(init_pcl, tform);
 
-    pointCloudList{1}           = init_pcl;
+%     pointCloudList{1}           = init_pcl;
 
     %% Doing the data
     fprintf('Max time delta is %f sec \n',max(abs(diffs)));
@@ -166,30 +166,30 @@ function get_tform(bag, tform_save_folder, ring_min, ring_max)
         lidarTrajectory             = [LidarxEast, LidaryNorth, LidarzUp];
 
         % Reading the current cloud for xyz, intensity, and ring (channel) values
-        xyz_cloud                   = rosReadXYZ(current_cloud);
-        intensities                 = rosReadField(current_cloud, 'intensity');
-        ring                        = rosReadField(current_cloud, 'ring');
-        xyz_cloud(:,4)              = intensities;
-        xyz_cloud(:,5)              = ring;
+%         xyz_cloud                   = rosReadXYZ(current_cloud);
+%         intensities                 = rosReadField(current_cloud, 'intensity');
+%         ring                        = rosReadField(current_cloud, 'ring');
+%         xyz_cloud(:,4)              = intensities;
+%         xyz_cloud(:,5)              = ring;
 
         % Eliminiating infs and nans from the xyz data - there may be a way to
         % use the
-        xyz_cloud                   = xyz_cloud( ~any( isnan(xyz_cloud) | isinf(xyz_cloud), 2),:);
+%         xyz_cloud                   = xyz_cloud( ~any( isnan(xyz_cloud) | isinf(xyz_cloud), 2),:);
 
         % EXPERIMENT sort rows
-        xyz_cloud = sortrows(xyz_cloud,5);
+%         xyz_cloud = sortrows(xyz_cloud,5);
 
         % Transforming the point cloud
         tform(cloud)                = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
 
         % Creating the point cloud object3
-        pointClouXYZI_curr          = pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)], 'Intensity',  xyz_cloud(:,4));
-        pointClouXYZI_curr          = pctransform(pointClouXYZI_curr, tform(cloud));
+%         pointClouXYZI_curr          = pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)], 'Intensity',  xyz_cloud(:,4));
+%         pointClouXYZI_curr          = pctransform(pointClouXYZI_curr, tform(cloud));
 
         gps_pos_store(cloud,:)      = groundTruthTrajectory;
         lidar_pos_store(cloud,:)    = lidarTrajectory;
 
-        pointCloudList{cloud}       = pointClouXYZI_curr;
+%         pointCloudList{cloud}       = pointClouXYZI_curr;
 
         %     mergeGridStep = 0.1;
         %     pointCloudList = pcmerge(pointCloudList, pointClouXYZI_curr, mergeGridStep);
@@ -210,35 +210,35 @@ function get_tform(bag, tform_save_folder, ring_min, ring_max)
 
     %% Compiling the map
 
-    disp("Making the map, sire...")
-    pointCloudList = pccat([pointCloudList{:}]);
+%     disp("Making the map, sire...")
+%     pointCloudList = pccat([pointCloudList{:}]);
 
     %% Displaying the map
-
-    figure
-
-    hold on
-
-    % Plotting the line between the lidar and gps
-    for point = 1:length(lidar_pos_store)
-
-        plot3([lidar_pos_store(point,1) gps_pos_store(point,1)],...
-            [lidar_pos_store(point,2) gps_pos_store(point,2)],...
-            [lidar_pos_store(point,3) gps_pos_store(point,3)],...
-            'linewidth',3)
-
-    end
-
-    % Plotting the lidar and gps points
-    scatter3(gps_pos_store(1,1),gps_pos_store(1,2),gps_pos_store(1,3),420,'^','MarkerFaceColor','yellow')
-    scatter3(gps_pos_store(end,1),gps_pos_store(end,2),gps_pos_store(end,3),420,'^','MarkerFaceColor','blue')
-    scatter3(gps_pos_store(:,1),gps_pos_store(:,2),gps_pos_store(:,3),50,'^','MarkerFaceColor','magenta')
-    scatter3(lidar_pos_store(:,1),lidar_pos_store(:,2),lidar_pos_store(:,3),50,'^','MarkerFaceColor','cyan')
-
-    % Plotting the point cloud
-    pcshow(pointCloudList);
-
-    view([0 0 90])
+% 
+%     figure
+% 
+%     hold on
+% 
+%     % Plotting the line between the lidar and gps
+%     for point = 1:length(lidar_pos_store)
+% 
+%         plot3([lidar_pos_store(point,1) gps_pos_store(point,1)],...
+%             [lidar_pos_store(point,2) gps_pos_store(point,2)],...
+%             [lidar_pos_store(point,3) gps_pos_store(point,3)],...
+%             'linewidth',3)
+% 
+%     end
+% 
+%     % Plotting the lidar and gps points
+%     scatter3(gps_pos_store(1,1),gps_pos_store(1,2),gps_pos_store(1,3),420,'^','MarkerFaceColor','yellow')
+%     scatter3(gps_pos_store(end,1),gps_pos_store(end,2),gps_pos_store(end,3),420,'^','MarkerFaceColor','blue')
+%     scatter3(gps_pos_store(:,1),gps_pos_store(:,2),gps_pos_store(:,3),50,'^','MarkerFaceColor','magenta')
+%     scatter3(lidar_pos_store(:,1),lidar_pos_store(:,2),lidar_pos_store(:,3),50,'^','MarkerFaceColor','cyan')
+% 
+%     % Plotting the point cloud
+%     pcshow(pointCloudList);
+% 
+%     view([0 0 90])
 
     %% Save the Tform Array
 
