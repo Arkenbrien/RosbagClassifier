@@ -257,7 +257,7 @@ for i = 1:num_pcds
     
 end  % Exporting PCD
 
-close(pcd_bar)
+delete(pcd_bar)
 
 clear i
 
@@ -798,7 +798,10 @@ load(Save_LiDAR_Loc_Filename);
 
 %% Applying Tform to each result
 
-for tform_idx = 1:1:length(classification_list)
+Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
+Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+
+for tform_idx = 1:1:num_pcds
 
     %% Clearing Vars
     
@@ -856,42 +859,54 @@ for tform_idx = 1:1:length(classification_list)
     % Correction factor because reasons (idk it just todd howards)
     rotatez = 90;
     
-    grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-    grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
+    if ~isempty(grav_array_temp)
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        Grav_Append_Array               = [Grav_Append_Array; grav_array_temp];
+    end
     
-    grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-    grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation;
+    if ~isempty(grav_avg_array_temp)
+        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
+        grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation;
+        Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
+    end
     
-    chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-    chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
+    if ~isempty(chip_array_temp)
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        Chip_Append_Array               = [Chip_Append_Array; chip_array_temp];
+    end
     
-    chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-    chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
+    if ~isempty(chip_avg_array_temp)
+        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
+        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
+        Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
+    end
     
-    foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-    foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
+    if ~isempty(foli_array_temp)
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        Foli_Append_Array               = [Foli_Append_Array; foli_array_temp];
+    end
     
-    foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-    foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
+    if ~isempty(foli_avg_array_temp)
+        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
+        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
+        Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
+    end
     
-    gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-    gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
+    if ~isempty(gras_array_temp)
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        Gras_Append_Array               = [Gras_Append_Array; gras_array_temp];
+    end
     
-    gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-    gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation;
-    
-    %% Appending to the Array
+    if ~isempty(gras_avg_array_temp)
+        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
+        gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation;
+        Gras_Avg_Append_Array           = [Gras_Avg_Append_Array; gras_avg_array_temp];
+    end
 
-    Grav_Append_Array               = [Grav_Append_Array; grav_array_temp];
-    Chip_Append_Array               = [Chip_Append_Array; chip_array_temp];
-    Foli_Append_Array               = [Foli_Append_Array; foli_array_temp];
-    Gras_Append_Array               = [Gras_Append_Array; gras_array_temp];
-    
-    Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
-    Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
-    Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
-    Gras_Avg_Append_Array           = [Gras_Avg_Append_Array; gras_avg_array_temp];
-    
     
 end % Going through the transform list
 
