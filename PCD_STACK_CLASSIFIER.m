@@ -6,8 +6,8 @@
 %  In conjuction with Travis Moleski
 %  =====================================================================  %
 
-
 %% Clear & Setup Workspace
+
 clc;
 clear;
 close all;
@@ -48,9 +48,9 @@ Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = 
 
 % Location of rosbag
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-07.bag';
@@ -58,7 +58,7 @@ file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-1
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
 
 % Load the rosbag into the workspace
-bag =  rosbag(file);
+bag = rosbag(file);
 
 %% Getting the file name from list to have a good savename
 
@@ -957,7 +957,6 @@ RESULTS_AVG.grav = Grav_Avg_Append_Array;
 RESULTS_AVG.chip = Chip_Avg_Append_Array;
 RESULTS_AVG.foli = Foli_Avg_Append_Array;
 RESULTS_AVG.gras = Gras_Avg_Append_Array;
-
 
 %% Saving the Results
 
