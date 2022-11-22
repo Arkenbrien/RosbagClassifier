@@ -140,7 +140,7 @@ get_tform(bag, tform_save_folder, ring_min, ring_max)
 %% LiDAR Stuffz
 
 % RPM of the LiDAR    
-RPM                                             = 900;
+RPM                                             = 600;
 
 % Device Model (string): VLP16 VLP32C HDL32E HDL64E VLS128
 device_model                                    = "VLP32C";
@@ -195,7 +195,7 @@ XYZI_TOT                = memory_array_XYZI_TOT;
 
 timing                  = zeros(1,length(velodyne_packets_struct));
 
-num_pcds = length(velodyne_packets_struct);
+num_pcds = length(velodyne_packets_struct) - 3;
 
 %% Extracting PCDs
 % Timing
@@ -287,7 +287,7 @@ pcd_files                  = dir(fullfile(PCD_STACK_FOLDER,'/*.pcd'));
 
 pause_length = 3;
 
-weight_bar = waitbar(0, sprintf('Loading subfolder...'));
+weight_bar = waitbar(0, sprintf('Waisting Your Time...'));
 
 for i = 1:0.1:pause_length
 
@@ -300,7 +300,7 @@ for i = 1:0.1:pause_length
     addpath(CLASSIFICATION_STACK_FOLDER)
     addpath(RESULT_EXPORT_FOLDER)
 
-    waitbar(i / pause_length, weight_bar, sprintf('Loading subfolder...'))
+    waitbar(i / pause_length, weight_bar, sprintf('WAISTing Your Time...'))
 
 end
 
@@ -349,7 +349,7 @@ for class_idx = 1:1:num_pcds
 
     iValues = 1:1:num_loops;
 
-    sprintf('Starting classification of PCD %d out of %d, ~ %0.1f min left', class_idx, num_pcds, est_time_to_complete)
+    sprintf('Starting classification of PCD %d out of %d', class_idx, num_pcds)
     
     parfor_progress(max(iValues));
 
