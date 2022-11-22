@@ -24,8 +24,13 @@ num_quadrants               = 100;
 
 % Basically just a random number (length of x in pcd xyzi / num_channels)
 % representing the number of points in a single 'channel' sweep. No idea if
-% this works brb lol (back it works)
-num_points_per_quadrant     = int32(3615 / num_quadrants);
+% this works brb lol (back it works) - Calculated by dividing the entire
+% number of points in a point cloud by the number of channels
+
+% points_per_channel          = 3615; % 600 RPM
+points_per_channel          = 1808; % 900 RPM
+
+num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
 % The Score (unused atm)
 % class_score_avg = []; guess_score_mean = []; guess_score = [];
@@ -43,14 +48,17 @@ grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; fo
 Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
 Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
+num_points_per_channel_grab = [];
+pcd_class_end = [];
+
 
 %% Loading the ROSBAG
 
 % Location of rosbag
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-07.bag';
@@ -187,11 +195,11 @@ XYZI_TOT                = memory_array_XYZI_TOT;
 
 timing                  = zeros(1,length(velodyne_packets_struct));
 
-%% Loop
+num_pcds = length(velodyne_packets_struct);
+
+%% Extracting PCDs
 % Timing
 %     tic
-
-num_pcds = length(velodyne_packets_struct);
 
 pcd_bar = waitbar(0, sprintf('PCD %d out of %d', i, num_pcds));
 
@@ -228,6 +236,9 @@ for i = 1:num_pcds
         y_append                = [y_append y];
         z_append                = [z_append z];
         int_append              = [int_append int];
+        
+        % Testing Var
+        num_points_per_channel_grab = [num_points_per_channel_grab; length(x)];
         
     end % Extracting data
     
@@ -281,6 +292,13 @@ weight_bar = waitbar(0, sprintf('Loading subfolder...'));
 for i = 1:0.1:pause_length
 
     pause(0.1)
+    
+    % Yes these folders & files exist, Matlab, chill.
+    addpath(root_dir)
+    addpath(tform_save_folder)
+    addpath(PCD_STACK_FOLDER)
+    addpath(CLASSIFICATION_STACK_FOLDER)
+    addpath(RESULT_EXPORT_FOLDER)
 
     waitbar(i / pause_length, weight_bar, sprintf('Loading subfolder...'))
 
@@ -294,10 +312,20 @@ classification_bar = waitbar(0, sprintf('PCD 0 out of %d, ~ X.X min left', num_p
 
 for class_idx = 1:1:num_pcds
     
+    %% Clearing Vars for Safety
+    
+        clear Classification_Result
+
+   %% Overall PCD Timing
+    
     tStart = tic;
     
     %% Loading the PCD
     ptCloudA                    = pcread(pcd_files(class_idx).name);
+    
+    %% Post Load Timing
+    
+    pcd_class_start = tic;
     
     % DEBUG: Viewing the point cloud for confirmation and context.
 %     pcshow(ptCloudA)
@@ -321,7 +349,7 @@ for class_idx = 1:1:num_pcds
 
     iValues = 1:1:num_loops;
 
-    disp('Starting Classification...')
+    sprintf('Starting classification of PCD %d out of %d, ~ %0.1f min left', class_idx, num_pcds, est_time_to_complete)
     
     parfor_progress(max(iValues));
 
@@ -734,6 +762,8 @@ for class_idx = 1:1:num_pcds
 
     end % Classification
     
+    pcd_class_end = [pcd_class_end; toc(pcd_class_start)];
+    
     parfor_progress(0);
 
     disp('Point Cloud Data Classification Complete!')
@@ -753,7 +783,6 @@ for class_idx = 1:1:num_pcds
     
     %% Clearing Vars for Safety
     
-    clear Classification_Result
     
     %% Time to Completion Estimation
     tEnd = toc(tStart);
@@ -763,7 +792,7 @@ for class_idx = 1:1:num_pcds
     
     %% Waitbar
     
-    waitbar(class_idx/num_pcds,classification_bar,sprintf('Cloud %d out of %d, ~ %0.1f min left', class_idx, num_pcds, est_time_to_complete))
+    waitbar(class_idx/num_pcds,classification_bar,sprintf('PCD %d out of %d, ~ %0.1f min left', class_idx, num_pcds, est_time_to_complete))
     
     
 end % Loop of which pcd I'm in
@@ -788,19 +817,19 @@ load(Save_LiDAR_Loc_Filename);
 
 % clear all
 % 
-% time_store = [];
-% grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
-% grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
-% Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
-% Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
-% 
-% 
-% temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
-% CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
-% tform_save_folder               = string(temp_dir) + "/TFORM";
-% classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
-% tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
-% load(tform_file_loc);
+time_store = [];
+grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
+grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
+Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
+Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+
+
+temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
+CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
+tform_save_folder               = string(temp_dir) + "/TFORM";
+classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
+tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
+load(tform_file_loc);
 % 
 % num_pcds = length(classification_list);
 
@@ -864,62 +893,88 @@ for tform_idx = 1:1:num_pcds
     % I supply two types of arrays - one having all the points and one
     % having the average xyz of the points per classified quadrant
     
+    % 1' = 0.3048 m
+    % Test......
+%     corr_trans = 0.3048;
+    corr_trans = 1;
+    
     % Correction factor because reasons (idk it just todd howards)
-    rotatez = 90;
+    corr_z = 90;
     
     if ~isempty(grav_array_temp)
-        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
         Grav_All_Append_Array               = [Grav_All_Append_Array; grav_array_temp];
     end
     
     if ~isempty(grav_avg_array_temp)
-        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-        grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation;
+        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
+        grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
         Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
     end
     
     if ~isempty(chip_array_temp)
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
         Chip_All_Append_Array               = [Chip_All_Append_Array; chip_array_temp];
     end
     
     if ~isempty(chip_avg_array_temp)
-        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
+        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
+        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
         Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
     end
     
     if ~isempty(foli_array_temp)
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
         Foli_All_Append_Array               = [Foli_All_Append_Array; foli_array_temp];
     end
     
     if ~isempty(foli_avg_array_temp)
-        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
+        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
+        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
         Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
     end
     
     if ~isempty(gras_array_temp)
-        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(rotatez);
-        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
         Gras_All_Append_Array               = [Gras_All_Append_Array; gras_array_temp];
     end
     
     if ~isempty(gras_avg_array_temp)
-        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation * rotz(rotatez);
-        gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation;
+        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
+        gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
         Gras_Avg_Append_Array           = [Gras_Avg_Append_Array; gras_avg_array_temp];
     end
 
     
 end % Going through the transform list
 
+%% Grabbing the time of quadrant classification
+
+quadrant_rate = []; quadrant_move_avg = []; move_avg_size = 5;
+
+for rate_idx = 1:1:num_pcds
+    
+    % Do Something
+    load(classification_list(rate_idx).name)
+    
+%     disp(classification_list(rate_idx).name)
+    
+    for result_idx = 1:1:length(Classification_Result)
+        
+        time_time = Classification_Result(result_idx).time;
+        quadrant_rate = [quadrant_rate; time_time];
+        
+    end
+
+end
+
 %% Plotting the results
 
+% All points
 figure
 
 hold all
@@ -933,18 +988,70 @@ axis('equal')
 axis off
 view([0 0 90])
 
+%% Average points
+
 figure
 
 hold all
 
-plot3(Grav_Avg_Append_Array(:,1), Grav_Avg_Append_Array(:,2), Grav_Avg_Append_Array(:,3), 'c.', 'MarkerSize', 3.5)
-plot3(Chip_Avg_Append_Array(:,1), Chip_Avg_Append_Array(:,2), Chip_Avg_Append_Array(:,3), 'k.', 'MarkerSize', 3.5)
-plot3(Foli_Avg_Append_Array(:,1), Foli_Avg_Append_Array(:,2), Foli_Avg_Append_Array(:,3), 'm.', 'MarkerSize', 3.5)
-plot3(Gras_Avg_Append_Array(:,1), Gras_Avg_Append_Array(:,2), Gras_Avg_Append_Array(:,3), 'g.', 'MarkerSize', 3.5)
+plot3(Grav_Avg_Append_Array(:,1), Grav_Avg_Append_Array(:,2), Grav_Avg_Append_Array(:,3), 'c.', 'MarkerSize', 8.5)
+plot3(Chip_Avg_Append_Array(:,1), Chip_Avg_Append_Array(:,2), Chip_Avg_Append_Array(:,3), 'k.', 'MarkerSize', 8.5)
+plot3(Foli_Avg_Append_Array(:,1), Foli_Avg_Append_Array(:,2), Foli_Avg_Append_Array(:,3), 'm.', 'MarkerSize', 8.5)
+plot3(Gras_Avg_Append_Array(:,1), Gras_Avg_Append_Array(:,2), Gras_Avg_Append_Array(:,3), 'g.', 'MarkerSize', 8.5)
 
 axis('equal')
 axis off
 view([0 0 90])
+
+%% Classification Rate Time
+
+max_time            = max(quadrant_rate); %s
+min_time            = min(quadrant_rate); %s
+
+max_Hz              = 1 / min(quadrant_rate); %Hz
+min_Hz              = 1 / max(quadrant_rate); %Hz
+
+quadrant_rate_Hz    =  quadrant_rate.^(-1);
+
+Move_mean_time      = movmean(quadrant_rate, move_avg_size);
+Move_mean_Hz        = movmean(quadrant_rate_Hz, move_avg_size);
+
+figure
+
+hold on
+
+plot(quadrant_rate, 'b')
+plot(Move_mean_time, 'r', 'LineWidth', 3)
+
+hold off
+% axis('equal')
+
+xlabel('Quadrant')
+ylabel('Time (s)')
+
+ylim([ min_time max_time])
+
+% legend({{'Classification Time'},{'Moving Average'}})
+
+hold off
+
+% Classification Rate Hz
+
+figure
+
+hold all
+
+plot(quadrant_rate_Hz, 'b')
+plot(Move_mean_Hz, 'r', 'LineWidth', 3)
+
+% axis('equal')
+
+xlabel('Quadrant')
+ylabel('Hz')
+
+% legend({{'Hz'},{'Moving Average'}})
+
+hold off
 
 %% Creating result structs
 
@@ -958,6 +1065,9 @@ RESULTS_AVG.chip = Chip_Avg_Append_Array;
 RESULTS_AVG.foli = Foli_Avg_Append_Array;
 RESULTS_AVG.gras = Gras_Avg_Append_Array;
 
+RESULTS_RATE.quadrant_rate = quadrant_rate;
+
+
 %% Saving the Results
 
 Save_All_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/ALL_RESULTS.mat";
@@ -969,3 +1079,4 @@ save(Save_Avg_Results_Filename, 'RESULTS_AVG');
 %% End program
 
 disp('End Program!')
+

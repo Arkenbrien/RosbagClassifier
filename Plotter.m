@@ -5,9 +5,9 @@
 %  By Rhett Huston
 %  =====================================================================  %
 
-clear all;
-close all;
-clc;
+% clear all;
+% close all;
+% clc;
 
 %% Requesting user for file
 
@@ -25,15 +25,17 @@ load(Save_Avg_Results_Filename);
 
 %% Creating result structs
 
-RESULTS_ALL.grav = Grav_All_Append_Array;
-RESULTS_ALL.chip = Chip_All_Append_Array;
-RESULTS_ALL.foli = Foli_All_Append_Array;
-RESULTS_ALL.gras = Gras_All_Append_Array;
+Grav_All_Append_Array = RESULTS_ALL.grav;
+Chip_All_Append_Array = RESULTS_ALL.chip;
+Foli_All_Append_Array = RESULTS_ALL.foli;
+Gras_All_Append_Array = RESULTS_ALL.gras;
 
-RESULTS_AVG.grav = Grav_Avg_Append_Array;
-RESULTS_AVG.chip = Chip_Avg_Append_Array;
-RESULTS_AVG.foli = Foli_Avg_Append_Array;
-RESULTS_AVG.gras = Gras_Avg_Append_Array;
+Grav_Avg_Append_Array = RESULTS_AVG.grav;
+Chip_Avg_Append_Array = RESULTS_AVG.chip;
+Foli_Avg_Append_Array = RESULTS_AVG.foli;
+Gras_Avg_Append_Array = RESULTS_AVG.gras;
+
+% quadrant_rate = RESULTS_RATE.quadrant_rate;
 
 %% Plotting Results
 
