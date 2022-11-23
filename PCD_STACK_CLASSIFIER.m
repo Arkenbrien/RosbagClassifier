@@ -55,8 +55,8 @@ pcd_class_end = [];
 %% Loading the ROSBAG
 
 % Location of rosbag
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
@@ -813,24 +813,24 @@ load(Save_Tform_Filename);
 load(Save_Gps_Loc_Filename);
 load(Save_LiDAR_Loc_Filename);
 
-%% Temp Debuging Thing
+%% Temp Debuging Thing COMMENT THIS THING OUT YOU FOOLISH FOOL YOU
 
-% clear all
+% % clear all
+% % 
+% time_store = [];
+% grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
+% grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
+% Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
+% Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 % 
-time_store = [];
-grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
-grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
-Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
-Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
-
-
-temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
-CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
-tform_save_folder               = string(temp_dir) + "/TFORM";
-classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
-tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
-load(tform_file_loc);
 % 
+% temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
+% CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
+% tform_save_folder               = string(temp_dir) + "/TFORM";
+% classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
+% tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
+% load(tform_file_loc);
+% % 
 % num_pcds = length(classification_list);
 
 %% Applying Tform to each result
