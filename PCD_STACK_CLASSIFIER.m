@@ -27,8 +27,8 @@ num_quadrants               = 100;
 % this works brb lol (back it works) - Calculated by dividing the entire
 % number of points in a point cloud by the number of channels
 
-% points_per_channel          = 3615; % 600 RPM
-points_per_channel          = 1808; % 900 RPM
+points_per_channel          = 3615; % 600 RPM
+% points_per_channel          = 1808; % 900 RPM
 
 num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
@@ -56,7 +56,7 @@ pcd_class_end = [];
 
 % Location of rosbag
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
@@ -64,6 +64,9 @@ file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-1
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-07.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-42.bag';
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
+
 
 % Load the rosbag into the workspace
 bag = rosbag(file);
@@ -974,6 +977,12 @@ end
 
 %% Plotting the results
 
+x_min_lim = min([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
+x_max_lim = max([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
+
+y_min_lim = min([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
+y_max_lim = max([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
+
 % All points
 figure
 
@@ -987,6 +996,9 @@ plot3(Gras_All_Append_Array(:,1), Gras_All_Append_Array(:,2), Gras_All_Append_Ar
 axis('equal')
 axis off
 view([0 0 90])
+
+xlim([x_min_lim x_max_lim]);
+ylim([y_min_lim y_max_lim]);
 
 %% Average points
 
@@ -1002,6 +1014,9 @@ plot3(Gras_Avg_Append_Array(:,1), Gras_Avg_Append_Array(:,2), Gras_Avg_Append_Ar
 axis('equal')
 axis off
 view([0 0 90])
+
+xlim([x_min_lim x_max_lim]);
+ylim([y_min_lim y_max_lim]);
 
 %% Classification Rate Time
 
