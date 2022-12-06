@@ -118,6 +118,12 @@ tform_save_folder           = string(root_dir) + "/TFORM";
 mkdir(tform_save_folder);
 addpath(tform_save_folder);
 
+%% Creating Combined PCD Export
+
+COMPILED_PCD_FOLDER = string(root_dir) + "/COMPILED_PCD";
+mkdir(COMPILED_PCD_FOLDER);
+addpath(COMPILED_PCD_FOLDER);
+
 %% Creating PCD Stack export
 
 PCD_STACK_FOLDER = string(root_dir) + "/PCD_STACK";
@@ -139,6 +145,10 @@ addpath(RESULT_EXPORT_FOLDER);
 %% Grabbing Tform
 
 get_tform(bag, tform_save_folder, ring_min, ring_max)
+
+%% Creating Combined PCD
+
+make_combined_pcd(bag, COMPILED_PCD_FOLDER) 
 
 %% LiDAR Stuffz
 
@@ -288,7 +298,7 @@ pcd_files                  = dir(fullfile(PCD_STACK_FOLDER,'/*.pcd'));
 %% Pausing so that stupid matlab can recognize that a stupid folder exists
 % why matlab why
 
-pause_length = 3;
+pause_length = 5;
 
 weight_bar = waitbar(0, sprintf('Waisting Your Time...'));
 
@@ -957,7 +967,7 @@ end % Going through the transform list
 
 %% Grabbing the time of quadrant classification
 
-quadrant_rate = []; quadrant_move_avg = []; move_avg_size = 5;
+quadrant_rate = []; move_avg_size = 5;
 
 for rate_idx = 1:1:num_pcds
     
@@ -1000,6 +1010,9 @@ view([0 0 90])
 xlim([x_min_lim x_max_lim]);
 ylim([y_min_lim y_max_lim]);
 
+    l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+
 %% Average points
 
 figure
@@ -1017,6 +1030,9 @@ view([0 0 90])
 
 xlim([x_min_lim x_max_lim]);
 ylim([y_min_lim y_max_lim]);
+
+    l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
 
 %% Classification Rate Time
 
@@ -1038,6 +1054,9 @@ hold on
 plot(quadrant_rate, 'b')
 plot(Move_mean_time, 'r', 'LineWidth', 3)
 
+ l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+
 hold off
 % axis('equal')
 
@@ -1046,7 +1065,6 @@ ylabel('Time (s)')
 
 ylim([ min_time max_time])
 
-% legend({{'Classification Time'},{'Moving Average'}})
 
 hold off
 
@@ -1064,7 +1082,9 @@ plot(Move_mean_Hz, 'r', 'LineWidth', 3)
 xlabel('Quadrant')
 ylabel('Hz')
 
-% legend({{'Hz'},{'Moving Average'}})
+
+ l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
 
 hold off
 

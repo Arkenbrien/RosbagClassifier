@@ -16,52 +16,38 @@ clear all
 close all
 clc
 
-%% Loading Point Cloud
+%% Requesting user for file
+
+root_dir = uigetdir();
+
+%% Creating Export Location
+
+MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
+mkdir(MANUAL_CLASSIFICATION_FOLDER);
+addpath(MANUAL_CLASSIFICATION_FOLDER);
+
+
+%% Loading point cloud
 
 disp('Loading PCD...')
 
-% %Setting the import folder location
-% [pcd_file, pcd_path]        = uigetfile('/media/autobuntu/chonk/chonk/DATA/*.pcd','Grab PCD file');
-% 
-% %Setting Full File Path
-% pointcloud_obj              = fullfile(pcd_path,pcd_file);
-% 
-% ptCloudSource               = pcread(pointcloud_obj);
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/DATA/MATLAB_PCD_EXPORT/lidar2Geo_export/2022-10-11-09-31-55/2022-10-11-09-31-55_min5_max25_fullpcd.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/DATA/MATLAB_PCD_EXPORT/lidar2Geo_export/coach_sturbois/sorted_sturbois_straight.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_straight_gravel.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_straight_gravel.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_training_curve.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_chipseal_woods_5.ply');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_curve_1_all.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/2022-10-20-10-17-06_CHIP_ALL_for_grass.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/2022-10-20-10-13-35_GRAV_ALL_foliage.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/2022-10-20-16-56-40_GRAV.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/sturbois_straight_1_all.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/PCD_RDF_Classifier/2022-10-11-09-28-18_Shortened_Sims.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/shortened_simms_2022_10_11_09_33_39.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/2022-10-20-10-13-35_GRAV.pcd');
-% ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/2022-10-20-1 1-15-07_GRAV_PRESENTAKSJDLF.pcd');
+Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD.pcd";
 
-ptCloudSource = pcread('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/ROSBAG_2022-10-11-09-28-18_20225823091158/COMPILED_PCD/2022-10-11-09-28-18.pcd');
+ptCloudSource = pcread(Combined_Pcd_File);
 
 ptCloudSource_figure = figure('Name','pcd','NumberTitle','off');
 pcshow(ptCloudSource)
 axis equal
 view([0 0 90])
 
-%% Selecting Export Location
-
-% export_dir = '/media/autobuntu/chonk/chonk/DATA/MATLAB_PCD_EXPORT/lidar2Geo_export/2022-10-11-09-31-55/';
-
 %% Var Init
 
-grav_ind = 1;
-chip_ind = 1;
-gras_ind = 1;
-foli_ind = 1;
-non_road_ind = 1;
-road_ind = 1;
+grav_ind        = 1;
+chip_ind        = 1;
+gras_ind        = 1;
+foli_ind        = 1;
+non_road_ind    = 1;
+road_ind        = 1;
 
 %% Selecting ROIs
 
@@ -298,19 +284,7 @@ if non_road_ind ~= 1
     Manual_Classfied_Areas.non_road_roi = non_road_roi;
 end
 
-name_ans        = inputdlg({'Enter File Name:'}, 'Filename', [1 35], {'Filename'});
-name_ans        = string(name_ans{:});
-
-% save_name       = string(name_ans);
-
-export_dir      = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT','Grab Classification Export Directory');
-addpath(export_dir)
-
-disp('Saving data...')
-time_now        = datetime("now","Format","uuuuMMddhhmmss");
-time_now        = datestr(time_now,'yyyyMMddhhmmss');
-
-Filename        = string(export_dir) + "/Manual_Classified_PCD_" + name_ans + ".mat";
+Filename        = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
 save(Filename, 'Manual_Classfied_Areas')
 
 disp('End Program!')
