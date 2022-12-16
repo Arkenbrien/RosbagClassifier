@@ -3,7 +3,7 @@
 %
 %                     FILE CREATION DATE: 10/11/2022
 %
-%                             PC Manual Area Classifier
+%                       PC Manual Area Classifier
 %
 % This program looks loads a point cloud and asks to select areas that are
 % of a desired terrain type. The areas are stored in a .mat file.
@@ -63,7 +63,6 @@ road_ind        = 1;
 % can be visually seen
 % If finished, break
 % Save the structures to a single .mat file
-
 
 while true
 
@@ -284,8 +283,21 @@ if non_road_ind ~= 1
     Manual_Classfied_Areas.non_road_roi = non_road_roi;
 end
 
-Filename        = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
-save(Filename, 'Manual_Classfied_Areas')
+save_ans = questdlg('Save?', 'Save?', 'Yes', 'No', 'Yes');
+
+switch save_ans
+
+    case 'Yes'
+        
+        disp('Saving File')
+        Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
+        save(Filename, 'Manual_Classfied_Areas')
+        
+    case 'No'
+
+        disp('Not Saving File')
+
+end
 
 disp('End Program!')
 
