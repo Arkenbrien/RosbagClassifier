@@ -11,10 +11,10 @@
 %==========================================================================
 
 %% Clear Workspace
-
-clear all
-close all
-clc
+% 
+% clear all
+% close all
+% clc
 
 %% Requesting user for file
 
@@ -26,12 +26,11 @@ MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
 mkdir(MANUAL_CLASSIFICATION_FOLDER);
 addpath(MANUAL_CLASSIFICATION_FOLDER);
 
-
 %% Loading point cloud
 
 disp('Loading PCD...')
 
-Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD.pcd";
+Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD_SMALL.pcd";
 
 ptCloudSource = pcread(Combined_Pcd_File);
 
@@ -298,6 +297,10 @@ switch save_ans
         disp('Not Saving File')
 
 end
+
+%% End Program
+
+close all
 
 disp('End Program!')
 

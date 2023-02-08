@@ -2,3 +2,4 @@
 /TEMP*
 *.asv
 parfor_progress.txt
+/CLASSIFICATION_RESULTS

@@ -33,6 +33,18 @@ if exist(MANUAL_CLASSIFICATION_FILE) == 2
     
 end
 
+%% Creating Image Export Location
+
+IMAGE_EXPORT_FOLDER = string(root_dir) + "/IMAGE_EXPORT";
+
+if ~exist(IMAGE_EXPORT_FOLDER, 'dir')
+    
+    mkdir(IMAGE_EXPORT_FOLDER);
+    
+end
+
+addpath(IMAGE_EXPORT_FOLDER);
+
 %% Creating result structs
 
 % All
@@ -79,7 +91,7 @@ end
 
 %% Plotting Results
 
-figure
+result_all_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1500 1500])
 
 hold all
 
@@ -92,11 +104,12 @@ axis('equal')
 axis off
 view([0 0 90])
 
-    l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-    l.Interpreter = 'tex';
+l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'best' );
+l.Interpreter = 'tex';
 
+hold off
 
-figure
+result_avg_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1500 1500])
 
 hold all
 
@@ -109,15 +122,16 @@ axis('equal')
 axis off
 view([0 0 90])
 
-    l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-    l.Interpreter = 'tex';
+l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
 
+hold off
 
 %% Classification Rate Time
 
 if  isfield(RESULTS_ALL, 'quadrant_rate')
     
-    figure('DefaultAxesFontSize',14)
+    rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 400 1000])
     
     hold on
     
@@ -143,7 +157,7 @@ end
 
 if  isfield(RESULTS_ALL, 'quadrant_rate')
     
-    figure('DefaultAxesFontSize',14)
+    hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 400 1000])
     
     hold all
     
@@ -165,7 +179,7 @@ end
 
 %% Manual Classification Areas
 
-if exist(MANUAL_CLASSIFICATION_FILE) == 2
+if exist(MANUAL_CLASSIFICATION_FILE, 'dir') == 2
     
     Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD.pcd";
     
@@ -268,9 +282,34 @@ if exist(MANUAL_CLASSIFICATION_FILE) == 2
     
 end
 
+%% Saving Figures
 
+try
+    
+    saveas(result_all_fig, string(IMAGE_EXPORT_FOLDER) + '/result_all_fig.png', 'png');
+    saveas(result_avg_fig, string(IMAGE_EXPORT_FOLDER) + '/result_avg_fig.png', 'png');
+    
+end
 
+try
+    saveas(rate_results_fig, string(IMAGE_EXPORT_FOLDER) + '/rate_results_fig.png', 'png');
+    saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.png', 'png');
+    
+catch
+    
+    disp('No timing data to plot')
+    
+end
 
+try
+    
+    saveas(ptCloudSource_figure, string(IMAGE_EXPORT_FOLDER) + '/ptCloudSource_figure.png', 'png');
+    
+catch
+    
+    disp('No Manual Classified areas to plot')
+    
+end
 
 %% End Program
 

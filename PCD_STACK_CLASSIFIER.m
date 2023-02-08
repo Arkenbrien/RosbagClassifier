@@ -4,6 +4,7 @@
 %  Created on 11/17/2022
 %  By Rhett Huston
 %  In conjuction with Travis Moleski
+%  Programmed with a IBM Model M keyboard :D
 %  =====================================================================  %
 
 %% Clear & Setup Workspace
@@ -13,60 +14,176 @@ clear;
 close all;
 format compact
 
-%% Var Inits
+%% OPTIONS
 
-ring_min = 29;
+% Rdf to load
+% THE FIVE
+rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
+% rdf_load_string = 'MLS_ZXY_50D_41Tree'; % ZXY
+% rdf_load_string = 'RAN_ALL_100D_46Tree'; % RAN ALL
+% rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
+% rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
+% rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
+
+% Feature to use: MUST USE THE SAME FEATURES AS RDF!!!
+% NOTE: RAN ZXY & MLS ZXY = same, RAN RANGE & MLS RANGE same. Planes are
+% not projected. Naming scheme fail, however beause of how baggin works
+% there are slight differences in the algorithms.
+dlg_list                            = {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
+[indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'ListSize', [250 250], 'SelectionMode','single');
+
+% Rings go from 0-31, with 0 being the highest elevation channel, 31 being
+% the lowest.
+ring_min = 30;
 ring_max = 31;
 
-% Num """splits""" that will be analized. It is estimated that there are
-% 3615 points in a 360 degree sweep (600 RPM).
+% Making combined PCD with only the desired rings
+rings = [4 2];
+
+% Num quadrants that will be be examined in a single 360 sweep per channel
 num_quadrants               = 100;
 
 % Basically just a random number (length of x in pcd xyzi / num_channels)
 % representing the number of points in a single 'channel' sweep. No idea if
 % this works brb lol (back it works) - Calculated by dividing the entire
-% number of points in a point cloud by the number of channels
-
+% number of points in a point cloud by the number of channels. This number
+% is very consistant so it works 99.9999% of the time.
 points_per_channel          = 3615; % 600 RPM
 % points_per_channel          = 1808; % 900 RPM
 
 num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
-% The Score (unused atm)
-% class_score_avg = []; guess_score_mean = []; guess_score = [];
+% Moving Averge size
+move_avg_size = 30;
 
-% Number of feats tracked - TEST VAR (unused atm)
-% num_feats                   = 3;
+% Close all figs at end
+close_figs_bool = 1;
 
-% Confidence Minimum (unused atm)
-% conf_min                    = 0.80;
+%% Determining the plane projection method based off the RDF selection
+if indx_dlg_list == 1 || indx_dlg_list == 2 
+    ran_proj = 1;
+    mls_proj = 0;
+elseif indx_dlg_list == 3 || indx_dlg_list == 4 
+    mls_proj = 1;
+    ran_proj = 0;
+elseif indx_dlg_list == 5 || indx_dlg_list == 6
+    ran_proj = 0;
+    mls_proj = 0;
+end
 
+%% Var Inits
 % Random array inits
+grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
+grav_avg_array_temp     = []; chip_avg_array_temp   = []; gras_avg_array_temp   = []; foli_avg_array_temp   = [];
+Grav_All_Append_Array   = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
+Grav_Avg_Append_Array   = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+
+% Diagnostics array
 time_store = [];
-grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
-grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
-Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
-Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
-
-num_points_per_channel_grab = [];
-pcd_class_end = [];
-
+num_points_per_channel_grab = []; 
+size_xyzi = [];
+pcd_class_end = []; 
+plane_proj_time = []; 
+rdf_time_store = []; 
+to_struct_time = [];
+quadrant_rate = []; 
+feat_grab_time = [];
 
 %% Loading the ROSBAG
 
 % Location of rosbag
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-07.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/2022-10-14-14-31-42.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+num_quadrants               = 100;
 
+% Basically just a random number (length of x in pcd xyzi / num_channels)
+% representing the number of points in a single 'channel' sweep. No idea if
+% this works brb lol (back it works) - Calculated by dividing the entire
+% number of points in a point cloud by the number of channels. This number
+% is very consistant so it works 99.9999% of the time.
+points_per_channel          = 3615; % 600 RPM
+% points_per_channel          = 1808; % 900 RPM
+
+num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
+
+% Moving Averge size
+move_avg_size = 30;
+
+% Close all figs at end
+close_figs_bool = 1;
+
+%% Determining the plane projection method based off the RDF selection
+if indx_dlg_list == 1 || indx_dlg_list == 2 
+    ran_proj = 1;
+    mls_proj = 0;
+elseif indx_dlg_list == 3 || indx_dlg_list == 4 
+    mls_proj = 1;
+    ran_proj = 0;
+elseif indx_dlg_list == 5 || indx_dlg_list == 6
+    ran_proj = 0;
+    mls_proj = 0;
+end
+
+%% Var Inits
+% Random array inits
+grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
+grav_avg_array_temp     = []; chip_avg_array_temp   = []; gras_avg_array_temp   = []; foli_avg_array_temp   = [];
+Grav_All_Append_Array   = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
+Grav_Avg_Append_Array   = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+
+% Diagnostics array
+time_store = [];
+num_points_per_channel_grab = []; 
+size_xyzi = [];
+pcd_class_end = []; 
+plane_proj_time = []; 
+rdf_time_store = []; 
+to_struct_time = [];
+quadrant_rate = []; 
+feat_grab_time = [];
+
+%% Loading the ROSBAG
+
+% Location of rosbag
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_woods_4.bag';
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag'; % NOTE: Woods 3 is borked!
+
+% THE SIX ROSBAGS
+% Chipseal
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
+
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
+
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+
+% Gravel
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+
+% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
+
+% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
 
 % Load the rosbag into the workspace
 bag = rosbag(file);
@@ -78,28 +195,8 @@ bag = rosbag(file);
 %% Loading RDF
 
 disp('Loading RDF...')
-% load(rdf_file)
-% load('RDF_10_20_2022_10TREES.mat');
-% load('RDF_10_20_2022_142TREES.mat');
-% load('RDF_Spat.mat');
-% load('RDF_Remi.mat');
-load('RDF_Both.mat');
+load(rdf_load_string);
 disp('RDF Loaded!')
-
-%% Creating the feat list
-
-% There's a better way to do this but this works so as long as it works I'm
-% not going to complain too much about it.
-
-disp('Load Feature List...')
-
-load('feat_list.mat');
-
-feat_list_pre_export        = {feat_list.S; feat_list.R};
-
-feat_list_export            = cat(1, feat_list_pre_export{:});
-
-disp('Feature List Loaded!')
 
 %% Creating ROOT Directory
 
@@ -107,7 +204,7 @@ disp('Feature List Loaded!')
 time_now                    = datetime("now","Format","uuuuMMddhhmmss");
 time_now                    = datestr(time_now,'yyyyMMddhhmmss');
 
-root_dir = "ROSBAG_" + string(rosbag_name) + "_" + string(time_now);
+root_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/" + string(rdf_load_string) + "_" + string(num_quadrants) + "_RB_" + string(rosbag_name) + "_" + string(time_now);
 
 mkdir(root_dir)
 addpath(root_dir)
@@ -142,6 +239,12 @@ RESULT_EXPORT_FOLDER = string(root_dir) + "/RESULT_EXPORT";
 mkdir(RESULT_EXPORT_FOLDER);
 addpath(RESULT_EXPORT_FOLDER);
 
+%% Creating Image Export Location
+
+IMAGE_EXPORT_FOLDER = string(root_dir) + "/IMAGE_EXPORT";
+mkdir(IMAGE_EXPORT_FOLDER);
+addpath(IMAGE_EXPORT_FOLDER);
+
 %% Grabbing Tform
 
 get_tform(bag, tform_save_folder, ring_min, ring_max)
@@ -149,6 +252,10 @@ get_tform(bag, tform_save_folder, ring_min, ring_max)
 %% Creating Combined PCD
 
 make_combined_pcd(bag, COMPILED_PCD_FOLDER) 
+
+%% Creating Combined PCD with desired rings
+
+make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
 
 %% LiDAR Stuffz
 
@@ -209,6 +316,9 @@ XYZI_TOT                = memory_array_XYZI_TOT;
 timing                  = zeros(1,length(velodyne_packets_struct));
 
 num_pcds = length(velodyne_packets_struct) - 3;
+
+% Temp limiter for testing
+% num_pcds = 5;
 
 %% Extracting PCDs
 % Timing
@@ -302,9 +412,9 @@ pause_length = 5;
 
 weight_bar = waitbar(0, sprintf('Waisting Your Time...'));
 
-for i = 1:0.1:pause_length
+for i = 1:1:pause_length
 
-    pause(0.1)
+    pause(1)
     
     % Yes these folders & files exist, Matlab, chill.
     addpath(root_dir)
@@ -327,7 +437,7 @@ for class_idx = 1:1:num_pcds
     
     %% Clearing Vars for Safety
     
-        clear Classification_Result
+    clear Classification_Result
 
    %% Overall PCD Timing
     
@@ -336,10 +446,8 @@ for class_idx = 1:1:num_pcds
     %% Loading the PCD
     ptCloudA                    = pcread(pcd_files(class_idx).name);
     
-    %% Post Load Timing
-    
-    pcd_class_start = tic;
-    
+    %% Post Load Timing & Debuging Point Cloud
+
     % DEBUG: Viewing the point cloud for confirmation and context.
 %     pcshow(ptCloudA)
 %     view([0 0 90])
@@ -347,14 +455,46 @@ for class_idx = 1:1:num_pcds
 %     pause
 %     close all
 %     disp('Continuing!')
+        
+    pcd_class_start = tic;
     
-    %% RANSAC - MATLAB
-    maxDistance                 = 0.1;
-    model                       = pcfitplane(ptCloudA, maxDistance);
-    a                           = model.Parameters(1);
-    b                           = model.Parameters(2);
-    c                           = model.Parameters(3);
-    d                           = model.Parameters(4);
+    %% Plane Projection
+    
+    % RANSAC
+    if ran_proj
+        
+        maxDistance                 = 0.1;
+        model                       = pcfitplane(ptCloudA, maxDistance);
+        a                           = model.Parameters(1);
+        b                           = model.Parameters(2);
+        c                           = model.Parameters(3);
+        d                           = model.Parameters(4);
+        
+        plane_proj_time = [plane_proj_time; toc(pcd_class_start)];
+        
+        abcd = [a, b, c, d];
+        
+    end
+    
+    % MLS
+    if mls_proj
+        
+        x_ptA                       = ptCloudA.Location(:,1);
+        y_ptA                       = ptCloudA.Location(:,2);
+        z_ptA                       = ptCloudA.Location(:,3);
+        xyz_mll                     = [x_ptA y_ptA z_ptA];
+        fobjPlane                   = planarFit(xyz_mll(isfinite(xyz_mll(:,1)), :)');
+        
+        a = fobjPlane.a;
+        b = fobjPlane.b;
+        c = fobjPlane.c;
+        d = fobjPlane.d;
+        
+        plane_proj_time = [plane_proj_time; toc(pcd_class_start)];
+        
+        abcd = [a, b, c, d];
+        
+    end
     
     %% Doing the Classification
 
@@ -391,6 +531,8 @@ for class_idx = 1:1:num_pcds
         xyzi = [x_array_B y_array_B z_array_B intensity];
         xyzi = xyzi( ~any( isnan(xyzi) | isinf(xyzi), 2), : );
         xyzi(any(xyzi == 0, 2), :) = [];
+        
+        size_xyzi = [size_xyzi; length(xyzi(:,1))];
 
         % Debug output........
     %     disp('made it before the if statement')
@@ -405,346 +547,51 @@ for class_idx = 1:1:num_pcds
     %         disp('made it into the if statement')
     %         disp([length(x_array_B) length(y_array_B) length(z_array_B) length(intensity)])
 
-            %% XYDist / Range ratio factor
-
-            xy_dist                     = sqrt(mean(xyzi(:,1))^2 + mean(xyzi(:,2))^2);
-            range                       = sqrt((xyzi(:,1)).^2 + (xyzi(:,2)).^2 + (xyzi(:,3)).^2);
-            range_mean                  = mean(range);
-
-            %% Height Props
-
-            % Getting height Properties
-            h_num                       = abs((a * xyzi(:,1)) + (b *  xyzi(:,2)) + (c *  xyzi(:,3)) - d);
-            h_dem                       = sqrt(a^2 + b^2 + c^2);
-            height                      = h_num / h_dem;
-
-            %% Z Props
-
-            Z                           = xyzi(:,3);
-
-           %% Safety for Shapiro Wilks freaking out about stuff being the same
-
-               % Catch for shaprio wilks balking at non-varying values - fix later?
-            if sum(double(intensity)) / length(double(intensity)) == mean(double(intensity))
-                intensity(1) = intensity(1) + 1;
-            end
-            if sum(height) / length(height) == mean(height)
-                height(1) = height(1) + 0.001;
-            end
-
             %% Feat Extract
-
-            StandDevHeight              = double(std(height));
-            MeanHeight                  = double(mean(height));
-            MinHeight                   = double(min(height));
-            MaxHeight                   = double(max(height));
-            MedHeight                   = double(median(height));
-            RoughnessHeight             = double(MaxHeight - MinHeight);
-            MinMaxRatioHeight           = double(MinHeight / MaxHeight);
-            Min2MaxRatioHeight          = double(MinHeight^2 / MaxHeight);
-            MagGradientHeight           = double(sqrt(sum(gradient(height).^2)));
-
-            StandDevHeightXYDist        = double(std(height) / xy_dist);
-            MeanHeightXYDist            = double(mean(height) / xy_dist);
-            MinHeightXYDist             = double(min(height) / xy_dist);
-            MaxHeightXYDist             = double(max(height) / xy_dist);
-            MedHeightXYDist             = double(median(height) / xy_dist);
-            RoughnessHeightXYDist       = double(MaxHeightXYDist - MinHeightXYDist);
-            MinMaxRatioHeightXYDist     = double(MinHeightXYDist / MaxHeightXYDist);
-            Min2MaxRatioHeightXYDist    = double(MinHeightXYDist^2 / MaxHeightXYDist);
-            MagGradientHeightXYDist     = double(sqrt(sum(gradient(height).^2)) / xy_dist);
-
-            StandDevHeightRange         = double(std(height) / range_mean);
-            MeanHeightRange             = double(mean(height) / range_mean);
-            MinHeightRange              = double(min(height) / range_mean);
-            MaxHeightRange              = double(max(height) / range_mean);
-            MedHeightRange              = double(median(height) / range_mean);
-            RoughnessHeightRange        = double(MaxHeightRange - MinHeightRange);
-            MinMaxRatioHeightRange      = double(MinHeightRange / MaxHeightRange);
-            Min2MaxRatioHeightRange     = double(MinHeightRange^2 / MaxHeightRange);
-            MagGradientHeightRange      = double(sqrt(sum(gradient(height).^2)) / range_mean);
-
-            % Getting RANGE Spatial Properties
-
-            StandDevRange               = double(std(range));
-            MeanRange                   = double(mean(range));
-            MinRange                    = double(min(range));
-            MaxRange                    = double(max(range));
-            MedRange                    = double(median(range));
-            RoughnessRange              = double(MaxRange - MinRange);
-            MinMaxRatioRange            = double(MinRange / MaxRange);
-            Min2MaxRatioRange           = double(MinRange^2 / MaxRange);
-            MagGradientRange            = double(sqrt(sum(gradient(range).^2)));
-
-            StandDevRangeXYDist         = double(std(range) / xy_dist);
-            MeanRangeXYDist             = double(mean(range) / xy_dist);
-            MinRangeXYDist              = double(min(range) / xy_dist);
-            MaxRangeXYDist              = double(max(range) / xy_dist);
-            MedRangeXYDist              = double(median(range) / xy_dist);
-            RoughnessRangeXYDist        = double(MaxRangeXYDist - MinRangeXYDist);
-            MinMaxRatioRangeXYDist      = double(MinRangeXYDist / MaxRangeXYDist);
-            Min2MaxRatioRangeXYDist     = double(MinRangeXYDist^2 / MaxRangeXYDist);
-            MagGradientRangeXYDist      = double(sqrt(sum(gradient(range).^2)) / xy_dist);
-
-            StandDevRangeRange          = double(std(range) / range_mean);
-            MeanRangeRange              = double(mean(range) / range_mean);
-            MinRangeRange               = double(min(range) / range_mean);
-            MaxRangeRange               = double(max(range) / range_mean);
-            MedRangeRange               = double(median(range) / range_mean);
-            RoughnessRangeRange         = double(MaxRangeRange - MinRangeRange);
-            MinMaxRatioRangeRange       = double(MinRangeRange / MaxRangeRange);
-            Min2MaxRatioRangeRange      = double(MinRangeRange^2 / MaxRangeRange);
-            MagGradientRangeRange       = double(sqrt(sum(gradient(range).^2)) / range_mean);
-
-            % Getting Height from the Zero plane (literally just z lol)
-
-            StandDevZ                   = double(std(Z));
-            MeanZ                       = double(mean(Z));
-            MinZ                        = double(min(Z));
-            MaxZ                        = double(max(Z));
-            MedZ                        = double(median(Z));
-            RoughnessZ                  = double(MaxZ - MinZ);
-            MinMaxRatioZ                = double(MinZ / MaxZ);
-            Min2MaxRatioZ               = double(MinZ^2 / MaxZ);
-            MagGradientZ                = double(sqrt(sum(gradient(Z).^2)));
-
-            StandDevZXYDist             = double(std(Z) / xy_dist);
-            MeanZXYDist                 = double(mean(Z) / xy_dist);
-            MinZXYDist                  = double(min(Z) / xy_dist);
-            MaxZXYDist                  = double(max(Z) / xy_dist);
-            MedZXYDist                  = double(median(Z) / xy_dist);
-            RoughnessZXYDist            = double(MaxZXYDist - MinZXYDist);
-            MinMaxRatioZXYDist          = double(MinZXYDist / MaxZXYDist);
-            Min2MaxRatioZXYDist         = double(MinZXYDist^2 / MaxZXYDist);
-            MagGradientZXYDist          = double(sqrt(sum(gradient(Z).^2)) / xy_dist);
-
-            StandDevZRange              = double(std(Z) / range_mean);
-            MeanZRange                  = double(mean(Z) / range_mean);
-            MinZRange                   = double(min(Z) / range_mean);
-            MaxZRange                   = double(max(Z) / range_mean);
-            MedZRange                   = double(median(Z) / range_mean);
-            RoughnessZRange             = double(MaxZRange - MinZRange);
-            MinMaxRatioZRange           = double(MinZRange / MaxZRange);
-            Min2MaxRatioZRange          = double(MinZRange^2 / MaxZRange);
-            MagGradientZRange           = double(sqrt(sum(gradient(Z).^2)) / range_mean);
-
-            % I don't actually use this but it's here just in case
-%             % Shaprio-Wilks - Height
-%             [H, pValue, W] = swtest_fun(single(height), 0.05);
-% 
-%             SwHHeight                   = H;
-%             SwpValueHeight              = pValue;
-%             SwWHeight                   = W;
-% 
-%             % Shaprio-Wilks - Range
-%             [H, pValue, W] = swtest_fun(single(range), 0.05);
-% 
-%             SwHRange                    = H;
-%             SwpValueRange               = pValue;
-%             SwWRange                    = W;
-% 
-%             % Shaprio-Wilks - Z
-%             [H, pValue, W] = swtest_fun(single(range), 0.05);
-% 
-%             SwHZ                        = H;
-%             SwpValueZ                   = pValue;
-%             SwWZ                        = W;
-
-            % Shaprio-Wilks - Height
-
-            SwHHeight                   = 0;
-            SwpValueHeight              = 0;
-            SwWHeight                   = 0;
-
-            % Shaprio-Wilks - Range
-
-            SwHRange                    = 0;
-            SwpValueRange               = 0;
-            SwWRange                    = 0;
-
-            % Shaprio-Wilks - Z
-
-            SwHZ                        = 0;
-            SwpValueZ                   = 0;
-            SwWZ                        = 0;
-
-            %% REMISION FEATURES CALCULATED AND SAVED
-
-            StandDevInt                 = double(std(intensity));
-            MeanInt                     = double(mean(intensity));
-            MinInt                      = double(min(intensity));
-            MaxInt                      = double(max(intensity));
-            MedInt                      = double(median(intensity));
-            RangeInt                    = double(MaxInt - MinInt);
-            MinMaxRatioInt              = double(MinInt / MaxInt);
-            Min2MaxRatioInt             = double(MinInt^2 / MaxInt);
-            MagGradientInt              = double(sqrt(sum(gradient(intensity).^2)));
-
-            StandDevIntXYDist           = double(std(intensity) / xy_dist);
-            MeanIntXYDist               = double(mean(intensity) / xy_dist);
-            MinIntXYDist                = double(min(intensity) / xy_dist);
-            MaxIntXYDist                = double(max(intensity) / xy_dist);
-            MedIntXYDist                = double(median(intensity) / xy_dist);
-            RangeIntXYDist              = double(MaxIntXYDist - MinIntXYDist);
-            MinMaxRatioIntXYDist        = double(MinIntXYDist / MaxIntXYDist);
-            Min2MaxRatioIntXYDist       = double(MinIntXYDist^2 / MaxIntXYDist);
-            MagGradientIntXYDist        = double(sqrt(sum(gradient(intensity).^2)) / xy_dist);
-
-            StandDevIntRange            = double(std(intensity) / range_mean);
-            MeanIntRange                = double(mean(intensity) / range_mean);
-            MinIntRange                 = double(min(intensity) / range_mean);
-            MaxIntRange                 = double(max(intensity) / range_mean);
-            MedIntRange                 = double(median(intensity) / range_mean);
-            RangeIntRange               = double(MaxIntRange - MinIntRange);
-            MinMaxRatioIntRange         = double(MinIntRange / MaxIntRange);
-            Min2MaxRatioIntRange        = double(MinIntRange^2 / MaxIntRange);
-            MagGradientIntRange         = double(sqrt(sum(gradient(intensity).^2)) / range_mean);
             
-            % I don't use this atm but the code is still here
-%             % Shaprio-Wilks
-%             [H, pValue, W] = swtest_fun(single(abs(intensity)), 0.05);
-% 
-%             SwHInt                      = H;
-%             SwpValueInt                 = pValue;
-%             SwWInt                      = W;
-            SwHInt                      = 0;
-            SwpValueInt                 = 0;
-            SwWInt                      = 0;
-
-            % Super annoying huge table
-
-            feat_extract_table = [StandDevHeight
-            MeanHeight
-            MinHeight
-            MaxHeight
-            MedHeight
-            RoughnessHeight
-            MinMaxRatioHeight
-            Min2MaxRatioHeight
-            MagGradientHeight
-            StandDevHeightXYDist
-            MeanHeightXYDist
-            MinHeightXYDist
-            MaxHeightXYDist
-            MedHeightXYDist
-            RoughnessHeightXYDist
-            MinMaxRatioHeightXYDist
-            Min2MaxRatioHeightXYDist
-            MagGradientHeightXYDist
-            StandDevHeightRange
-            MeanHeightRange
-            MinHeightRange
-            MaxHeightRange
-            MedHeightRange
-            RoughnessHeightRange
-            MinMaxRatioHeightRange
-            Min2MaxRatioHeightRange
-            MagGradientHeightRange
-            StandDevRange
-            MeanRange
-            MinRange
-            MaxRange
-            MedRange
-            RoughnessRange
-            MinMaxRatioRange
-            Min2MaxRatioRange
-            MagGradientRange
-            StandDevRangeXYDist
-            MeanRangeXYDist
-            MinRangeXYDist
-            MaxRangeXYDist
-            MedRangeXYDist
-            RoughnessRangeXYDist
-            MinMaxRatioRangeXYDist
-            Min2MaxRatioRangeXYDist
-            MagGradientRangeXYDist
-            StandDevRangeRange
-            MeanRangeRange
-            MinRangeRange
-            MaxRangeRange
-            MedRangeRange
-            RoughnessRangeRange
-            MinMaxRatioRangeRange
-            Min2MaxRatioRangeRange
-            MagGradientRangeRange
-            StandDevZ
-            MeanZ
-            MinZ
-            MaxZ
-            MedZ
-            RoughnessZ
-            MinMaxRatioZ
-            Min2MaxRatioZ
-            MagGradientZ
-            StandDevZXYDist
-            MeanZXYDist
-            MinZXYDist
-            MaxZXYDist
-            MedZXYDist
-            RoughnessZXYDist
-            MinMaxRatioZXYDist
-            Min2MaxRatioZXYDist
-            MagGradientZXYDist
-            StandDevZRange
-            MeanZRange
-            MinZRange
-            MaxZRange
-            MedZRange
-            RoughnessZRange
-            MinMaxRatioZRange
-            Min2MaxRatioZRange
-            MagGradientZRange
-            SwHHeight
-            SwpValueHeight
-            SwWHeight
-            SwHRange
-            SwpValueRange
-            SwWRange
-            SwHZ
-            SwpValueZ
-            SwWZ
-            StandDevInt
-            MeanInt
-            MinInt
-            MaxInt
-            MedInt
-            RangeInt
-            MinMaxRatioInt
-            Min2MaxRatioInt
-            MagGradientInt
-            StandDevIntXYDist
-            MeanIntXYDist
-            MinIntXYDist
-            MaxIntXYDist
-            MedIntXYDist
-            RangeIntXYDist
-            MinMaxRatioIntXYDist
-            Min2MaxRatioIntXYDist
-            MagGradientIntXYDist
-            StandDevIntRange
-            MeanIntRange
-            MinIntRange
-            MaxIntRange
-            MedIntRange
-            RangeIntRange
-            MinMaxRatioIntRange
-            Min2MaxRatioIntRange
-            MagGradientIntRange
-            SwHInt
-            SwpValueInt
-            SwWInt]';
-
-            %% Getting just the features that are needed
-
-    %         Mdl_Trainer_Table       = getfeaturenamearray(feat_extract_table);
-
-            %% Tabulating & Getting desired features
-
-            table_export = array2table(feat_extract_table,'VariableNames',feat_list_export);
+            % Here is the list in order
+            % dlg_list = = {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
+            % 1 = RAN All
+            % 2 = RAN TT
+            % 3 = MLS All
+            % 4 = MLS TT
+            % 5 = RANGE
+            % 6 = ZXY
+            % THEREFORE
+            % 1, 3  = get all feats
+            % 2     = get ran tt feats
+            % 4     = get mls tt feats
+            % 5     = get range feats
+            % 6     = get zxy
+            % 7     = get z NOT IMPLEMENTED YET!
+            
+            feat_grab_time_start = tic;
+            
+            if indx_dlg_list == 1 || indx_dlg_list == 3
+                table_export = getallfeats(xyzi, abcd);
+            elseif indx_dlg_list == 2
+                table_export = gettoptwentyfeatsran(xyzi, abcd);
+            elseif indx_dlg_list == 4
+                table_export = gettoptwentyfeatsmls(xyzi, abcd);
+            elseif indx_dlg_list == 5
+                table_export = getrangefeats(xyzi);
+            elseif indx_dlg_list == 6
+                table_export = getzxyfeats(xyzi);
+%             elseif indx_dlg_list == 7
+                % table_export = getzfeats(xyzi);
+            end
+            
+            feat_grab_time = [feat_grab_time; toc(feat_grab_time_start)];
 
             %% Run RFD algorithm
-
+            
+            rdf_time_start = tic;
+            
             [Yfit, scores, stdevs]              = predict(Mdl, table_export);
+            
+            rdf_time_store = [rdf_time_store; toc(rdf_time_start)];
+%             [Yfit, scores, stdevs]              = trainedModel4.predictFcn(table_export);
+%             Yfit = trainedModel4.predictFcn(table_export);
             
             %% End Time
             
@@ -752,12 +599,23 @@ for class_idx = 1:1:num_pcds
 
             %% Exporting results to struct
 
-            Classification_Result(idx).label    = Yfit;
+%             if class(Yfit) == 'categorical'
+%                 
+%                 Yfit = cellstr(Yfit);
+%                 
+%             end
+                
+            to_struct_start = tic;
+            
             Classification_Result(idx).scores   = scores;
             Classification_Result(idx).stdevs   = stdevs;
+            Classification_Result(idx).label    = Yfit;
+
             Classification_Result(idx).xyzi     = xyzi;
             Classification_Result(idx).time     = Classification_Time_End;
             Classification_Result(idx).avg_xyz  = [mean(xyzi(:,1)), mean(xyzi(:,2)), mean(xyzi(:,3))];
+            
+            to_struct_time = [to_struct_time; toc(to_struct_start)];
 
         end % if statment for > than 3 points that are not Inf, NaN, or 0.
 
@@ -778,8 +636,6 @@ for class_idx = 1:1:num_pcds
     pcd_class_end = [pcd_class_end; toc(pcd_class_start)];
     
     parfor_progress(0);
-
-    disp('Point Cloud Data Classification Complete!')
 
     %% Saving the Classification Result
 %     
@@ -805,6 +661,7 @@ for class_idx = 1:1:num_pcds
     
     %% Waitbar
     
+    sprintf('Classification Complete! ~ %0.1f min left', est_time_to_complete)
     waitbar(class_idx/num_pcds,classification_bar,sprintf('PCD %d out of %d, ~ %0.1f min left', class_idx, num_pcds, est_time_to_complete))
     
     
@@ -848,6 +705,8 @@ load(Save_LiDAR_Loc_Filename);
 
 %% Applying Tform to each result
 
+disp('Applying Tform to each result')
+
 Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
 Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
@@ -857,19 +716,25 @@ for tform_idx = 1:1:num_pcds
     
     grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
     grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
+    
+    label_cell = [];
 
     %% Loading Classification
 
     load(classification_list(tform_idx).name)
-
-     %% Grabbing the Classification Results
+    
+    %% Grabbing the Classification Results
 
     % Go through all the classification results
     for result_idx = 1:1:length(Classification_Result)
         
         label                       = Classification_Result(result_idx).label;
-        scores                      = Classification_Result(result_idx).scores;
-        stdevs                      = Classification_Result(result_idx).stdevs;
+        
+        try
+            label = cellstr(label);
+        end
+%         scores                      = Classification_Result(result_idx).scores;
+%         stdevs                      = Classification_Result(result_idx).stdevs;
         
         % If the labelresult is not empty, grab the xyz data according to 
         % the label. 
@@ -965,9 +830,11 @@ for tform_idx = 1:1:num_pcds
     
 end % Going through the transform list
 
+disp('Tform application complete!')
+
 %% Grabbing the time of quadrant classification
 
-quadrant_rate = []; move_avg_size = 5;
+disp('Grabbing time of quadrant classification')
 
 for rate_idx = 1:1:num_pcds
     
@@ -985,16 +852,39 @@ for rate_idx = 1:1:num_pcds
 
 end
 
+disp('Quadrant classification obtained!')
+
 %% Plotting the results
 
-x_min_lim = min([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
-x_max_lim = max([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
+disp('Plotting Results')
+% 
 
-y_min_lim = min([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
-y_max_lim = max([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
+try
+    
+    x_min_lim = min([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
+    x_max_lim = max([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
+
+    % Temp Over-ride
+    % x_min = -100;
+    % x_max = 100;
+
+    y_min_lim = min([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
+    y_max_lim = max([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
+    
+    
+catch
+    
+    x_min_lim = -100;
+    x_max_lim = 100;
+    y_min_lim = -100;
+    y_max_lim = 100;
+end
+% Temp Over-ride
+% y_min_lim = 100;
+% y_max_lim = 100;
 
 % All points
-figure
+result_all_fig = figure('DefaultAxesFontSize', 14)
 
 hold all
 
@@ -1015,7 +905,7 @@ ylim([y_min_lim y_max_lim]);
 
 %% Average points
 
-figure
+result_avg_fig = figure('DefaultAxesFontSize', 14)
 
 hold all
 
@@ -1047,14 +937,14 @@ quadrant_rate_Hz    =  quadrant_rate.^(-1);
 Move_mean_time      = movmean(quadrant_rate, move_avg_size);
 Move_mean_Hz        = movmean(quadrant_rate_Hz, move_avg_size);
 
-figure
+rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10  1400 500])
 
 hold on
 
 plot(quadrant_rate, 'b')
 plot(Move_mean_time, 'r', 'LineWidth', 3)
 
- l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+ l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 
 hold off
@@ -1070,7 +960,7 @@ hold off
 
 % Classification Rate Hz
 
-figure
+hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500])
 
 hold all
 
@@ -1082,11 +972,40 @@ plot(Move_mean_Hz, 'r', 'LineWidth', 3)
 xlabel('Quadrant')
 ylabel('Hz')
 
-
- l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+ l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 
 hold off
+
+%% Plane projection Time
+
+plane_proj_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500])
+
+plot(plane_proj_time*1000, 'r', 'LineWidth', 3)
+
+xlabel('PCD')
+ylabel('Time (ms)')
+legend({sprintf('Plane Projection Time (ms)\n Mean: %f', mean(plane_proj_time)*1000)}, 'Location', 'best')
+
+%% XYZI_Size
+
+xyzi_size_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500])
+
+plot(size_xyzi, 'r', 'LineWidth', 3)
+
+xlabel('Quadrant')
+ylabel('# Points')
+legend({'# Points'}, 'Location', 'best')
+
+%% Quadrant Feat Grab
+
+feat_grab_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500])
+
+plot(feat_grab_time * 1000, 'r', 'LineWidth', 3)
+
+xlabel('Quadrant')
+ylabel('Time (ms)')
+legend({sprintf('Feat Extr. Time (ms)\n Mean: %f', mean(feat_grab_time))}, 'Location', 'best')
 
 %% Creating result structs
 
@@ -1101,6 +1020,9 @@ RESULTS_AVG.foli = Foli_Avg_Append_Array;
 RESULTS_AVG.gras = Gras_Avg_Append_Array;
 
 RESULTS_RATE.quadrant_rate = quadrant_rate;
+RESULTS_RATE.size_xyzi = size_xyzi;
+RESULTS_RATE.feat_grab_time = feat_grab_time;
+RESULTS_RATE.plane_proj_time = plane_proj_time;
 
 
 %% Saving the Results
@@ -1111,7 +1033,42 @@ Save_Avg_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/AVG_RESULTS.mat";
 save(Save_All_Results_Filename, 'RESULTS_ALL');
 save(Save_Avg_Results_Filename, 'RESULTS_AVG');
 
+%% Saving Figures
+
+disp('PAUSING UNTIL FIGURES RESIZED AS DESIRED!!!')
+pause
+disp('Saving Figures....')
+
+try
+    saveas(result_all_fig, string(IMAGE_EXPORT_FOLDER) + '/result_all_fig.png', 'png');
+    saveas(result_avg_fig, string(IMAGE_EXPORT_FOLDER) + '/result_avg_fig.png', 'png');
+    saveas(rate_results_fig, string(IMAGE_EXPORT_FOLDER) + '/rate_results_fig.png', 'png');
+    saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.png', 'png');
+    saveas(plane_proj_fig, string(IMAGE_EXPORT_FOLDER) + '/plane_proj_fig.png', 'png');
+    saveas(xyzi_size_fig, string(IMAGE_EXPORT_FOLDER) + '/xyzi_size_fig.png', 'png');
+    saveas(feat_grab_fig, string(IMAGE_EXPORT_FOLDER) + '/feat_grab_fig.png', 'png');
+%     saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.fig', 'fig');
+    saveas(result_all_fig, string(IMAGE_EXPORT_FOLDER) + '/result_all_fig.fig', 'fig');
+    saveas(result_avg_fig, string(IMAGE_EXPORT_FOLDER) + '/result_avg_fig.fig', 'fig');
+    saveas(rate_results_fig, string(IMAGE_EXPORT_FOLDER) + '/rate_results_fig.fig', 'fig');
+    saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.fig', 'fig');
+    saveas(plane_proj_fig, string(IMAGE_EXPORT_FOLDER) + '/plane_proj_fig.fig', 'fig');
+    saveas(xyzi_size_fig, string(IMAGE_EXPORT_FOLDER) + '/xyzi_size_fig.fig', 'fig');
+    saveas(feat_grab_fig, string(IMAGE_EXPORT_FOLDER) + '/feat_grab_fig.fig', 'fig');
+%     saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.fig', 'fig');
+catch
+    disp('SOME FIGURES GONE!')
+end
+
+disp('Figures saved')
+
 %% End program
+
+if close_figs_bool
+    
+    close all
+    
+end
 
 disp('End Program!')
 
