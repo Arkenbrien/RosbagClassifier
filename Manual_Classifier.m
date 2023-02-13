@@ -20,6 +20,35 @@
 
 root_dir = uigetdir();
 
+% sturbois_chipseal_woods_1     - COMPLETE
+% sturbois_chipseal_woods_2     - COMPLETE
+% 2022-10-11-09-24-00           - COMPLETE
+
+% 2022-10-20-10-14-05_GRAV      - COMPLETE
+% sturbois_curve_1              - INCOMPLETE
+% sturbois_straight_1           - INCOMPLETE
+
+% THE SIX ROSBAGS
+% Chipseal
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
+
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
+
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+
+% Gravel
+% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+
+% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
+
+% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+
 %% Creating Export Location
 
 MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";

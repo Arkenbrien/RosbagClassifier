@@ -16,16 +16,7 @@ format compact
 
 %% OPTIONS
 
-% Rdf to load
-% THE FIVE
-rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
-% rdf_load_string = 'MLS_ZXY_50D_41Tree'; % ZXY
-% rdf_load_string = 'RAN_ALL_100D_46Tree'; % RAN ALL
-% rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
-% rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
-% rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
-
-% Feature to use: MUST USE THE SAME FEATURES AS RDF!!!
+% RDF/Feature to use
 % NOTE: RAN ZXY & MLS ZXY = same, RAN RANGE & MLS RANGE same. Planes are
 % not projected. Naming scheme fail, however beause of how baggin works
 % there are slight differences in the algorithms.
@@ -59,59 +50,8 @@ move_avg_size = 30;
 % Close all figs at end
 close_figs_bool = 1;
 
-%% Determining the plane projection method based off the RDF selection
-if indx_dlg_list == 1 || indx_dlg_list == 2 
-    ran_proj = 1;
-    mls_proj = 0;
-elseif indx_dlg_list == 3 || indx_dlg_list == 4 
-    mls_proj = 1;
-    ran_proj = 0;
-elseif indx_dlg_list == 5 || indx_dlg_list == 6
-    ran_proj = 0;
-    mls_proj = 0;
-end
-
-%% Var Inits
-% Random array inits
-grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
-grav_avg_array_temp     = []; chip_avg_array_temp   = []; gras_avg_array_temp   = []; foli_avg_array_temp   = [];
-Grav_All_Append_Array   = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
-Grav_Avg_Append_Array   = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
-
-% Diagnostics array
-time_store = [];
-num_points_per_channel_grab = []; 
-size_xyzi = [];
-pcd_class_end = []; 
-plane_proj_time = []; 
-rdf_time_store = []; 
-to_struct_time = [];
-quadrant_rate = []; 
-feat_grab_time = [];
-
-%% Loading the ROSBAG
-
-% Location of rosbag
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+% Number of quadrants each channel is split into
 num_quadrants               = 100;
-
-% Basically just a random number (length of x in pcd xyzi / num_channels)
-% representing the number of points in a single 'channel' sweep. No idea if
-% this works brb lol (back it works) - Calculated by dividing the entire
-% number of points in a point cloud by the number of channels. This number
-% is very consistant so it works 99.9999% of the time.
-points_per_channel          = 3615; % 600 RPM
-% points_per_channel          = 1808; % 900 RPM
-
-num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
 % Moving Averge size
 move_avg_size = 30;
@@ -131,6 +71,35 @@ elseif indx_dlg_list == 5 || indx_dlg_list == 6
     mls_proj = 0;
 end
 
+%% Loading Appropriate RDF
+
+% {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
+
+if indx_dlg_list == 1
+    rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
+elseif indx_dlg_list == 2
+    rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
+elseif indx_dlg_list == 3
+    rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
+elseif indx_dlg_list == 4
+    rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
+elseif indx_dlg_list == 5
+    rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
+elseif indx_dlg_list == 6
+    rdf_load_string = 'MLS_ZXY_50D_41Tree.mat'; % ZXY
+elseif indx_dlg_list == 7
+    % Not Implemented
+end
+
+% Rdf to load
+% THE FIVE
+% rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
+% rdf_load_string = 'MLS_ZXY_50D_41Tree.mat'; % ZXY
+% rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
+% rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
+% rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
+% rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
+
 %% Var Inits
 % Random array inits
 grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
@@ -148,6 +117,17 @@ rdf_time_store = [];
 to_struct_time = [];
 quadrant_rate = []; 
 feat_grab_time = [];
+tform_time = [];
+
+% Basically just a random number (length of x in pcd xyzi / num_channels)
+% representing the number of points in a single 'channel' sweep. No idea if
+% this works brb lol (back it works) - Calculated by dividing the entire
+% number of points in a point cloud by the number of channels. This number
+% is very consistant so it works 99.9999% of the time.
+points_per_channel          = 3615; % 600 RPM
+% points_per_channel          = 1808; % 900 RPM
+
+num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
 %% Loading the ROSBAG
 
@@ -166,23 +146,23 @@ feat_grab_time = [];
 
 % THE SIX ROSBAGS
 % Chipseal
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
 
 % Gravel
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
 
-% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
 
-% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
 
 % Load the rosbag into the workspace
@@ -324,13 +304,15 @@ num_pcds = length(velodyne_packets_struct) - 3;
 % Timing
 %     tic
 
+disp('Extracting PCDs & Saving to disk')
+
 pcd_bar = waitbar(0, sprintf('PCD %d out of %d', i, num_pcds));
 
 % Exporting PCDs
-for i = 1:num_pcds
+for pcd_idx = 1:num_pcds
     
     % Which loop is this?
-    dT_loop                 = dT * i;
+    dT_loop                 = dT * pcd_idx;
     
     %% Extracting Point Clouds
     %       timeDuration_points      = veloReader_points.StartTime + seconds(dT);
@@ -378,7 +360,7 @@ for i = 1:num_pcds
 %     disp('Continuing!')
 
     %Creates pcd file name
-    n_strPadded             = sprintf('%08d', i);
+    n_strPadded             = sprintf('%08d', pcd_idx);
     pcdFileName             = strcat(root_dir, '/PCD_STACK/', n_strPadded, '.pcd');
     
     %Writes to a pcd file
@@ -392,18 +374,19 @@ for i = 1:num_pcds
         
     %% Waitbar
     
-    waitbar(i/num_pcds, pcd_bar, sprintf('PCD %d out of %d', i, num_pcds))
-    
+    waitbar(pcd_idx/num_pcds, pcd_bar, sprintf('PCD %d out of %d', pcd_idx, num_pcds))
     
 end  % Exporting PCD
 
 delete(pcd_bar)
 
-clear i
+disp('PCDs exported, loading pcds into array...')
 
 %% Opening the stack folder:
 
 pcd_files                  = dir(fullfile(PCD_STACK_FOLDER,'/*.pcd'));
+
+disp('PCDs loaded. Loading all folders...')
 
 %% Pausing so that stupid matlab can recognize that a stupid folder exists
 % why matlab why
@@ -428,6 +411,8 @@ for i = 1:1:pause_length
 end
 
 delete(weight_bar)
+
+disp('Folders loaded. Commencing classification!')
 
 %% Classifying each point cloud
 
@@ -683,26 +668,6 @@ load(Save_Tform_Filename);
 load(Save_Gps_Loc_Filename);
 load(Save_LiDAR_Loc_Filename);
 
-%% Temp Debuging Thing COMMENT THIS THING OUT YOU FOOLISH FOOL YOU
-
-% % clear all
-% % 
-% time_store = [];
-% grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
-% grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
-% Grav_Append_Array = []; Chip_Append_Array = []; Foli_Append_Array = []; Gras_Append_Array = [];
-% Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
-% 
-% 
-% temp_dir = "ROSBAG_2022-10-11-09-28-18_20220318091112";
-% CLASSIFICATION_STACK_FOLDER     = string(temp_dir) + "/CLASSIFICATION_STACK";
-% tform_save_folder               = string(temp_dir) + "/TFORM";
-% classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
-% tform_file_loc                  = string(tform_save_folder) + "/tform.mat";
-% load(tform_file_loc);
-% % 
-% num_pcds = length(classification_list);
-
 %% Applying Tform to each result
 
 disp('Applying Tform to each result')
@@ -710,7 +675,11 @@ disp('Applying Tform to each result')
 Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
 Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
+tform_apply_bar = waitbar(0, sprintf('tform 0 out of %d, ~ X.X min left', num_pcds));
+
 for tform_idx = 1:1:num_pcds
+    
+    tform_start = tic;
 
     %% Clearing Vars
     
@@ -770,65 +739,65 @@ for tform_idx = 1:1:num_pcds
     
     % I supply two types of arrays - one having all the points and one
     % having the average xyz of the points per classified quadrant
-    
-    % 1' = 0.3048 m
-    % Test......
-%     corr_trans = 0.3048;
-    corr_trans = 1;
-    
-    % Correction factor because reasons (idk it just todd howards)
-    corr_z = 90;
-    
+
     if ~isempty(grav_array_temp)
-        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
-        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Grav_All_Append_Array               = [Grav_All_Append_Array; grav_array_temp];
     end
     
     if ~isempty(grav_avg_array_temp)
-        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
-        grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
+        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation;
+        grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation;
         Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
     end
     
     if ~isempty(chip_array_temp)
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Chip_All_Append_Array               = [Chip_All_Append_Array; chip_array_temp];
     end
     
     if ~isempty(chip_avg_array_temp)
-        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
-        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
+        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation;
+        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
         Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
     end
     
     if ~isempty(foli_array_temp)
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Foli_All_Append_Array               = [Foli_All_Append_Array; foli_array_temp];
     end
     
     if ~isempty(foli_avg_array_temp)
-        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
-        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
+        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation;
+        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
         Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
     end
     
     if ~isempty(gras_array_temp)
-        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation * rotz(corr_z);
-        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation * corr_trans;
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Gras_All_Append_Array               = [Gras_All_Append_Array; gras_array_temp];
     end
     
     if ~isempty(gras_avg_array_temp)
-        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation * rotz(corr_z);
-        gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation * corr_trans;
+        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation;
+        gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation;
         Gras_Avg_Append_Array           = [Gras_Avg_Append_Array; gras_avg_array_temp];
     end
-
     
+    %% Waitbar
+    tform_time = [tform_time; toc(tform_start)];
+    tform_time_avg = mean(tform_time);
+    tform_est_time_to_complete = (tform_time_avg * (num_pcds - tform_idx));
+    
+    waitbar(tform_idx/num_pcds,tform_apply_bar,sprintf('tform %d out of %d, ~ %0.2f sec left', tform_idx, num_pcds, tform_est_time_to_complete))
+
 end % Going through the transform list
+
+delete(tform_apply_bar)
 
 disp('Tform application complete!')
 
