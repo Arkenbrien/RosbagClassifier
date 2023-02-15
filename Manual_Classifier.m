@@ -25,8 +25,8 @@ root_dir = uigetdir();
 % 2022-10-11-09-24-00           - COMPLETE
 
 % 2022-10-20-10-14-05_GRAV      - COMPLETE
-% sturbois_curve_1              - INCOMPLETE
-% sturbois_straight_1           - INCOMPLETE
+% sturbois_curve_1              - COMPLETE
+% sturbois_straight_1           - COMPLETE
 
 % THE SIX ROSBAGS
 % Chipseal
@@ -93,23 +93,25 @@ road_ind        = 1;
 % Save the structures to a single .mat file
 
 while true
-
+    
     %% Initilization
+    
     % Select desired type
     disp('Select terrain type')
     dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf'};
     [indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'SelectionMode','single');
-
+    
     % Selecting the zoom tool by default
     disp('Zoom to where you want, Sahib')
     zoom(ptCloudSource_figure)
-
+    
     % Pausing until ready for ROI selection
     disp('Pausing until you are ready, Sahib')
     pause
     view([0 0 90])
-
+    
     %% Selecting ROI and grabbing points
+    
     % Grab User Defined Area
     disp('Selecting ROI')
     roi = drawpolygon;
