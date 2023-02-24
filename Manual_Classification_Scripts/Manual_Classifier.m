@@ -11,14 +11,28 @@
 %==========================================================================
 
 %% Clear Workspace
-% 
-% clear all
-% close all
-% clc
 
-%% Requesting user for file
+clear all
+close all
+clc
 
-root_dir = uigetdir();
+%% Options
+
+% No options for you! XD
+
+%% Ask user to load previous file
+
+% WARNING! Must ensure that the previous file is what you want, please do
+% not try to do anything stupid like load a MCA for one pcd and then add
+% new rois for a different pcd! This is asking for trouble! Very bad!
+
+load_prev_MCA_file = questdlg("Load previous file? This will apphend any future additions to the file, and will not delete previous rois.",... 
+    "Load Previous File?",...
+    "Yes", "No", "No");
+
+%% Requesting user for root file
+
+root_dir = uigetdir("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/", "Grab ROOT Dir");
 
 % sturbois_chipseal_woods_1     - COMPLETE
 % sturbois_chipseal_woods_2     - COMPLETE
@@ -49,12 +63,6 @@ root_dir = uigetdir();
 % RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
 
-%% Creating Export Location
-
-MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
-mkdir(MANUAL_CLASSIFICATION_FOLDER);
-addpath(MANUAL_CLASSIFICATION_FOLDER);
-
 %% Loading point cloud
 
 disp('Loading PCD...')
@@ -68,14 +76,98 @@ pcshow(ptCloudSource)
 axis equal
 view([0 0 90])
 
+if load_prev_MCA_file == "Yes"
+    
+    % Load File
+    Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/", "Grab old MCA");
+    load(Manual_Classfied_Areas_File)
+    
+    mca_plot_fun(Manual_Classfied_Areas)
+    
+end
+
+%% Creating Export Location
+
+if load_prev_MCA_file == "Yes"
+    
+    [mca_dir, mca_name, mca_type] = fileparts(which(Manual_Classfied_Areas_File));
+    
+    Filename = string(mca_dir) + "/" + string(mca_name) + string(mca_type);
+
+else
+    
+    MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
+    mkdir(MANUAL_CLASSIFICATION_FOLDER);
+    addpath(MANUAL_CLASSIFICATION_FOLDER);
+    Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
+    
+end
+
 %% Var Init
 
-grav_ind        = 1;
-chip_ind        = 1;
-gras_ind        = 1;
-foli_ind        = 1;
-non_road_ind    = 1;
-road_ind        = 1;
+grav_ind_start        = 1;
+chip_ind_start        = 1;
+gras_ind_start        = 1;
+foli_ind_start        = 1;
+non_road_ind_start    = 1;
+road_ind_start        = 1;
+
+grav_ind        = grav_ind_start;
+chip_ind        = chip_ind_start;
+gras_ind        = gras_ind_start;
+foli_ind        = foli_ind_start;
+non_road_ind    = non_road_ind_start;
+road_ind        = road_ind_start;
+
+if load_prev_MCA_file == "Yes"
+    
+    try
+        grav_ind_start      = length(Manual_Classfied_Areas.grav);
+        grav_ind            = grav_ind_start + 1;
+    catch
+        grav_ind        = 1;
+    end
+    try
+        chip_ind_start      = length(Manual_Classfied_Areas.chip);
+        chip_ind            = chip_ind_start + 1;
+    catch
+        chip_ind        = 1;
+    end
+    try
+        gras_ind_start      = length(Manual_Classfied_Areas.gras);
+        gras_ind            = gras_ind_start + 1;
+    catch
+        gras_ind        = 1;
+    end
+    try
+        foli_ind_start      = length(Manual_Classfied_Areas.foli);
+        foli_ind            = foli_ind_start + 1;
+    catch
+        foli_ind        = 1;
+    end
+    try
+        non_road_ind_start  = length(Manual_Classfied_Areas.non_road_roi);
+        non_road_ind        = non_road_ind_start + 1;
+    catch
+        non_road_ind    = 1;
+    end
+    try
+        road_ind_start      = length(Manual_Classfied_Areas.road_roi);
+        road_ind            = road_ind_start + 1;
+    catch
+        road_ind        = 1;
+    end
+    
+else
+    
+    grav_ind        = 1;
+    chip_ind        = 1;
+    gras_ind        = 1;
+    foli_ind        = 1;
+    non_road_ind    = 1;
+    road_ind        = 1;
+    
+end
 
 %% Selecting ROIs
 
@@ -287,31 +379,45 @@ while true
 
 end
 
-%% Saving the file
+%% Assigning to Struct
 
-if foli_ind ~= 1
+try
+if foli_ind ~= foli_ind_start
     Manual_Classfied_Areas.foli = foli_roi;
 end
+end
 
-if gras_ind ~= 1
+try
+if gras_ind ~= gras_ind_start
     Manual_Classfied_Areas.gras = gras_roi;
 end
+end
 
-if grav_ind ~= 1
+try
+if grav_ind ~= grav_ind_start
     Manual_Classfied_Areas.grav = grav_roi;
 end
+end
 
-if chip_ind ~= 1
+try
+if chip_ind ~= chip_ind_start
     Manual_Classfied_Areas.chip = chip_roi;
 end
+end
 
-if road_ind ~= 1
+try
+if road_ind ~= road_ind_start
     Manual_Classfied_Areas.road_roi = road_roi;
 end
+end
 
-if non_road_ind ~= 1
+try
+if non_road_ind ~= non_road_ind_start
     Manual_Classfied_Areas.non_road_roi = non_road_roi;
 end
+end
+
+%% Saving MCA file
 
 save_ans = questdlg('Save?', 'Save?', 'Yes', 'No', 'Yes');
 
@@ -320,7 +426,6 @@ switch save_ans
     case 'Yes'
         
         disp('Saving File')
-        Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
         save(Filename, 'Manual_Classfied_Areas')
         
     case 'No'

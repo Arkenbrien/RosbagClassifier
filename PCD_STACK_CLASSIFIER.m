@@ -25,7 +25,7 @@ dlg_list                            = {'RAN All', 'RAN TT', 'MLS All', 'MLS TT',
 
 % Rings go from 0-31, with 0 being the highest elevation channel, 31 being
 % the lowest.
-ring_min = 30;
+ring_min = 28;
 ring_max = 31;
 
 % Making combined PCD with only the desired rings
@@ -40,6 +40,9 @@ num_quadrants               = 100;
 % number of points in a point cloud by the number of channels. This number
 % is very consistant so it works 99.9999% of the time.
 points_per_channel          = 3615; % 600 RPM
+% 3615 is only evenly divisible by: 1, 3, 5, 15, 241, 723, 1205. 15 is few
+% quadrants, will result in very low accuracy scores, while 241 may be too
+% small, and it will take a long time for stuff to classify. 
 % points_per_channel          = 1808; % 900 RPM
 
 num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
@@ -77,6 +80,8 @@ end
 
 if indx_dlg_list == 1
     rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
+%     rdf_load_string = 'RDF_OLD.mat'; % RAN ALL
+%     rdf_load_string = 'Ran_All_Smol.mat'; %Ran All small
 elseif indx_dlg_list == 2
     rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
 elseif indx_dlg_list == 3
@@ -118,6 +123,7 @@ to_struct_time = [];
 quadrant_rate = []; 
 feat_grab_time = [];
 tform_time = [];
+class_rate = [];
 
 % Basically just a random number (length of x in pcd xyzi / num_channels)
 % representing the number of points in a single 'channel' sweep. No idea if
@@ -128,6 +134,10 @@ points_per_channel          = 3615; % 600 RPM
 % points_per_channel          = 1808; % 900 RPM
 
 num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
+
+% tform rotaiontal correction factor
+corr_z_rot_deg  = 90;
+corr_z_matrix   = rotz(corr_z_rot_deg);
 
 %% Loading the ROSBAG
 
@@ -146,24 +156,27 @@ num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
 % THE SIX ROSBAGS
 % Chipseal
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
-% % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
+% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
 
 % Gravel
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
 
-% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y |
+% RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+
+% FUN BAGS
+file = 'ridges_inner_loop.bag';
 
 % Load the rosbag into the workspace
 bag = rosbag(file);
@@ -574,7 +587,7 @@ for class_idx = 1:1:num_pcds
             
             [Yfit, scores, stdevs]              = predict(Mdl, table_export);
             
-            rdf_time_store = [rdf_time_store; toc(rdf_time_start)];
+            class_rate = [class_rate; toc(rdf_time_start)];
 %             [Yfit, scores, stdevs]              = trainedModel4.predictFcn(table_export);
 %             Yfit = trainedModel4.predictFcn(table_export);
             
@@ -599,6 +612,7 @@ for class_idx = 1:1:num_pcds
             Classification_Result(idx).xyzi     = xyzi;
             Classification_Result(idx).time     = Classification_Time_End;
             Classification_Result(idx).avg_xyz  = [mean(xyzi(:,1)), mean(xyzi(:,2)), mean(xyzi(:,3))];
+%             Classification_Result(idx).rdf_time = rdf_time_store;
             
             to_struct_time = [to_struct_time; toc(to_struct_start)];
 
@@ -623,7 +637,7 @@ for class_idx = 1:1:num_pcds
     parfor_progress(0);
 
     %% Saving the Classification Result
-%     
+    
 %     n_strPadded                 = sprintf('%08d', class_idx);
 % %     Classification_FileName     = strcat(root_dir, '/CLASSIFICATION_STACK/', n_strPadded, '.mat');
 %     Classification_FileName     = string(root_dir) + "/CLASSIFICATION_STACK/" + string(n_strPadded) + ".mat";
@@ -741,49 +755,49 @@ for tform_idx = 1:1:num_pcds
     % having the average xyz of the points per classified quadrant
 
     if ~isempty(grav_array_temp)
-        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
         grav_array_temp(:,1:3)          = grav_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Grav_All_Append_Array               = [Grav_All_Append_Array; grav_array_temp];
     end
     
     if ~isempty(grav_avg_array_temp)
-        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation;
+        grav_avg_array_temp             = grav_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
         grav_avg_array_temp             = grav_avg_array_temp       + tform(tform_idx).Translation;
         Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
     end
     
     if ~isempty(chip_array_temp)
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
         chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Chip_All_Append_Array               = [Chip_All_Append_Array; chip_array_temp];
     end
     
     if ~isempty(chip_avg_array_temp)
-        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation;
+        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
         chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
         Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
     end
     
     if ~isempty(foli_array_temp)
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
         foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Foli_All_Append_Array               = [Foli_All_Append_Array; foli_array_temp];
     end
     
     if ~isempty(foli_avg_array_temp)
-        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation;
+        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
         foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
         Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
     end
     
     if ~isempty(gras_array_temp)
-        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation;
+        gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
         gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
         Gras_All_Append_Array               = [Gras_All_Append_Array; gras_array_temp];
     end
     
     if ~isempty(gras_avg_array_temp)
-        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation;
+        gras_avg_array_temp             = gras_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
         gras_avg_array_temp             = gras_avg_array_temp       + tform(tform_idx).Translation;
         Gras_Avg_Append_Array           = [Gras_Avg_Append_Array; gras_avg_array_temp];
     end
@@ -893,7 +907,7 @@ ylim([y_min_lim y_max_lim]);
     l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 
-%% Classification Rate Time
+%% Quadrant Rate Time
 
 max_time            = max(quadrant_rate); %s
 min_time            = min(quadrant_rate); %s
@@ -978,6 +992,10 @@ legend({sprintf('Feat Extr. Time (ms)\n Mean: %f', mean(feat_grab_time))}, 'Loca
 
 %% Creating result structs
 
+disp('Plotting complete!')
+
+disp('Creating Structs...')
+
 RESULTS_ALL.grav = Grav_All_Append_Array;
 RESULTS_ALL.chip = Chip_All_Append_Array;
 RESULTS_ALL.foli = Foli_All_Append_Array;
@@ -992,23 +1010,30 @@ RESULTS_RATE.quadrant_rate = quadrant_rate;
 RESULTS_RATE.size_xyzi = size_xyzi;
 RESULTS_RATE.feat_grab_time = feat_grab_time;
 RESULTS_RATE.plane_proj_time = plane_proj_time;
-
+RESULTS_RATE.class_rate  = class_rate;
 
 %% Saving the Results
 
+disp('Structs Created! Saving structs to disk...')
+
 Save_All_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/ALL_RESULTS.mat";
 Save_Avg_Results_Filename = string(RESULT_EXPORT_FOLDER) + "/AVG_RESULTS.mat";
+Save_Result_Rate_Filename = string(RESULT_EXPORT_FOLDER) + "/RESULTS_RATE.mat";
 
 save(Save_All_Results_Filename, 'RESULTS_ALL');
 save(Save_Avg_Results_Filename, 'RESULTS_AVG');
+save(Save_Result_Rate_Filename, 'RESULTS_RATE');
 
 %% Saving Figures
+
+disp('Structs saved to disk!')
 
 disp('PAUSING UNTIL FIGURES RESIZED AS DESIRED!!!')
 pause
 disp('Saving Figures....')
 
 try
+    
     saveas(result_all_fig, string(IMAGE_EXPORT_FOLDER) + '/result_all_fig.png', 'png');
     saveas(result_avg_fig, string(IMAGE_EXPORT_FOLDER) + '/result_avg_fig.png', 'png');
     saveas(rate_results_fig, string(IMAGE_EXPORT_FOLDER) + '/rate_results_fig.png', 'png');
@@ -1025,6 +1050,7 @@ try
     saveas(xyzi_size_fig, string(IMAGE_EXPORT_FOLDER) + '/xyzi_size_fig.fig', 'fig');
     saveas(feat_grab_fig, string(IMAGE_EXPORT_FOLDER) + '/feat_grab_fig.fig', 'fig');
 %     saveas(hz_results_fig, string(IMAGE_EXPORT_FOLDER) + '/hz_results_fig.fig', 'fig');
+
 catch
     disp('SOME FIGURES GONE!')
 end

@@ -22,8 +22,10 @@ root_dir = uigetdir();
 
 %% Grabbing Manual Classification File
 
-MANUAL_CLASSIFICATION_FILE = string(root_dir) + "/MANUAL_CLASSIFICATION/MANUAL_CLASSIFICATION.mat";
-load(MANUAL_CLASSIFICATION_FILE)
+% MANUAL_CLASSIFICATION_FILE = string(root_dir) + "/MANUAL_CLASSIFICATION/MANUAL_CLASSIFICATION.mat";
+% load(MANUAL_CLASSIFICATION_FILE)
+
+load('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manually_Classified_Areas/sturbois_chipseal_woods_1_MANUAL_CLASSIFICATION_fixed_1.mat')
 
 %% Grabbing compiled pcd
 

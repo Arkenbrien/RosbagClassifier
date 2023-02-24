@@ -4,3 +4,8 @@
 parfor_progress.txt
 /CLASSIFICATION_RESULTS
 *.png
+/Image_Dump
+*.bag
+*.xlsx
+*.ods
+ransac_scoring_elimination.txt
