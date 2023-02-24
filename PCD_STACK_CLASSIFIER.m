@@ -32,7 +32,7 @@ ring_max = 31;
 rings = [4 2];
 
 % Num quadrants that will be be examined in a single 360 sweep per channel
-num_quadrants               = 100;
+num_quadrants               = 240;
 
 % Basically just a random number (length of x in pcd xyzi / num_channels)
 % representing the number of points in a single 'channel' sweep. No idea if
@@ -53,9 +53,6 @@ move_avg_size = 30;
 % Close all figs at end
 close_figs_bool = 1;
 
-% Number of quadrants each channel is split into
-num_quadrants               = 100;
-
 % Moving Averge size
 move_avg_size = 30;
 
@@ -63,6 +60,7 @@ move_avg_size = 30;
 close_figs_bool = 1;
 
 %% Determining the plane projection method based off the RDF selection
+
 if indx_dlg_list == 1 || indx_dlg_list == 2 
     ran_proj = 1;
     mls_proj = 0;
@@ -96,15 +94,6 @@ elseif indx_dlg_list == 7
     % Not Implemented
 end
 
-% Rdf to load
-% THE FIVE
-% rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
-% rdf_load_string = 'MLS_ZXY_50D_41Tree.mat'; % ZXY
-% rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
-% rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
-% rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
-% rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
-
 %% Var Inits
 % Random array inits
 grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
@@ -125,34 +114,11 @@ feat_grab_time = [];
 tform_time = [];
 class_rate = [];
 
-% Basically just a random number (length of x in pcd xyzi / num_channels)
-% representing the number of points in a single 'channel' sweep. No idea if
-% this works brb lol (back it works) - Calculated by dividing the entire
-% number of points in a point cloud by the number of channels. This number
-% is very consistant so it works 99.9999% of the time.
-points_per_channel          = 3615; % 600 RPM
-% points_per_channel          = 1808; % 900 RPM
-
-num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
-
 % tform rotaiontal correction factor
 corr_z_rot_deg  = 90;
 corr_z_matrix   = rotz(corr_z_rot_deg);
 
 %% Loading the ROSBAG
-
-% Location of rosbag
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-28-18.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-29-34.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-31-55.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-33-39.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_woods_4.bag';
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag'; % NOTE: Woods 3 is borked!
 
 % THE SIX ROSBAGS
 % Chipseal
@@ -163,7 +129,7 @@ corr_z_matrix   = rotz(corr_z_rot_deg);
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
 
 % RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
 
 % Gravel
 % RANGE - Y | MLS ALL - Y | RAN ALL - Y | MLS TT - Y | RAN TT - Y | ZXY - Y | RAN OLD - Y |
@@ -176,7 +142,7 @@ corr_z_matrix   = rotz(corr_z_rot_deg);
 % file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
 
 % FUN BAGS
-file = 'ridges_inner_loop.bag';
+% file = 'ridges_inner_loop.bag';
 
 % Load the rosbag into the workspace
 bag = rosbag(file);
@@ -693,6 +659,7 @@ tform_apply_bar = waitbar(0, sprintf('tform 0 out of %d, ~ X.X min left', num_pc
 
 for tform_idx = 1:1:num_pcds
     
+    % Starting the timer for the progress bar estimated time
     tform_start = tic;
 
     %% Clearing Vars
@@ -713,9 +680,14 @@ for tform_idx = 1:1:num_pcds
         
         label                       = Classification_Result(result_idx).label;
         
+        % I was messing around with the MATLAB machine learning app, this
+        % catches the classification label and re-formats it to the correct
+        % format for the later code. 
+        
         try
             label = cellstr(label);
         end
+        
 %         scores                      = Classification_Result(result_idx).scores;
 %         stdevs                      = Classification_Result(result_idx).stdevs;
         
@@ -803,6 +775,7 @@ for tform_idx = 1:1:num_pcds
     end
     
     %% Waitbar
+    
     tform_time = [tform_time; toc(tform_start)];
     tform_time_avg = mean(tform_time);
     tform_est_time_to_complete = (tform_time_avg * (num_pcds - tform_idx));
@@ -821,15 +794,13 @@ disp('Grabbing time of quadrant classification')
 
 for rate_idx = 1:1:num_pcds
     
-    % Do Something
+    % Load classification file
     load(classification_list(rate_idx).name)
-    
-%     disp(classification_list(rate_idx).name)
-    
+
+    % for each file, grab the time
     for result_idx = 1:1:length(Classification_Result)
         
-        time_time = Classification_Result(result_idx).time;
-        quadrant_rate = [quadrant_rate; time_time];
+        quadrant_rate = [quadrant_rate; Classification_Result(result_idx).time];
         
     end
 
@@ -847,10 +818,6 @@ try
     x_min_lim = min([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
     x_max_lim = max([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
 
-    % Temp Over-ride
-    % x_min = -100;
-    % x_max = 100;
-
     y_min_lim = min([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
     y_max_lim = max([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
     
@@ -862,9 +829,6 @@ catch
     y_min_lim = -100;
     y_max_lim = 100;
 end
-% Temp Over-ride
-% y_min_lim = 100;
-% y_max_lim = 100;
 
 % All points
 result_all_fig = figure('DefaultAxesFontSize', 14)
@@ -904,8 +868,8 @@ view([0 0 90])
 xlim([x_min_lim x_max_lim]);
 ylim([y_min_lim y_max_lim]);
 
-    l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-    l.Interpreter = 'tex';
+l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
 
 %% Quadrant Rate Time
 
@@ -927,8 +891,8 @@ hold on
 plot(quadrant_rate, 'b')
 plot(Move_mean_time, 'r', 'LineWidth', 3)
 
- l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
-    l.Interpreter = 'tex';
+l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
 
 hold off
 % axis('equal')
@@ -937,7 +901,6 @@ xlabel('Quadrant')
 ylabel('Time (s)')
 
 ylim([ min_time max_time])
-
 
 hold off
 
