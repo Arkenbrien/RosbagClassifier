@@ -38,8 +38,10 @@ function make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
     gps_pos_store               = zeros(cloud_break,3);
     lidar_pos_store             = gps_pos_store;
     
-    ring_min                    = rings(1); % higher pointed lazer - max 31
-    ring_max                    = rings(2); % lower pointed lazer - min 0
+%     ring_min                    = rings(1); % higher pointed lazer - max 31
+%     ring_max                    = rings(2); % lower pointed lazer - min 0
+    ring_min                    = 1; % higher pointed lazer - max 31
+    ring_max                    = 1; % lower pointed lazer - min 0
 
     time_store = [];
 
@@ -55,8 +57,7 @@ function make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
     %% Initilizing the starting point
     % Select reference point as first GPS reading (local)
     origin = [matchedGps_init.Latitude, matchedGps_init.Longitude, matchedGps_init.Altitude];
-    [xEast_init, yNorth_init, zUp_init] = latlon2local(matchedGps_init.Latitude, matchedGps_init.Longitude, matchedGps_init.Altitude, origin);
-
+%     [xEast_init, yNorth_init, zUp_init] = latlon2local(matchedGps_init.Latitude, matchedGps_init.Longitude, matchedGps_init.Altitude, origin);
 
     %%  CONVERT TO LIDAR FRAME:
 
@@ -76,55 +77,55 @@ function make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
                   sind(90)  cosd(90)   0;
                   0        0           1]; 
 
-    % Setting initial orientation offset
-    init_rotate_offset          = rotz(90-yaw)*roty(roll)*rotx(pitch);
-
-    % Offset the gps coord by the current orientation (in this case, initial) 
-    % Converts the ground truth to lidar frame
-    groundTruthTrajectory       = [xEast_init, yNorth_init, zUp_init] * gps2lidar;
+%     % Setting initial orientation offset
+%     init_rotate_offset          = rotz(90-yaw)*roty(roll)*rotx(pitch);
+% 
+%     % Offset the gps coord by the current orientation (in this case, initial) 
+%     % Converts the ground truth to lidar frame
+%     groundTruthTrajectory       = [xEast_init, yNorth_init, zUp_init] * gps2lidar;
 
     % Setting the updated difference between the lidar and gps coordiate and
     % orientation
     % Converts the offsett to the lidar frame
-    gps_to_lidar_diff_update    = gps_to_lidar_diff * LidarOffset2gps * init_rotate_offset;
+%     gps_to_lidar_diff_update    = gps_to_lidar_diff * LidarOffset2gps * init_rotate_offset;
 
-    % Rotating the offset and adding them together
-    LidarxEast_init             = groundTruthTrajectory(1) + gps_to_lidar_diff_update(1);
-    LidaryNorth_init            = groundTruthTrajectory(2) + gps_to_lidar_diff_update(2);
-    LidarzUp_init               = groundTruthTrajectory(3) + gps_to_lidar_diff_update(3);
+%     % Rotating the offset and adding them together
+%     LidarxEast_init             = groundTruthTrajectory(1) + gps_to_lidar_diff_update(1);
+%     LidaryNorth_init            = groundTruthTrajectory(2) + gps_to_lidar_diff_update(2);
+%     LidarzUp_init               = groundTruthTrajectory(3) + gps_to_lidar_diff_update(3);
 
-    % Making the vector of ^^^
-    lidarTrajectory             = [LidarxEast_init,LidaryNorth_init,LidarzUp_init];
+%     % Making the vector of ^^^
+%     lidarTrajectory             = [LidarxEast_init,LidaryNorth_init,LidarzUp_init];
 
-    % Initilizing the lists
-    gps_pos_store(1,:)          = groundTruthTrajectory;
-    lidar_pos_store(1,:)        = lidarTrajectory;
-
-    % Reading the current cloud for xyz, intensity, and ring (channel) values
-    init_cloud                  = rosReadXYZ(matchedLidar);
-    intensities                 = rosReadField(matchedLidar, 'intensity');
-    ring                        = rosReadField(matchedLidar, 'ring');
-    init_cloud(:,4)             = intensities;
-    init_cloud(:,5)             = ring;
-
-    % Eliminate nans and zeros
-    init_cloud                   = init_cloud( ~any( isnan(init_cloud) | isinf(init_cloud), 2),:);
-
-    % Eliminate points based on channel
-    init_cloud(init_cloud(:,5) < ring_max, :) = [];
-    init_cloud(init_cloud(:,5) > ring_min, :) = [];
-
-    % EXPERIMENT sort rows
-    init_cloud = sortrows(init_cloud,5);
-
-    % Transforming the initial point cloud
-    tform                       = rigid3d(init_rotate_offset, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
-
-    % Creating the initial point cloud object
-    init_pcl                    = pointCloud([init_cloud(:,1), init_cloud(:,2), init_cloud(:,3)], 'Intensity',  init_cloud(:,4));
-    init_pcl                    = pctransform(init_pcl, tform);
-
-    pointCloudList{1}           = init_pcl; 
+%     % Initilizing the lists
+%     gps_pos_store(1,:)          = groundTruthTrajectory;
+%     lidar_pos_store(1,:)        = lidarTrajectory;
+% 
+%     % Reading the current cloud for xyz, intensity, and ring (channel) values
+%     init_cloud                  = rosReadXYZ(matchedLidar);
+%     intensities                 = rosReadField(matchedLidar, 'intensity');
+%     ring                        = rosReadField(matchedLidar, 'ring');
+%     init_cloud(:,4)             = intensities;
+%     init_cloud(:,5)             = ring;
+% 
+%     % Eliminate nans and zeros
+%     init_cloud                   = init_cloud( ~any( isnan(init_cloud) | isinf(init_cloud), 2),:);
+% 
+%     % Eliminate points based on channel
+%     init_cloud(init_cloud(:,5) < ring_max, :) = [];
+%     init_cloud(init_cloud(:,5) > ring_min, :) = [];
+% 
+%     % EXPERIMENT sort rows
+%     init_cloud = sortrows(init_cloud,5);
+% 
+%     % Transforming the initial point cloud
+%     tform                       = rigid3d(init_rotate_offset, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
+% 
+%     % Creating the initial point cloud object
+%     init_pcl                    = pointCloud([init_cloud(:,1), init_cloud(:,2), init_cloud(:,3)], 'Intensity',  init_cloud(:,4));
+%     init_pcl                    = pctransform(init_pcl, tform);
+% 
+%     pointCloudList{1}           = init_pcl; 
 
     %% Doing the data
     fprintf('Max time delta is %f sec \n',max(abs(diffs)));
@@ -231,7 +232,8 @@ function make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
     %% Save the PCD
     
     pc_name = string(COMPILED_PCD_FOLDER) + "/COMPILED_PCD_SMALL.pcd";
-
+    figure
+    pcshow(pointCloudList)
     pcwrite(pointCloudList, pc_name)
 
     %% End Program 

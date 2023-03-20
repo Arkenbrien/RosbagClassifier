@@ -37,7 +37,7 @@ ring_max = 31;
 rings = [4 2];
 
 % Num quadrants that will be be examined in a single 360 sweep per channel
-num_quadrants               = 100;
+num_quadrants               = 60;
 
 % Moving Averge size - for plotting purposes
 move_avg_size = 30;
@@ -45,7 +45,7 @@ move_avg_size = 30;
 % Temp limiter for testing - set num_pcd_over_ride to 1 to use the num_pcds
 % value, otherwise it WILL be overwritten.
 num_pcd_over_ride = 0;
-num_pcds = 30;
+num_pcds = 10;
 
 % Save Figures
 save_figure_bool = 1;
@@ -100,16 +100,16 @@ end
 %     % Not Implemented
 % end
 
-rdf_load_string = 'Channel_2_RDF.mat';
+rdf_load_string = 'test_07_chan_2_20_spltz.mat';
 
 
 %% Var Inits
 
 % xyz arrays for the four classes
-grav_array_temp         = []; chip_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
-grav_avg_array_temp     = []; chip_avg_array_temp   = []; gras_avg_array_temp   = []; foli_avg_array_temp   = [];
-Grav_All_Append_Array   = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
-Grav_Avg_Append_Array   = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+grav_array_temp         = []; asph_array_temp       = []; gras_array_temp       = []; foli_array_temp       = [];
+grav_avg_array_temp     = []; asph_avg_array_temp   = []; gras_avg_array_temp   = []; foli_avg_array_temp   = [];
+Grav_All_Append_Array   = []; Asph_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
+Grav_Avg_Append_Array   = []; Asph_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
 % Diagnostics array
 time_store = [];
@@ -249,7 +249,7 @@ get_tform(bag, tform_save_folder, ring_min, ring_max)
 
 %% Creating Combined PCD with desired rings
 
-make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
+% make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
 
 %% LiDAR Stuffz
 
@@ -305,7 +305,7 @@ y_append                = memory_array_xyzi;
 z_append                = memory_array_xyzi;
 int_append              = memory_array_xyzi;
 ptCloudLoc_packets      = memory_array_pt_pack;
-xyzi_chan_2                = memory_array_XYZI_TOT;
+xyzi_chan_2             = memory_array_XYZI_TOT;
 
 timing                  = zeros(1,length(velodyne_packets_struct));
 
@@ -319,7 +319,7 @@ end
 
 disp('Extracting PCDs & Saving to disk')
 
-pcd_bar = waitbar(0, sprintf('PCD %d out of %d', i, num_pcds));
+pcd_bar = waitbar(0, sprintf('PCD %d out of %d', 0, num_pcds));
 
 % Exporting PCDs
 for pcd_idx = 1:num_pcds
@@ -362,10 +362,10 @@ for pcd_idx = 1:num_pcds
     
     % ring_2 grab
     
-    x_2                     = ptCloudLoc_packets(2,:,1);
-    y_2                     = ptCloudLoc_packets(2,:,2);
-    z_2                     = ptCloudLoc_packets(2,:,3);
-    int_2                   = ptCloudInt_packets(2,:);
+    x_2                     = ptCloudLoc_packets(30,:,1);
+    y_2                     = ptCloudLoc_packets(30,:,2);
+    z_2                     = ptCloudLoc_packets(30,:,3);
+    int_2                   = ptCloudInt_packets(30,:);
     
     xyzi_chan_2             = [x_2' y_2' z_2' double(int_2')];
     
@@ -420,7 +420,7 @@ pause_length = 2;
 
 weight_bar = waitbar(0, sprintf('Waisting Your Time...'));
 
-for i = 1:1:pause_length
+for idx_2 = 1:1:pause_length
 
     pause(1)
     
@@ -431,7 +431,7 @@ for i = 1:1:pause_length
     addpath(CLASSIFICATION_STACK_FOLDER)
     addpath(RESULT_EXPORT_FOLDER)
 
-    waitbar(i / pause_length, weight_bar, sprintf('WAISTing Your Time...'))
+    waitbar(idx_2 / pause_length, weight_bar, sprintf('WAISTing Your Time...'))
 
 end
 
@@ -524,11 +524,11 @@ for class_idx = 1:1:num_pcds
 
     parfor idx = 1:numel(iValues)
 
-        i = iValues(idx);
+        idx_2 = iValues(idx);
         
         %% "Split" location / indices
-        begin_var                   = (i-1) * num_points_per_quadrant + 1;
-        end_var                     = i * num_points_per_quadrant;
+        begin_var                   = (idx_2-1) * num_points_per_quadrant + 1;
+        end_var                     = idx_2 * num_points_per_quadrant;
         
         if end_var > length(ptCloudA.Location(:,1))
             
@@ -773,8 +773,8 @@ load(Save_LiDAR_Loc_Filename);
 
 disp('Applying Tform to each result')
 
-Grav_All_Append_Array = []; Chip_All_Append_Array = []; Foli_All_Append_Array = []; Gras_All_Append_Array = [];
-Grav_Avg_Append_Array = []; Chip_Avg_Append_Array = []; Foli_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
+Grav_All_Append_Array = []; Asph_All_Append_Array = []; Gras_All_Append_Array = [];
+Grav_Avg_Append_Array = []; Asph_Avg_Append_Array = []; Gras_Avg_Append_Array = [];
 
 tform_apply_bar = waitbar(0, sprintf('tform 0 out of %d, ~ X.X min left', num_pcds));
 
@@ -785,8 +785,8 @@ for tform_idx = 1:1:num_pcds
 
     %% Clearing Vars
     
-    grav_array_temp = []; chip_array_temp = []; gras_array_temp = []; foli_array_temp = [];
-    grav_avg_array_temp = []; chip_avg_array_temp = []; gras_avg_array_temp = []; foli_avg_array_temp = [];
+    grav_array_temp = []; asph_array_temp = []; gras_array_temp = [];
+    grav_avg_array_temp = []; asph_avg_array_temp = []; gras_avg_array_temp = [];
     
     label_cell = [];
 
@@ -824,17 +824,12 @@ for tform_idx = 1:1:num_pcds
                 grav_array_temp         = [grav_array_temp; Classification_Result(result_idx).xyzi];
                 grav_avg_array_temp     = [grav_avg_array_temp; Classification_Result(result_idx).avg_xyz];
             end
-
-            if isequal(cell2mat(label), 'chipseal')
-                chip_array_temp         = [chip_array_temp; Classification_Result(result_idx).xyzi];
-                chip_avg_array_temp     = [chip_avg_array_temp; Classification_Result(result_idx).avg_xyz];
+            
+            if isequal(cell2mat(label), 'asphalt')
+                asph_array_temp         = [asph_array_temp; Classification_Result(result_idx).xyzi];
+                asph_avg_array_temp     = [asph_avg_array_temp; Classification_Result(result_idx).avg_xyz];
             end
-
-            if isequal(cell2mat(label), 'foliage')
-                foli_array_temp         = [foli_array_temp; Classification_Result(result_idx).xyzi];
-                foli_avg_array_temp     = [foli_avg_array_temp; Classification_Result(result_idx).avg_xyz];
-            end
-
+            
             if isequal(cell2mat(label), 'grass')
                 gras_array_temp         = [gras_array_temp; Classification_Result(result_idx).xyzi];
                 gras_avg_array_temp     = [gras_avg_array_temp; Classification_Result(result_idx).avg_xyz];
@@ -861,34 +856,22 @@ for tform_idx = 1:1:num_pcds
         Grav_Avg_Append_Array           = [Grav_Avg_Append_Array; grav_avg_array_temp];
     end
     
-    if ~isempty(chip_array_temp)
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
-        chip_array_temp(:,1:3)          = chip_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Chip_All_Append_Array               = [Chip_All_Append_Array; chip_array_temp];
+    if ~isempty(asph_array_temp)
+        asph_array_temp(:,1:3)          = asph_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
+        asph_array_temp(:,1:3)          = asph_array_temp(:,1:3)    + tform(tform_idx).Translation;
+        Asph_All_Append_Array               = [Asph_All_Append_Array; asph_array_temp];
     end
     
-    if ~isempty(chip_avg_array_temp)
-        chip_avg_array_temp             = chip_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
-        chip_avg_array_temp             = chip_avg_array_temp       + tform(tform_idx).Translation;
-        Chip_Avg_Append_Array           = [Chip_Avg_Append_Array; chip_avg_array_temp];
-    end
-    
-    if ~isempty(foli_array_temp)
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
-        foli_array_temp(:,1:3)          = foli_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Foli_All_Append_Array               = [Foli_All_Append_Array; foli_array_temp];
-    end
-    
-    if ~isempty(foli_avg_array_temp)
-        foli_avg_array_temp             = foli_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
-        foli_avg_array_temp             = foli_avg_array_temp       + tform(tform_idx).Translation;
-        Foli_Avg_Append_Array           = [Foli_Avg_Append_Array; foli_avg_array_temp];
+    if ~isempty(asph_avg_array_temp)
+        asph_avg_array_temp             = asph_avg_array_temp       * tform(tform_idx).Rotation     * corr_z_matrix;
+        asph_avg_array_temp             = asph_avg_array_temp       + tform(tform_idx).Translation;
+        Asph_Avg_Append_Array           = [Asph_Avg_Append_Array; asph_avg_array_temp];
     end
     
     if ~isempty(gras_array_temp)
         gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    * tform(tform_idx).Rotation     * corr_z_matrix;
         gras_array_temp(:,1:3)          = gras_array_temp(:,1:3)    + tform(tform_idx).Translation;
-        Gras_All_Append_Array               = [Gras_All_Append_Array; gras_array_temp];
+        Gras_All_Append_Array           = [Gras_All_Append_Array; gras_array_temp];
     end
     
     if ~isempty(gras_avg_array_temp)
@@ -939,11 +922,11 @@ disp('Plotting Results')
 
 try
     
-    x_min_lim = min([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
-    x_max_lim = max([Grav_All_Append_Array(:,1); Chip_All_Append_Array(:,1); Foli_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
+    x_min_lim = min([Grav_All_Append_Array(:,1); Asph_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) - 5;
+    x_max_lim = max([Grav_All_Append_Array(:,1); Asph_All_Append_Array(:,1); Gras_All_Append_Array(:,1)]) + 5;
 
-    y_min_lim = min([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
-    y_max_lim = max([Grav_All_Append_Array(:,2); Chip_All_Append_Array(:,2); Foli_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
+    y_min_lim = min([Grav_All_Append_Array(:,2); Asph_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) - 5;
+    y_max_lim = max([Grav_All_Append_Array(:,2); Asph_All_Append_Array(:,2); Gras_All_Append_Array(:,2)]) + 5;
     
     
 catch
@@ -960,7 +943,7 @@ result_all_fig = figure('DefaultAxesFontSize', 14)
 hold all
 
 plot3(Grav_All_Append_Array(:,1), Grav_All_Append_Array(:,2), Grav_All_Append_Array(:,3), 'c.', 'MarkerSize', 3.5)
-plot3(Chip_All_Append_Array(:,1), Chip_All_Append_Array(:,2), Chip_All_Append_Array(:,3), 'k.', 'MarkerSize', 3.5)
+plot3(Asph_All_Append_Array(:,1), Asph_All_Append_Array(:,2), Asph_All_Append_Array(:,3), 'k.', 'MarkerSize', 3.5)
 % plot3(Foli_All_Append_Array(:,1), Foli_All_Append_Array(:,2), Foli_All_Append_Array(:,3), 'm.', 'MarkerSize', 3.5)
 plot3(Gras_All_Append_Array(:,1), Gras_All_Append_Array(:,2), Gras_All_Append_Array(:,3), 'g.', 'MarkerSize', 3.5)
 
@@ -984,7 +967,7 @@ result_avg_fig = figure('DefaultAxesFontSize', 14)
 hold all
 
 plot3(Grav_Avg_Append_Array(:,1), Grav_Avg_Append_Array(:,2), Grav_Avg_Append_Array(:,3), 'c.', 'MarkerSize', 8.5)
-plot3(Chip_Avg_Append_Array(:,1), Chip_Avg_Append_Array(:,2), Chip_Avg_Append_Array(:,3), 'k.', 'MarkerSize', 8.5)
+plot3(Asph_Avg_Append_Array(:,1), Asph_Avg_Append_Array(:,2), Asph_Avg_Append_Array(:,3), 'k.', 'MarkerSize', 8.5)
 % plot3(Foli_Avg_Append_Array(:,1), Foli_Avg_Append_Array(:,2), Foli_Avg_Append_Array(:,3), 'm.', 'MarkerSize', 8.5)
 plot3(Gras_Avg_Append_Array(:,1), Gras_Avg_Append_Array(:,2), Gras_Avg_Append_Array(:,3), 'g.', 'MarkerSize', 8.5)
 
@@ -1090,13 +1073,13 @@ disp('Plotting complete!')
 disp('Creating Structs...')
 
 RESULTS_ALL.grav = Grav_All_Append_Array;
-RESULTS_ALL.chip = Chip_All_Append_Array;
-RESULTS_ALL.foli = Foli_All_Append_Array;
+RESULTS_ALL.chip = Asph_All_Append_Array;
+% RESULTS_ALL.foli = Foli_All_Append_Array;
 RESULTS_ALL.gras = Gras_All_Append_Array;
 
 RESULTS_AVG.grav = Grav_Avg_Append_Array;
-RESULTS_AVG.chip = Chip_Avg_Append_Array;
-RESULTS_AVG.foli = Foli_Avg_Append_Array;
+RESULTS_AVG.chip = Asph_Avg_Append_Array;
+% RESULTS_AVG.foli = Foli_Avg_Append_Array;
 RESULTS_AVG.gras = Gras_Avg_Append_Array;
 
 RESULTS_RATE.quadrant_rate = quadrant_rate;

@@ -19,6 +19,15 @@ close all
 
 % No Options for you! :D
 
+%     load('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manuall_Classified_Areas_Wide_SoR/sturbois_straight_1_MANUAL_CLASSIFICATION_widesor.mat');
+
+chip_bool       = 0;
+grav_bool       = 1;
+gras_bool       = 0;
+foli_bool       = 0;
+non_road_bool   = 1;
+road_bool       = 0;
+
 %% Var Init
 
 grav_array = []; chip_array = []; foli_array = []; gras_array = [];
@@ -66,7 +75,7 @@ gras_offroad_array      = [];
 
 %% Load Classification Root File
 
-root_dir = uigetdir();
+root_dir = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/');
 
 RESULT_EXPORT_FOLDER = string(root_dir) + "/RESULT_EXPORT";
 addpath(RESULT_EXPORT_FOLDER);
@@ -143,6 +152,17 @@ elseif contains(root_dir, 'sturbois_straight_1')
     non_road_bool   = 1;
     road_bool       = 0;
     
+else
+    
+    load('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/pcd_exports/Manual_Classified_PCD_gravel_lot_rererere.mat');
+
+    chip_bool       = 0;
+    grav_bool       = 1;
+    gras_bool       = 0;
+    foli_bool       = 0;
+    non_road_bool   = 0;
+    road_bool       = 0;
+    
 end
 
 %% Loading Dataz
@@ -155,9 +175,9 @@ for clas_idx = 1:1:length(RESULTS_AVG.chip(:,1))
     chip_array = [chip_array; RESULTS_AVG.chip(clas_idx, :)];
 end
 
-for clas_idx = 1:1:length(RESULTS_AVG.foli(:,1))
-    foli_array = [foli_array; RESULTS_AVG.foli(clas_idx, :)];
-end
+% for clas_idx = 1:1:length(RESULTS_AVG.foli(:,1))
+%     foli_array = [foli_array; RESULTS_AVG.foli(clas_idx, :)];
+% end
 
 for clas_idx = 1:1:length(RESULTS_AVG.gras(:,1))
     gras_array = [gras_array; RESULTS_AVG.gras(clas_idx, :)];
@@ -173,7 +193,7 @@ hold all
     
     plot3(grav_array(:,1), grav_array(:,2), grav_array(:,3), 'c.', 'MarkerSize', 18)
     plot3(chip_array(:,1), chip_array(:,2), chip_array(:,3), 'k.', 'MarkerSize', 18)
-    plot3(foli_array(:,1), foli_array(:,2), foli_array(:,3), 'm.', 'MarkerSize', 18)
+%     plot3(foli_array(:,1), foli_array(:,2), foli_array(:,3), 'm.', 'MarkerSize', 18)
     plot3(gras_array(:,1), gras_array(:,2), gras_array(:,3), 'g.', 'MarkerSize', 18)
     
     if chip_bool
@@ -283,7 +303,7 @@ l.Interpreter = 'tex';
 
 hold off
 
-% view([pi/2 0 90])
+view([pi/2 0 90])
 
 ax = gca;
 ax.Clipping = 'off';
@@ -694,132 +714,132 @@ score_table_SoR(:,[1,2,5])
 
 
 %% Plot only used points
-
-figure
-
-hold all
-
-plot3(grav_array(grav_inroad_array,1), grav_array(grav_inroad_array,2), grav_array(grav_inroad_array,3), 'c.', 'MarkerSize', 18)
-plot3(chip_array(chip_inroad_array,1), chip_array(chip_inroad_array,2), chip_array(chip_inroad_array,3), 'k.', 'MarkerSize', 18)
-plot3(foli_array(foli_inroad_array,1), foli_array(foli_inroad_array,2), foli_array(foli_inroad_array,3), 'm.', 'MarkerSize', 18)
-plot3(gras_array(gras_inroad_array,1), gras_array(gras_inroad_array,2), gras_array(gras_inroad_array,3), 'g.', 'MarkerSize', 18)
-
-plot3(grav_array(grav_offroad_array,1), grav_array(grav_offroad_array,2), grav_array(grav_offroad_array,3), 'c.', 'MarkerSize', 18)
-plot3(chip_array(chip_offroad_array,1), chip_array(chip_offroad_array,2), chip_array(chip_offroad_array,3), 'k.', 'MarkerSize', 18)
-plot3(foli_array(foli_offroad_array,1), foli_array(foli_offroad_array,2), foli_array(foli_offroad_array,3), 'm.', 'MarkerSize', 18)
-plot3(gras_array(gras_offroad_array,1), gras_array(gras_offroad_array,2), gras_array(gras_offroad_array,3), 'g.', 'MarkerSize', 18)
-
-if chip_bool
-    
-    for i = 1:length(Manual_Classfied_Areas.chip)
-    
-        % Plot something
-    
-        xy_roi = Manual_Classfied_Areas.chip{:,i};
-    
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','black','FaceAlpha',0.25)
-    
-    end
-    
-end
-
-if grav_bool
-    
-    for i = 1:length(Manual_Classfied_Areas.grav)
-        
-        % Plot something
-        xy_roi = Manual_Classfied_Areas.grav{:,i};
-        
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','red','FaceAlpha',0.25)
-        
-    end
-    
-end
-
-
-if gras_bool
-    
-    for i = 1:length(Manual_Classfied_Areas.gras)
-    
-        % Plot Something
-        xy_roi = Manual_Classfied_Areas.gras{:,i};
-    
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','green','FaceAlpha',0.25)
-    
-    end
-    
-end
-
-if foli_bool
-    
-    for i = 1:length(Manual_Classfied_Areas.foli)
-    
-        % Do Something
-        xy_roi = Manual_Classfied_Areas.foli{:,i};
-    
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','magenta','FaceAlpha',0.25)
-    
-    end
-    
-end
-
-if non_road_bool
-
-    for i = 1:length(Manual_Classfied_Areas.non_road_roi)
-
-        % Do Something
-        xy_roi = Manual_Classfied_Areas.non_road_roi{:,i};
-
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.25)
-
-    end
-
-end
-
-if road_bool
-
-    for i = 1:length(Manual_Classfied_Areas.road_roi)
-
-        % Do Something
-        xy_roi = Manual_Classfied_Areas.road_roi{:,i};
-
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor',[0.58, 0.50, 1.00],'FaceAlpha',0.25)
-
-    end
-
-end
-
-axis equal
-
-view([0 0 90])
-%
-% xlim_max = max([grav_array(:,1); chip_array(:,1); foli_array(:,1); gras_array(:,1)]);
-% xlim_min = min([grav_array(:,1); chip_array(:,1); foli_array(:,1); gras_array(:,1)]);
-%
-% ylim_max = max([grav_array(:,2); chip_array(:,2); foli_array(:,2); gras_array(:,2)]);
-% ylim_min = min([grav_array(:,2); chip_array(:,2); foli_array(:,2); gras_array(:,2)]);
-%
-% xlim([xlim_min xlim_max]);
-% ylim([ylim_min ylim_max]);
-
-axis off
-
-hold off
-
-l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-l.Interpreter = 'tex';
-
-view([pi/2 0 90])
-
-ax = gca;
-ax.Clipping = 'off';
-
+% 
+% figure
+% 
+% hold all
+% 
+% plot3(grav_array(grav_inroad_array,1), grav_array(grav_inroad_array,2), grav_array(grav_inroad_array,3), 'c.', 'MarkerSize', 18)
+% plot3(chip_array(chip_inroad_array,1), chip_array(chip_inroad_array,2), chip_array(chip_inroad_array,3), 'k.', 'MarkerSize', 18)
+% plot3(foli_array(foli_inroad_array,1), foli_array(foli_inroad_array,2), foli_array(foli_inroad_array,3), 'm.', 'MarkerSize', 18)
+% plot3(gras_array(gras_inroad_array,1), gras_array(gras_inroad_array,2), gras_array(gras_inroad_array,3), 'g.', 'MarkerSize', 18)
+% 
+% plot3(grav_array(grav_offroad_array,1), grav_array(grav_offroad_array,2), grav_array(grav_offroad_array,3), 'c.', 'MarkerSize', 18)
+% plot3(chip_array(chip_offroad_array,1), chip_array(chip_offroad_array,2), chip_array(chip_offroad_array,3), 'k.', 'MarkerSize', 18)
+% plot3(foli_array(foli_offroad_array,1), foli_array(foli_offroad_array,2), foli_array(foli_offroad_array,3), 'm.', 'MarkerSize', 18)
+% plot3(gras_array(gras_offroad_array,1), gras_array(gras_offroad_array,2), gras_array(gras_offroad_array,3), 'g.', 'MarkerSize', 18)
+% 
+% if chip_bool
+%     
+%     for i = 1:length(Manual_Classfied_Areas.chip)
+%     
+%         % Plot something
+%     
+%         xy_roi = Manual_Classfied_Areas.chip{:,i};
+%     
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor','black','FaceAlpha',0.25)
+%     
+%     end
+%     
+% end
+% 
+% if grav_bool
+%     
+%     for i = 1:length(Manual_Classfied_Areas.grav)
+%         
+%         % Plot something
+%         xy_roi = Manual_Classfied_Areas.grav{:,i};
+%         
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor','red','FaceAlpha',0.25)
+%         
+%     end
+%     
+% end
+% 
+% 
+% if gras_bool
+%     
+%     for i = 1:length(Manual_Classfied_Areas.gras)
+%     
+%         % Plot Something
+%         xy_roi = Manual_Classfied_Areas.gras{:,i};
+%     
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor','green','FaceAlpha',0.25)
+%     
+%     end
+%     
+% end
+% 
+% if foli_bool
+%     
+%     for i = 1:length(Manual_Classfied_Areas.foli)
+%     
+%         % Do Something
+%         xy_roi = Manual_Classfied_Areas.foli{:,i};
+%     
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor','magenta','FaceAlpha',0.25)
+%     
+%     end
+%     
+% end
+% 
+% if non_road_bool
+% 
+%     for i = 1:length(Manual_Classfied_Areas.non_road_roi)
+% 
+%         % Do Something
+%         xy_roi = Manual_Classfied_Areas.non_road_roi{:,i};
+% 
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.25)
+% 
+%     end
+% 
+% end
+% 
+% if road_bool
+% 
+%     for i = 1:length(Manual_Classfied_Areas.road_roi)
+% 
+%         % Do Something
+%         xy_roi = Manual_Classfied_Areas.road_roi{:,i};
+% 
+%         pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+%         plot(pgon,'FaceColor',[0.58, 0.50, 1.00],'FaceAlpha',0.25)
+% 
+%     end
+% 
+% end
+% 
+% axis equal
+% 
+% view([0 0 90])
+% %
+% % xlim_max = max([grav_array(:,1); chip_array(:,1); foli_array(:,1); gras_array(:,1)]);
+% % xlim_min = min([grav_array(:,1); chip_array(:,1); foli_array(:,1); gras_array(:,1)]);
+% %
+% % ylim_max = max([grav_array(:,2); chip_array(:,2); foli_array(:,2); gras_array(:,2)]);
+% % ylim_min = min([grav_array(:,2); chip_array(:,2); foli_array(:,2); gras_array(:,2)]);
+% %
+% % xlim([xlim_min xlim_max]);
+% % ylim([ylim_min ylim_max]);
+% 
+% axis off
+% 
+% hold off
+% 
+% l = legend({'\color{cyan} Gravel','\color{black} Chipseal','\color{magenta} Foliage','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+% l.Interpreter = 'tex';
+% 
+% view([pi/2 0 90])
+% 
+% ax = gca;
+% ax.Clipping = 'off';
+% 
 
 
 %% Display the standard end of program notification which consists of a single line of text being printed unto the command window resulting in the user of this program being informed that the program has completed successfully
