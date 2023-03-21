@@ -16,35 +16,33 @@ format compact
 
 %% Options
 
-% Number of areas / channel
-num_areas           = 5;
-
 % Left | Cent | Right Area Center Angle
 % Center is Constant
 cent_cent           = 90 * pi/180;
 
 % Left
 chan_2_cent_l       = 110 * pi/180;
-chan_5_cent_l       = 105 * pi/180;
+chan_5_cent_l       = 95 * pi/180;
 
 % More Left
-chan_2_cent_ll      = 120 * pi/180;
-chan_5_cent_ll      = 110 * pi/180;
+chan_2_cent_ll      = 130 * pi/180;
+chan_5_cent_ll      = 100 * pi/180;
 
 % Right
-chan_2_cent_r       =  75 * pi/180;
-chan_5_cent_r       =  70 * pi/180;
+chan_2_cent_r       = 70 * pi/180;
+chan_5_cent_r       = 85 * pi/180;
 
 % More Right
-chan_2_cent_rr      =  60 * pi/180;
-chan_5_cent_rr      =  65 * pi/180;
+chan_2_cent_rr      = 50 * pi/180;
+chan_5_cent_rr      = 80 * pi/180;
 
-% Angle +- to add to center
+% Angle +- to add to each arc center
 chan_2_d_ang        = 5 * pi/180;
-chan_5_d_ang        = 3 * pi/180;
+chan_5_d_ang        = 2 * pi/180;
 
-% RANSAC 
-maxDistance         = 0.5;
+% RANSAC - not used atm
+% maxDistance         = 0.5;
+
 
 %% RDF / Rosbag selection
 
@@ -99,11 +97,11 @@ chan_2_strt_angs = [chan_2_cent_ll-chan_2_d_ang chan_2_cent_l-chan_2_d_ang cent_
 chan_2_end_angs  = [chan_2_cent_ll+chan_2_d_ang chan_2_cent_l+chan_2_d_ang cent_cent+chan_2_d_ang chan_2_cent_r+chan_2_d_ang chan_2_cent_rr+chan_2_d_ang];
 
 % Channel 5
-chan_5_l_angs   = [chan_5_cent_l-chan_5_d_ang   chan_5_cent_l+chan_5_d_ang];
-chan_5_ll_angs  = [chan_5_cent_ll-chan_5_d_ang  chan_5_cent_ll+chan_5_d_ang];
-chan_5_c_angs   = [cent_cent-chan_5_d_ang       cent_cent+chan_5_d_ang];
-chan_5_r_angs   = [chan_5_cent_r-chan_5_d_ang   chan_5_cent_r+chan_5_d_ang];
-chan_5_rr_angs  = [chan_5_cent_rr-chan_5_d_ang  chan_5_cent_rr+chan_5_d_ang];
+chan_5_l_angs   = [chan_5_cent_l    - chan_5_d_ang,   chan_5_cent_l   +   chan_5_d_ang];
+chan_5_ll_angs  = [chan_5_cent_ll   - chan_5_d_ang,   chan_5_cent_ll  +   chan_5_d_ang];
+chan_5_c_angs   = [cent_cent        - chan_5_d_ang,   cent_cent       +   chan_5_d_ang];
+chan_5_r_angs   = [chan_5_cent_r    - chan_5_d_ang,   chan_5_cent_r   +   chan_5_d_ang];
+chan_5_rr_angs  = [chan_5_cent_rr   - chan_5_d_ang,   chan_5_cent_rr  +   chan_5_d_ang];
 
 % chan_5_angs     = [chan_5_ll_angs chan_5_l_angs chan_5_c_angs chan_5_r_angs chan_5_rr_angs];
 chan_5_strt_angs = [chan_5_cent_ll-chan_5_d_ang chan_5_cent_l-chan_5_d_ang cent_cent-chan_5_d_ang chan_5_cent_r-chan_5_d_ang chan_5_cent_rr-chan_5_d_ang];
@@ -113,6 +111,15 @@ chan_5_end_angs  = [chan_5_cent_ll+chan_5_d_ang chan_5_cent_l+chan_5_d_ang cent_
 all_start_angs  = [chan_2_strt_angs chan_5_strt_angs];
 all_end_angs    = [chan_2_end_angs chan_5_end_angs];
 
+% Only certain channels
+% all_start_angs  = [chan_2_strt_angs];
+% all_end_angs    = [chan_2_end_angs];
+% all_start_angs  = [chan_5_strt_angs];
+% all_end_angs    = [chan_5_end_angs];
+
+% Names for channel
+area_names = [];
+
 % Array Inits
 % Chan 2
 grav_array_temp_2         = []; asph_array_temp_2       = []; foli_array_temp_2       = []; gras_array_temp_2       = []; 
@@ -121,10 +128,10 @@ Grav_All_Append_Array_2   = []; Asph_All_Append_Array_2 = []; Foli_All_Append_Ar
 Grav_Avg_Append_Array_2   = []; Asph_Avg_Append_Array_2 = []; Foli_Avg_Append_Array_2 = []; Gras_Avg_Append_Array_2 = [];
 
 % Chan 5 - not used yet
-% grav_array_temp_5         = []; asph_array_temp_5       = []; foli_array_temp_5       = []; gras_array_temp_5       = []; 
-% grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; foli_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
-% Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Array_5 = []; Gras_All_Append_Array_5 = [];
-% Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
+grav_array_temp_5         = []; asph_array_temp_5       = []; foli_array_temp_5       = []; gras_array_temp_5       = []; 
+grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; foli_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
+Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Array_5 = []; Gras_All_Append_Array_5 = [];
+Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
 
 raw_data_export = []; save_folder = [];
 model_RANSAC = []; model_MLS = [];
@@ -188,15 +195,15 @@ disp('Messages Loaded')
 time_now        = datetime("now","Format","uuuuMMddhhmmss");
 time_now        = datestr(time_now,'yyyyMMddhhmmss');
 
-root_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Channel_2_Only/" + string(chan_2_rdf_load_string) + "Chan_2z" + string(time_now);
+CLASSIFICATION_STACK_FOLDER = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_5_" + string(time_now);
 
-if ~exist(root_dir,'dir')
-    mkdir(root_dir)
+if ~exist(CLASSIFICATION_STACK_FOLDER,'dir')
+    mkdir(CLASSIFICATION_STACK_FOLDER)
 end
 
-addpath(root_dir)
-CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
-mkdir(CLASSIFICATION_STACK_FOLDER);
+% addpath(root_dir)
+% CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
+% mkdir(CLASSIFICATION_STACK_FOLDER);
 addpath(CLASSIFICATION_STACK_FOLDER);
 
 
@@ -246,7 +253,7 @@ fprintf('Max time delta is %f sec \n',max(abs(diffs)));
 parfor_progress(cloud_break);
 
 parfor cloud = 1:cloud_break
-    
+  
     %% Clearing Vars
     
     xyz_cloud = [];
@@ -320,8 +327,8 @@ parfor cloud = 1:cloud_break
     xyz_cloud = xyz_cloud(xyz_cloud(:,1) >= 0, :);
 
     % Channel Split
-    xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :);
-    xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 5, :);
+    xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
+    xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 4, :); % indexes start @ 0
     
     % DEBUG
 %     figure
@@ -333,21 +340,43 @@ parfor cloud = 1:cloud_break
     %% Getting Left | Center | Right areas
     
     for area_find_idx = 1:length(all_start_angs)
-        
-        if any(area_find_idx == 1:5)
-        
-            % Do Something
-            arc_idx     = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  all_end_angs(area_find_idx));
-            
-            
 
-            % Transforming the point cloud
-            xyz_cloud_2(:,1:3) = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
-            xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
+        if any(area_find_idx == 1:5) % Channel 2
+
+            % Find Indexes
+            arc_idx     = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  all_end_angs(area_find_idx));
+
+            % Grabbing Features
+            table_export = get_feats_2(xyz_cloud_2(arc_idx,:),[]);
+
+            % Classifying
+            [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
+
+            %Creates pcd file name
+            n_strPadded             = sprintf('%08d', cloud);
+            Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
+
+            % Saves it
+            RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(arc_idx,:), tform)
             
-        elseif any(area_find_idx == 6:10)
-            
+        
+        elseif any(area_find_idx == 6:10) % Channel 5
+
+            % Find Indexes
             arc_idx     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  all_end_angs(area_find_idx));
+
+            % Grabbing Features
+            table_export = get_feats_2(xyz_cloud_5(arc_idx,:),[]);
+
+            % Classifying
+            [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
+
+            %Creates pcd file name
+            n_strPadded             = sprintf('%08d', cloud);
+            Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
+
+            % Saves it
+            RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(arc_idx,:), tform)
             
         end
         
@@ -395,48 +424,48 @@ parfor cloud = 1:cloud_break
 %     xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
     
 
-    %% Classify C2 LEFT
-
-    table_export = get_feats_2(xyz_cloud_2(chan_2_l_idxs,:),[]);
-
-    [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
-
-    %Creates pcd file name
-    n_strPadded             = sprintf('%08d', cloud);
-    Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/LEFT_2_" + string(n_strPadded) + ".mat";
-
-    % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_l_idxs,:))
-
-
-    %% Classify C2 CENTER
-
-    table_export = get_feats_2(xyz_cloud_2(chan_2_c_idxs,:),[]);
-
-    [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
-
-    %Creates pcd file name
-    n_strPadded             = sprintf('%08d', cloud);
-    Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/FRONT_2_" + string(n_strPadded) + ".mat";
-
-    % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_c_idxs,:))
-
-
-    %% Classify C2 RIGHT
-
-    table_export = get_feats_2(xyz_cloud_2(chan_2_r_idxs,:),[]);
-
-    [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
-
-    %Creates pcd file name
-    n_strPadded             = sprintf('%08d', cloud);
-    Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/RIGHT_2_" + string(n_strPadded) + ".mat";
-
-    % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_r_idxs,:))
-    
-    
+%     %% Classify C2 LEFT
+% 
+%     table_export = get_feats_2(xyz_cloud_2(chan_2_l_idxs,:),[]);
+% 
+%     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
+% 
+%     %Creates pcd file name
+%     n_strPadded             = sprintf('%08d', cloud);
+%     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/LEFT_2_" + string(n_strPadded) + ".mat";
+% 
+%     % Saves it
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_l_idxs,:))
+% 
+% 
+%     %% Classify C2 CENTER
+% 
+%     table_export = get_feats_2(xyz_cloud_2(chan_2_c_idxs,:),[]);
+% 
+%     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
+% 
+%     %Creates pcd file name
+%     n_strPadded             = sprintf('%08d', cloud);
+%     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/FRONT_2_" + string(n_strPadded) + ".mat";
+% 
+%     % Saves it
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_c_idxs,:))
+% 
+% 
+%     %% Classify C2 RIGHT
+% 
+%     table_export = get_feats_2(xyz_cloud_2(chan_2_r_idxs,:),[]);
+% 
+%     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
+% 
+%     %Creates pcd file name
+%     n_strPadded             = sprintf('%08d', cloud);
+%     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/RIGHT_2_" + string(n_strPadded) + ".mat";
+% 
+%     % Saves it
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_r_idxs,:))
+%     
+%     
 %     %% Classify C5 LEFT
 % 
 %     table_export = get_feats_2(xyz_cloud_5(chan_5_l_idxs,:),[]);
@@ -483,11 +512,15 @@ parfor cloud = 1:cloud_break
     %% Weightbar
     
 	parfor_progress;
+
+%     waitbar(cloud/cloud_break, h, sprintf('Cloud %d out of %d', cloud, cloud_break))
     
 
 end
 
 parfor_progress(0);
+
+% close(h);
 
 
 %% Load the Classification folder and grab the results
@@ -500,19 +533,25 @@ classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.m
 for class_idx = 1:1:length(classification_list)
     
     % Starting the timer for the progress bar estimated time
-    tform_start = tic;
+%     tform_start = tic;
 
     %% Clearing Vars
+
+    grav_array_temp_2         = []; asph_array_temp_2       = []; gras_array_temp_2       = []; 
+    grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; gras_avg_array_temp_2   = []; 
     
-    grav_array_temp_2 = []; asph_array_temp_2 = []; gras_array_temp_2 = [];
-    grav_avg_array_temp_2 = []; asph_avg_array_temp_2 = []; gras_avg_array_temp_2 = [];
-    
+    grav_array_temp_5         = []; asph_array_temp_5       = []; gras_array_temp_5       = []; 
+    grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
     label_cell = [];
 
     
     %% Loading Classification
 
     load(classification_list(class_idx).name)
+    
+    underscore_idx = strfind(classification_list(class_idx).name, '_');
+    
+    chan_number = str2double(classification_list(class_idx).name(1:underscore_idx-1));
     
     
     %% Grabbing the Classification Results
@@ -539,7 +578,7 @@ for class_idx = 1:1:length(classification_list)
         % the label. 
         % I supply two types of arrays - one having all the points and one
         % having the average xyz of the points per classified quadrant
-        if ~isempty(Classification_Result.label)
+        if ~isempty(Classification_Result.label) && any(chan_number == 1:5)
 
             if isequal(cell2mat(label), 'gravel')
                 grav_array_temp_2         = [grav_array_temp_2; Classification_Result.xyzi];
@@ -554,6 +593,23 @@ for class_idx = 1:1:length(classification_list)
             if isequal(cell2mat(label), 'grass')
                 gras_array_temp_2         = [gras_array_temp_2; Classification_Result.xyzi];
                 gras_avg_array_temp_2     = [gras_avg_array_temp_2; Classification_Result.avg_xyz];
+            end
+            
+        elseif ~isempty(Classification_Result.label) && any(chan_number == 6:10)
+
+            if isequal(cell2mat(label), 'gravel')
+                grav_array_temp_5         = [grav_array_temp_5; Classification_Result.xyzi];
+                grav_avg_array_temp_2     = [grav_avg_array_temp_2; Classification_Result.avg_xyz];
+            end
+            
+            if isequal(cell2mat(label), 'asphalt')
+                asph_array_temp_5         = [asph_array_temp_5; Classification_Result.xyzi];
+                asph_avg_array_temp_2     = [asph_avg_array_temp_2; Classification_Result.avg_xyz];
+            end
+            
+            if isequal(cell2mat(label), 'grass')
+                gras_array_temp_5         = [gras_array_temp_5; Classification_Result.xyzi];
+                gras_avg_array_temp_5     = [gras_avg_array_temp_5; Classification_Result.avg_xyz];
             end
 
         end % Go through all the result
@@ -572,13 +628,30 @@ for class_idx = 1:1:length(classification_list)
     end
     
     if ~isempty(asph_array_temp_2)
-        Asph_All_Append_Array_2               = [Asph_All_Append_Array_2; asph_array_temp_2];
+        Asph_All_Append_Array_2           = [Asph_All_Append_Array_2; asph_array_temp_2];
         Asph_Avg_Append_Array_2           = [Asph_Avg_Append_Array_2; asph_avg_array_temp_2];
     end
     
     if ~isempty(gras_array_temp_2)
         Gras_All_Append_Array_2           = [Gras_All_Append_Array_2; gras_array_temp_2];
         Gras_Avg_Append_Array_2           = [Gras_Avg_Append_Array_2; gras_avg_array_temp_2];
+    end
+    
+    
+    
+    if ~isempty(grav_array_temp_5)
+        Grav_All_Append_Array_5           = [Grav_All_Append_Array_5; grav_array_temp_5];
+        Grav_Avg_Append_Array_5           = [Grav_Avg_Append_Array_5; grav_avg_array_temp_5];
+    end
+    
+    if ~isempty(asph_array_temp_5)
+        Asph_All_Append_Array_5           = [Asph_All_Append_Array_5; asph_array_temp_5];
+        Asph_Avg_Append_Array_5           = [Asph_Avg_Append_Array_5; asph_avg_array_temp_5];
+    end
+    
+    if ~isempty(gras_array_temp_5)
+        Gras_All_Append_Array_5           = [Gras_All_Append_Array_5; gras_array_temp_5];
+        Gras_Avg_Append_Array_5           = [Gras_Avg_Append_Array_5; gras_avg_array_temp_5];
     end
 
 end % Going through the transform list
@@ -608,26 +681,46 @@ catch
 end
 
 % All points
-% result_all_fig = figure('DefaultAxesFontSize', 14)
+result_all_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
 
 hold all
 
 try
-    plot3(Grav_All_Append_Array_2(:,1), Grav_All_Append_Array_2(:,2), Grav_All_Append_Array_2(:,3), 'c.', 'MarkerSize', 3.5)
+    plot3(Grav_All_Append_Array_2(:,1), Grav_All_Append_Array_2(:,2), Grav_All_Append_Array_2(:,3), 'c.', 'MarkerSize', 10)
 catch
-    disp('No Grav Data!')
+    disp('No Grav Data on Chan 2!')
 end
    
 try
-    plot3(Asph_All_Append_Array_2(:,1), Asph_All_Append_Array_2(:,2), Asph_All_Append_Array_2(:,3), 'k.', 'MarkerSize', 3.5)
+    plot3(Asph_All_Append_Array_2(:,1), Asph_All_Append_Array_2(:,2), Asph_All_Append_Array_2(:,3), 'k.', 'MarkerSize', 10)
 catch
-    disp('No Asph Data!')
+    disp('No Asph Dataon Chan 2!')
 end
 
 try
-    plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', 3.5)
+    plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', 10)
 catch
-    disp('No Gras Data!')
+    disp('No Gras Dataon Chan 2!')
+end
+
+
+
+try
+    plot3(Grav_All_Append_Array_5(:,1), Grav_All_Append_Array_5(:,2), Grav_All_Append_Array_5(:,3), 'cx', 'MarkerSize', 10)
+catch
+    disp('No Grav Data on Chan 5!')
+end
+   
+try
+    plot3(Asph_All_Append_Array_5(:,1), Asph_All_Append_Array_5(:,2), Asph_All_Append_Array_5(:,3), 'kx', 'MarkerSize', 10)
+catch
+    disp('No Asph Data on Chan 5!')
+end
+
+try
+    plot3(Gras_All_Append_Array_5(:,1), Gras_All_Append_Array_5(:,2), Gras_All_Append_Array_5(:,3), 'gx', 'MarkerSize', 10)
+catch
+    disp('No Gras Data on Chan 5!')
 end
 
 axis('equal')
@@ -660,19 +753,38 @@ hold all
 try
     plot3(Grav_Avg_Append_Array_2(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_2(:,3), 'c.', 'MarkerSize', 8.5)
 catch
-    disp('No Grav Data!')
+    disp('No Grav Data on Chan 2!')
 end
 
 try   
     plot3(Asph_Avg_Append_Array_2(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_2(:,3), 'k.', 'MarkerSize', 8.5)
 catch
-    disp('No Asph Data!')
+    disp('No Asph Data on Chan 2!')
 end
 
 try
     plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'g.', 'MarkerSize', 8.5)
 catch
-    disp('No Gras Data!')
+    disp('No Gras Data on Chan 2!')
+end
+
+
+try
+    plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_5(:,3), 'c.', 'MarkerSize', 8.5)
+catch
+    disp('No Grav Data on Chan 5!')
+end
+
+try   
+    plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_5(:,3), 'k.', 'MarkerSize', 8.5)
+catch
+    disp('No Asph Data on Chan 5!')
+end
+
+try
+    plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_5(:,3), 'g.', 'MarkerSize', 8.5)
+catch
+    disp('No Gras Data on Chan 5!')
 end
 
 axis('equal')
