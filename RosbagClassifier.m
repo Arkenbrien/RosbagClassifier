@@ -16,24 +16,37 @@ format compact
 
 %% Options
 
+% Number of areas / channel
+num_areas           = 5;
+
 % Left | Cent | Right Area Center Angle
 % Center is Constant
 cent_cent           = 90 * pi/180;
 
 % Left
-chan_2_cent_left    = 110 * pi/180;
-chan_5_cent_left    = 105 * pi/180;
+chan_2_cent_l       = 110 * pi/180;
+chan_5_cent_l       = 105 * pi/180;
 
-% Right (needed only four characters)
-chan_2_cent_rite    =  75 * pi/180;
-chan_5_cent_rite    =  70 * pi/180;
+% More Left
+chan_2_cent_ll      = 120 * pi/180;
+chan_5_cent_ll      = 110 * pi/180;
+
+% Right
+chan_2_cent_r       =  75 * pi/180;
+chan_5_cent_r       =  70 * pi/180;
+
+% More Right
+chan_2_cent_rr      =  60 * pi/180;
+chan_5_cent_rr      =  65 * pi/180;
 
 % Angle +- to add to center
 chan_2_d_ang        = 5 * pi/180;
 chan_5_d_ang        = 3 * pi/180;
 
-% Angle Select
-% class_angles = [125 105 100 80 75 55 ];
+% RANSAC 
+maxDistance         = 0.5;
+
+%% RDF / Rosbag selection
 
 % Which RDF to load?
 % rdf_load_string = 'test_07_chan_2_20_spltz.mat';
@@ -74,13 +87,31 @@ IMU_Ref_Frame               = [0; 0.336; -0.046];
 gps_to_lidar_diff           = [(LiDAR_Ref_Frame(1) - IMU_Ref_Frame(1)), (LiDAR_Ref_Frame(2) - IMU_Ref_Frame(2)), (LiDAR_Ref_Frame(3) - IMU_Ref_Frame(3))]; 
 
 % Angle Selection
-chan_2_left_angs   = [chan_2_cent_left-chan_2_d_ang  chan_2_cent_left+chan_2_d_ang];
-chan_2_cent_angs   = [cent_cent-chan_2_d_ang  cent_cent+chan_2_d_ang];
-chan_2_rite_angs   = [chan_2_cent_rite-chan_2_d_ang  chan_2_cent_rite+chan_2_d_ang];
+% Channel 2
+chan_2_l_angs   = [chan_2_cent_l-chan_2_d_ang   chan_2_cent_l+chan_2_d_ang];
+chan_2_ll_angs  = [chan_2_cent_ll-chan_2_d_ang  chan_2_cent_ll+chan_2_d_ang];
+chan_2_c_angs   = [cent_cent-chan_2_d_ang       cent_cent+chan_2_d_ang];
+chan_2_r_angs   = [chan_2_cent_r-chan_2_d_ang   chan_2_cent_r+chan_2_d_ang];
+chan_2_rr_angs  = [chan_2_cent_rr-chan_2_d_ang  chan_2_cent_rr+chan_2_d_ang];
 
-chan_5_left_angs   = [chan_5_cent_left-chan_5_d_ang  chan_5_cent_left+chan_5_d_ang];
-chan_5_cent_angs   = [cent_cent-chan_5_d_ang  cent_cent+chan_5_d_ang];
-chan_5_rite_angs   = [chan_5_cent_rite-chan_5_d_ang  chan_5_cent_rite+chan_5_d_ang];
+% chan_2_angs     = [chan_2_ll_angs chan_2_l_angs chan_2_c_angs chan_2_r_angs chan_2_rr_angs];
+chan_2_strt_angs = [chan_2_cent_ll-chan_2_d_ang chan_2_cent_l-chan_2_d_ang cent_cent-chan_2_d_ang chan_2_cent_r-chan_2_d_ang chan_2_cent_rr-chan_2_d_ang];
+chan_2_end_angs  = [chan_2_cent_ll+chan_2_d_ang chan_2_cent_l+chan_2_d_ang cent_cent+chan_2_d_ang chan_2_cent_r+chan_2_d_ang chan_2_cent_rr+chan_2_d_ang];
+
+% Channel 5
+chan_5_l_angs   = [chan_5_cent_l-chan_5_d_ang   chan_5_cent_l+chan_5_d_ang];
+chan_5_ll_angs  = [chan_5_cent_ll-chan_5_d_ang  chan_5_cent_ll+chan_5_d_ang];
+chan_5_c_angs   = [cent_cent-chan_5_d_ang       cent_cent+chan_5_d_ang];
+chan_5_r_angs   = [chan_5_cent_r-chan_5_d_ang   chan_5_cent_r+chan_5_d_ang];
+chan_5_rr_angs  = [chan_5_cent_rr-chan_5_d_ang  chan_5_cent_rr+chan_5_d_ang];
+
+% chan_5_angs     = [chan_5_ll_angs chan_5_l_angs chan_5_c_angs chan_5_r_angs chan_5_rr_angs];
+chan_5_strt_angs = [chan_5_cent_ll-chan_5_d_ang chan_5_cent_l-chan_5_d_ang cent_cent-chan_5_d_ang chan_5_cent_r-chan_5_d_ang chan_5_cent_rr-chan_5_d_ang];
+chan_5_end_angs  = [chan_5_cent_ll+chan_5_d_ang chan_5_cent_l+chan_5_d_ang cent_cent+chan_5_d_ang chan_5_cent_r+chan_5_d_ang chan_5_cent_rr+chan_5_d_ang];
+
+% all_angs        = [chan_2_angs chan_5_angs];
+all_start_angs  = [chan_2_strt_angs chan_5_strt_angs];
+all_end_angs    = [chan_2_end_angs chan_5_end_angs];
 
 % Array Inits
 % Chan 2
@@ -89,11 +120,11 @@ grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; foli_avg_array_tem
 Grav_All_Append_Array_2   = []; Asph_All_Append_Array_2 = []; Foli_All_Append_Array_2 = []; Gras_All_Append_Array_2 = [];
 Grav_Avg_Append_Array_2   = []; Asph_Avg_Append_Array_2 = []; Foli_Avg_Append_Array_2 = []; Gras_Avg_Append_Array_2 = [];
 
-% Chan 5
-grav_array_temp_5         = []; asph_array_temp_5       = []; foli_array_temp_5       = []; gras_array_temp_5       = []; 
-grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; foli_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
-Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Array_5 = []; Gras_All_Append_Array_5 = [];
-Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
+% Chan 5 - not used yet
+% grav_array_temp_5         = []; asph_array_temp_5       = []; foli_array_temp_5       = []; gras_array_temp_5       = []; 
+% grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; foli_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
+% Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Array_5 = []; Gras_All_Append_Array_5 = [];
+% Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
 
 raw_data_export = []; save_folder = [];
 model_RANSAC = []; model_MLS = [];
@@ -244,20 +275,26 @@ parfor cloud = 1:cloud_break
     % Creating the rotation matrix
     rotate_update               = rotz(90-yaw)*roty(roll)*rotx(pitch);
      
-    % Comment Here
+    % Offset the gps coord by the current orientation (in this case, initial) 
+    % Converts the ground truth to lidar frame
     groundTruthTrajectory       = [xEast, yNorth, zUp] * gps2lidar ;
     
-    % Comment Here
+    % Setting the updated difference between the lidar and gps coordiate and
+    % orientation
+    % Converts the offsett to the lidar frame
     gps_to_lidar_diff_update    = gps_to_lidar_diff * LidarOffset2gps * rotate_update;
 
-    % Comment Here
+    % Offset the gps coord by the current orientation (in this case, initial) 
+    % Converts the ground truth to lidar frame
     LidarxEast                  = groundTruthTrajectory(1)  + gps_to_lidar_diff_update(1);
     LidaryNorth                 = groundTruthTrajectory(2)  + gps_to_lidar_diff_update(2);
     LidarzUp                    = groundTruthTrajectory(3)  + gps_to_lidar_diff_update(3);
 
-    % Comment here
-%     groundTruthTrajectory       = groundTruthTrajectory;
+    % Making the vector of ^^^
     lidarTrajectory             = [LidarxEast, LidaryNorth, LidarzUp];
+    
+    % Creating the transform
+    tform                       = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
     
     % Reading the current cloud for xyz, intensity, and ring (channel) values
     xyz_cloud                   = rosReadXYZ(current_cloud);
@@ -274,7 +311,6 @@ parfor cloud = 1:cloud_break
 %     xyz_mll                     = [x_ptA y_ptA z_ptA];
 %     model_MLS                   = MLL_plane_proj(xyz_mll(isfinite(xyz_mll(:,1)), :));
     % RANSAC - MATLAB
-%     maxDistance                 = 0.5;
 %     model_RANSAC                = pcfitplane(ptCloudSource, maxDistance);
 
     %% Trimming data
@@ -296,44 +332,72 @@ parfor cloud = 1:cloud_break
 
     %% Getting Left | Center | Right areas
     
+    for area_find_idx = 1:length(all_start_angs)
+        
+        if any(area_find_idx == 1:5)
+        
+            % Do Something
+            arc_idx     = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  all_end_angs(area_find_idx));
+            
+            
+
+            % Transforming the point cloud
+            xyz_cloud_2(:,1:3) = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
+            xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
+            
+        elseif any(area_find_idx == 6:10)
+            
+            arc_idx     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  all_end_angs(area_find_idx));
+            
+        end
+        
+    end
+    
+    %%
+    
     % CHANNEL 2
     % Chan_2 - LEFT
-    chan_2_left_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_left_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_left_angs(2));
+%     chan_2_l_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_l_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_l_angs(2));
         
     % Chan_2 - CENTER
-    chan_2_cent_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_cent_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_cent_angs(2));
+%     chan_2_c_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_c_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_c_angs(2));
     
     % Chan_2 - RIGHT
-    chan_2_rite_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_rite_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) < chan_2_rite_angs(2));
+%     chan_2_r_idxs = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_r_angs(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) < chan_2_r_angs(2));
     
     % CHANNEL 5
     % Chan_5 - LEFT
-    chan_5_left_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_left_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_left_angs(2));
+%     chan_5_l_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_l_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_l_angs(2));
         
     % Chan_5 - CENTER
-    chan_5_cent_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_cent_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_cent_angs(2));
+%     chan_5_c_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_c_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_c_angs(2));
     
     % Chan_5 - RIGHT
-    chan_5_rite_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_rite_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) < chan_5_rite_angs(2));
+%     chan_5_r_idxs = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_r_angs(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) < chan_5_r_angs(2));
     
-    % Appending all to single thing so we can loop through it to save on
-    % pixel real-estate (lots of repeated code)
-%     chan_idxs{1,:} = chan_2_left_idxs;
-
+    
+    %% Set up for parloop
+    
+%     for area_idx_idx = 1:length
+%     parfor area_idx_idx = 1:length(all_start_angs)
+%         
+%         
+%         
+%     end
     
     %% Applying Transform
 
     % Creating the transform object
-    tform           = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
-    
-    % Transforming the point cloud
-    xyz_cloud_2(:,1:3) = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
-    xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
+%     tform           = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
+%     
+%     % Transforming the point cloud
+%     xyz_cloud_2(:,1:3) = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
+%     xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
     
 
     %% Classify C2 LEFT
 
-    table_export = get_feats_2(xyz_cloud_2(chan_2_left_idxs,:),[]);
+    table_export = get_feats_2(xyz_cloud_2(chan_2_l_idxs,:),[]);
 
     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
 
@@ -342,12 +406,12 @@ parfor cloud = 1:cloud_break
     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/LEFT_2_" + string(n_strPadded) + ".mat";
 
     % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_left_idxs,:))
+    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_l_idxs,:))
 
 
     %% Classify C2 CENTER
 
-    table_export = get_feats_2(xyz_cloud_2(chan_2_cent_idxs,:),[]);
+    table_export = get_feats_2(xyz_cloud_2(chan_2_c_idxs,:),[]);
 
     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
 
@@ -356,12 +420,12 @@ parfor cloud = 1:cloud_break
     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/FRONT_2_" + string(n_strPadded) + ".mat";
 
     % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_cent_idxs,:))
+    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_c_idxs,:))
 
 
     %% Classify C2 RIGHT
 
-    table_export = get_feats_2(xyz_cloud_2(chan_2_rite_idxs,:),[]);
+    table_export = get_feats_2(xyz_cloud_2(chan_2_r_idxs,:),[]);
 
     [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
 
@@ -370,12 +434,12 @@ parfor cloud = 1:cloud_break
     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/RIGHT_2_" + string(n_strPadded) + ".mat";
 
     % Saves it
-    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_rite_idxs,:))
+    RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(chan_2_r_idxs,:))
     
     
 %     %% Classify C5 LEFT
 % 
-%     table_export = get_feats_2(xyz_cloud_5(chan_5_left_idxs,:),[]);
+%     table_export = get_feats_2(xyz_cloud_5(chan_5_l_idxs,:),[]);
 % 
 %     [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
 % 
@@ -384,12 +448,12 @@ parfor cloud = 1:cloud_break
 %     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/LEFT_5_" + string(n_strPadded) + ".mat";
 % 
 %     % Saves it
-%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_left_idxs,:))
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_l_idxs,:))
 % 
 % 
 %     %% Classify C5 CENTER
 % 
-%     table_export = get_feats_2(xyz_cloud_5(chan_5_cent_idxs,:),[]);
+%     table_export = get_feats_2(xyz_cloud_5(chan_5_c_idxs,:),[]);
 % 
 %     [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
 % 
@@ -398,12 +462,12 @@ parfor cloud = 1:cloud_break
 %     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/FRONT_5_" + string(n_strPadded) + ".mat";
 % 
 %     % Saves it
-%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_cent_idxs,:))
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_c_idxs,:))
 % 
 % 
 %     %% Classify C5 RIGHT
 % 
-%     table_export = get_feats_2(xyz_cloud_5(chan_5_rite_idxs,:),[]);
+%     table_export = get_feats_2(xyz_cloud_5(chan_5_r_idxs,:),[]);
 % 
 %     [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
 % 
@@ -412,7 +476,7 @@ parfor cloud = 1:cloud_break
 %     Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/RIGHT_5_" + string(n_strPadded) + ".mat";
 % 
 %     % Saves it
-%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_rite_idxs,:))
+%     RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(chan_5_r_idxs,:))
     
     
 
@@ -544,7 +608,7 @@ catch
 end
 
 % All points
-result_all_fig = figure('DefaultAxesFontSize', 14)
+% result_all_fig = figure('DefaultAxesFontSize', 14)
 
 hold all
 
@@ -568,7 +632,7 @@ end
 
 axis('equal')
 axis off
-view([0 0 90])
+view([pi/2 0 90])
 
 hold on
 pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
@@ -613,7 +677,7 @@ end
 
 axis('equal')
 axis off
-view([0 0 90])
+view([pi/2 0 90])
 
 hold on
 pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
