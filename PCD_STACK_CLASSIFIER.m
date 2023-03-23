@@ -20,8 +20,8 @@ format compact
 % NOTE: RAN ZXY & MLS ZXY = same, RAN RANGE & MLS RANGE same. Planes are
 % not projected. Naming scheme fail, however beause of how baggin works
 % there are slight differences in the algorithms.
-% dlg_list                            = {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
-% [indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'ListSize', [250 250], 'SelectionMode','single');
+dlg_list                            = {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
+[indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'ListSize', [250 250], 'SelectionMode','single');
 
 % Use seperate algorithm for determining if a positive road identification
 % is made, verify with a different algorithm to verify
@@ -55,19 +55,19 @@ close_figs_bool = 0;
 
 %% Determining the plane projection method based off the RDF selection
 
-% if indx_dlg_list == 1 || indx_dlg_list == 2 
-%     ran_proj = 1;
-%     mls_proj = 0;
-% elseif indx_dlg_list == 3 || indx_dlg_list == 4 
-%     mls_proj = 1;
-%     ran_proj = 0;
-% elseif indx_dlg_list == 5 || indx_dlg_list == 6
-%     ran_proj = 0;
-%     mls_proj = 0;
-% end
-
-ran_proj = 0;
-mls_proj = 0;
+if indx_dlg_list == 1 || indx_dlg_list == 2 
+    ran_proj = 1;
+    mls_proj = 0;
+elseif indx_dlg_list == 3 || indx_dlg_list == 4 
+    mls_proj = 1;
+    ran_proj = 0;
+elseif indx_dlg_list == 5 || indx_dlg_list == 6
+    ran_proj = 0;
+    mls_proj = 0;
+end
+% 
+% ran_proj = 0;
+% mls_proj = 0;
 
 %% Loading second RDF
 
@@ -81,26 +81,26 @@ end
 
 % {'RAN All', 'RAN TT', 'MLS All', 'MLS TT', 'Range', 'ZXY'};
 
-% if indx_dlg_list == 1
-% %     rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
-% %     rdf_load_string = 'RDF_OLD.mat'; % RAN ALL
-% %     rdf_load_string = 'Ran_All_Smol.mat'; %Ran All small
+if indx_dlg_list == 1
+    rdf_load_string = 'RAN_ALL_100D_46Tree.mat'; % RAN ALL
+%     rdf_load_string = 'RDF_OLD.mat'; % RAN ALL
+%     rdf_load_string = 'Ran_All_Smol.mat'; %Ran All small
 %     rdf_load_string = 'RAN_ALL_adaboostrdf.mat';
-% elseif indx_dlg_list == 2
-%     rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
-% elseif indx_dlg_list == 3
-%     rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
-% elseif indx_dlg_list == 4
-%     rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
-% elseif indx_dlg_list == 5
-%     rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
-% elseif indx_dlg_list == 6
-%     rdf_load_string = 'MLS_ZXY_50D_41Tree.mat'; % ZXY
-% elseif indx_dlg_list == 7
-%     % Not Implemented
-% end
+elseif indx_dlg_list == 2
+    rdf_load_string = 'RAN_TT_100D_51Tree.mat'; % RAN TT
+elseif indx_dlg_list == 3
+    rdf_load_string = 'MLS_ALL_200D_61Tree.mat'; % MLS ALL
+elseif indx_dlg_list == 4
+    rdf_load_string = 'MLS_TT_50D_56Tree.mat'; % MLS TT
+elseif indx_dlg_list == 5
+    rdf_load_string = 'Ran_Range_50D_51Tree.mat'; % RANGE
+elseif indx_dlg_list == 6
+    rdf_load_string = 'MLS_ZXY_50D_41Tree.mat'; % ZXY
+elseif indx_dlg_list == 7
+    % Not Implemented
+end
 
-rdf_load_string = 'Channel_2_RDF.mat';
+% rdf_load_string = 'Channel_2_RDF.mat';
 
 
 %% Var Inits
@@ -167,7 +167,7 @@ num_points_per_quadrant     = int32(points_per_channel / num_quadrants);
 
 % FUN BAGS
 % file = 'ridges_inner_loop.bag';
-file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-09-14-46-23.bag';
+file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_23_23_SHORTENED_CAOCH/angel_ridge_1.bag';
 
 % Load the rosbag into the workspace
 bag = rosbag(file);
@@ -249,7 +249,7 @@ get_tform(bag, tform_save_folder, ring_min, ring_max)
 
 %% Creating Combined PCD with desired rings
 
-make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
+% make_combined_pcd_small(bag, COMPILED_PCD_FOLDER, rings)
 
 %% LiDAR Stuffz
 
@@ -590,21 +590,21 @@ for class_idx = 1:1:num_pcds
             
             feat_grab_time_start = tic;
             
-%             if indx_dlg_list == 1 || indx_dlg_list == 3
-%                 table_export = getallfeats(xyzi, abcd);
-%             elseif indx_dlg_list == 2
-%                 table_export = gettoptwentyfeatsran(xyzi, abcd);
-%             elseif indx_dlg_list == 4
-%                 table_export = gettoptwentyfeatsmls(xyzi, abcd);
-%             elseif indx_dlg_list == 5
-%                 table_export = getrangefeats(xyzi);
-%             elseif indx_dlg_list == 6
-%                 table_export = getzxyfeats(xyzi);
-% %             elseif indx_dlg_list == 7
-%                 % table_export = getzfeats(xyzi);
-%             end
+            if indx_dlg_list == 1 || indx_dlg_list == 3
+                table_export = getallfeats(xyzi, abcd);
+            elseif indx_dlg_list == 2
+                table_export = gettoptwentyfeatsran(xyzi, abcd);
+            elseif indx_dlg_list == 4
+                table_export = gettoptwentyfeatsmls(xyzi, abcd);
+            elseif indx_dlg_list == 5
+                table_export = getrangefeats(xyzi);
+            elseif indx_dlg_list == 6
+                table_export = getzxyfeats(xyzi);
+%             elseif indx_dlg_list == 7
+                % table_export = getzfeats(xyzi);
+            end
             
-            table_export = get_feats_2(xyzi,[])
+%             table_export = get_feats_2(xyzi,[])
             
 %             if use_sep_rdf_bool
 %                 range_table_export = getrangefeats(xyzi);

@@ -18,65 +18,34 @@ clc
 
 %% Options
 
-% No options for you! XD
+% Comment this out and un-comment next section to get a nice dialogue box 
+load_prev_MCA_file  = 0; 
 
 %% Ask user to load previous file
 
 % WARNING! Must ensure that the previous file is what you want, please do
 % not try to do anything stupid like load a MCA for one pcd and then add
 % new rois for a different pcd! This is asking for trouble! Very bad!
-
-load_prev_MCA_file = questdlg("Load previous file? This will apphend any future additions to the file, and will not delete previous rois.",... 
-    "Load Previous File?",...
-    "Yes", "No", "No");
-
-%% Requesting user for root file
-
-root_dir = uigetdir("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/", "Grab ROOT Dir");
-
-% sturbois_chipseal_woods_1     - COMPLETE
-% sturbois_chipseal_woods_2     - COMPLETE
-% 2022-10-11-09-24-00           - COMPLETE
-
-% 2022-10-20-10-14-05_GRAV      - COMPLETE
-% sturbois_curve_1              - COMPLETE
-% sturbois_straight_1           - COMPLETE
-
-% THE SIX ROSBAGS
-% Chipseal
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_1.bag';
-
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_chipseal_woods_2.bag';
-
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_Simms/2022-10-11-09-24-00.bag';
-
-% Gravel
-% RANGE - Y | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-14-05_GRAV.bag';
-
-% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_curve_1.bag';
-
-% RANGE - N | MLS ALL - Y | RAN ALL - N | MLS TT - N | RAN TT - N | ZXY - N |
-% file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Coach_Sturbois_Shortened/sturbois_straight_1.bag';
+% 
+% load_prev_MCA_file = questdlg("Load previous file? This will apphend any future additions to the file, and will not delete previous rois.",... 
+%     "Load Previous File?",...
+%     "Yes", "No", "No");
 
 %% Loading point cloud
 
+% Ask user for location of pcd
+[pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/pcd_exports/*.pcd','Get PCD');
+
 disp('Loading PCD...')
-
-Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD_SMALL.pcd";
-
-ptCloudSource = pcread(Combined_Pcd_File);
+ptCloudSource = pcread(pcfile);
 
 ptCloudSource_figure = figure('Name','pcd','NumberTitle','off');
 pcshow(ptCloudSource)
 axis equal
 view([0 0 90])
 
-if load_prev_MCA_file == "Yes"
+% Loading the old MCA file if selected
+if load_prev_MCA_file
     
     % Load File
     Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/", "Grab old MCA");
@@ -86,40 +55,44 @@ if load_prev_MCA_file == "Yes"
     
 end
 
+disp('PCD Loaded!')
+
+
 %% Creating Export Location
 
-if load_prev_MCA_file == "Yes"
-    
-    [mca_dir, mca_name, mca_type] = fileparts(which(Manual_Classfied_Areas_File));
-    
-    Filename = string(mca_dir) + "/" + string(mca_name) + string(mca_type);
+% Time of Run
+time_now                = datetime("now","Format","uuuuMMddhhmmss");
+time_now                = datestr(time_now,'yyyyMMddhhmmss');
 
-else
-    
-    MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
-    mkdir(MANUAL_CLASSIFICATION_FOLDER);
-    addpath(MANUAL_CLASSIFICATION_FOLDER);
-    Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
-    
-end
+% if load_prev_MCA_file == "Yes"
+%     
+%     [mca_dir, mca_name, mca_type] = fileparts(which(Manual_Classfied_Areas_File));
+%     
+%     Filename = string(mca_dir) + "/" + string(mca_name) + string(mca_type);
+% 
+% else
+%     
+%     MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
+%     mkdir(MANUAL_CLASSIFICATION_FOLDER);
+%     addpath(MANUAL_CLASSIFICATION_FOLDER);
+%     Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
+%     
+% end
+
+Filename = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manuall_Classified_Areas_Wide_SoR/' + string(pcfile) + "_" + string(time_now) + ".mat";
+
 
 %% Var Init
+% 
+grav_ind_start          = 1;
+chip_ind_start          = 1;
+gras_ind_start          = 1;
+foli_ind_start          = 1;
+non_road_ind_start      = 1;
+road_ind_start          = 1;
+asph_ind_start          = 1;
 
-grav_ind_start        = 1;
-chip_ind_start        = 1;
-gras_ind_start        = 1;
-foli_ind_start        = 1;
-non_road_ind_start    = 1;
-road_ind_start        = 1;
-
-grav_ind        = grav_ind_start;
-chip_ind        = chip_ind_start;
-gras_ind        = gras_ind_start;
-foli_ind        = foli_ind_start;
-non_road_ind    = non_road_ind_start;
-road_ind        = road_ind_start;
-
-if load_prev_MCA_file == "Yes"
+if load_prev_MCA_file
     
     try
         grav_ind_start      = length(Manual_Classfied_Areas.grav);
@@ -146,6 +119,12 @@ if load_prev_MCA_file == "Yes"
         foli_ind        = 1;
     end
     try
+        asph_ind_start      = length(Manual_Classfied_Areas.asph);
+        asph_ind            = asph_ind_start + 1;
+    catch
+        asph_ind        = 1;
+    end
+    try
         non_road_ind_start  = length(Manual_Classfied_Areas.non_road_roi);
         non_road_ind        = non_road_ind_start + 1;
     catch
@@ -164,6 +143,7 @@ else
     chip_ind        = 1;
     gras_ind        = 1;
     foli_ind        = 1;
+    asph_ind        = 1;
     non_road_ind    = 1;
     road_ind        = 1;
     
@@ -190,7 +170,7 @@ while true
     
     % Select desired type
     disp('Select terrain type')
-    dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf'};
+    dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf', 'Asph'};
     [indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'SelectionMode','single');
     
     % Selecting the zoom tool by default
@@ -346,7 +326,21 @@ while true
                     % identification
                     pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
                     plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.75)
+                    
+                case 7
+                    
+                    disp('Asphalt')
+                    % Save the x y of the polygon points
+                    asph_roi{asph_ind} = xy_roi;
 
+                    % increase the index counter
+                    asph_ind = asph_ind + 1;
+
+                    % Plot the shape unto the point cloud for easy
+                    % identification
+                    pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+                    plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha',0.75)
+                    
             end
 
             % Clear the workspace for safety
@@ -382,40 +376,47 @@ end
 %% Assigning to Struct
 
 try
-if foli_ind ~= foli_ind_start
-    Manual_Classfied_Areas.foli = foli_roi;
-end
-end
-
-try
-if gras_ind ~= gras_ind_start
-    Manual_Classfied_Areas.gras = gras_roi;
-end
+    if foli_ind ~= foli_ind_start
+        Manual_Classfied_Areas.foli = foli_roi;
+    end
 end
 
 try
-if grav_ind ~= grav_ind_start
-    Manual_Classfied_Areas.grav = grav_roi;
-end
-end
-
-try
-if chip_ind ~= chip_ind_start
-    Manual_Classfied_Areas.chip = chip_roi;
-end
+    if gras_ind ~= gras_ind_start
+        Manual_Classfied_Areas.gras = gras_roi;
+    end
 end
 
 try
-if road_ind ~= road_ind_start
-    Manual_Classfied_Areas.road_roi = road_roi;
-end
+    if grav_ind ~= grav_ind_start
+        Manual_Classfied_Areas.grav = grav_roi;
+    end
 end
 
 try
-if non_road_ind ~= non_road_ind_start
-    Manual_Classfied_Areas.non_road_roi = non_road_roi;
+    if chip_ind ~= chip_ind_start
+        Manual_Classfied_Areas.chip = chip_roi;
+    end
 end
+
+try
+    if road_ind ~= road_ind_start
+        Manual_Classfied_Areas.road_roi = road_roi;
+    end
 end
+
+try
+    if non_road_ind ~= non_road_ind_start
+        Manual_Classfied_Areas.non_road_roi = non_road_roi;
+    end
+end
+
+try
+    if asph_ind ~= asph_ind_start
+        Manual_Classfied_Areas.asph_roi = asph_roi;
+    end
+end
+
 
 %% Saving MCA file
 
@@ -434,22 +435,10 @@ switch save_ans
 
 end
 
+
 %% End Program
 
 close all
 
 disp('End Program!')
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -90,7 +90,7 @@ Tree_Num_Array          = [Min_Num_Trees:Step_Size:Max_Num_Trees];
 
 %% Load Training Data - All-in-one
 
-[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/CSV_TRAIN_TEST/*.csv','Grab CSV training data');
+[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/*.csv','Grab CSV training data');
 % 
 import_file = string(train_dat_path) + string(train_dat_file);
 
