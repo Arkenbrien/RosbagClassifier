@@ -3,9 +3,9 @@
 %
 %                     FILE CREATION DATE: 10/19/2022
 %
-%                      Bulk_Training_Data_Extract.m
+%                          RosbagClassifier.m
 %
-% 
+% This program  
 %==========================================================================
 
 %% Clear & Setup Workspace
@@ -269,6 +269,9 @@ fprintf('Max time delta is %f sec \n',max(abs(diffs)));
 
 %% Classifying the Rosbag
 
+% TO-DO: Re-make so that the results are not saved to disk but saved to
+% memory, makes loading results way faster.
+
 % Rate of classification rate per 360 scan
 pcd_class_rate = Par(int64(cloud_break));
 
@@ -466,15 +469,15 @@ for class_idx = 1:1:num_files
 
     %% Clearing Vars
 
-    grav_array_temp_2         = []; asph_array_temp_2       = []; gras_array_temp_2       = []; 
-    grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; gras_avg_array_temp_2   = []; 
-    
-    grav_array_temp_3         = []; asph_array_temp_3       = []; gras_array_temp_3       = []; 
-    grav_avg_array_temp_3     = []; asph_avg_array_temp_3   = []; gras_avg_array_temp_3   = []; 
-    
-    grav_array_temp_5         = []; asph_array_temp_5       = []; gras_array_temp_5       = []; 
-    grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
-    
+%     grav_array_temp_2         = []; asph_array_temp_2       = []; gras_array_temp_2       = []; 
+%     grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; gras_avg_array_temp_2   = []; 
+%     
+%     grav_array_temp_3         = []; asph_array_temp_3       = []; gras_array_temp_3       = []; 
+%     grav_avg_array_temp_3     = []; asph_avg_array_temp_3   = []; gras_avg_array_temp_3   = []; 
+%     
+%     grav_array_temp_5         = []; asph_array_temp_5       = []; gras_array_temp_5       = []; 
+%     grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
+%     
     label_cell = [];
 
     
@@ -511,59 +514,59 @@ for class_idx = 1:1:num_files
         % the label. 
         % I supply two types of arrays - one having all the points and one
         % having the average xyz of the points per classified quadrant
-    if ~isempty(Classification_Result.label) && chan_number == 2
-
-        if isequal(cell2mat(label), 'gravel')
-            grav_array_temp_2         = [grav_array_temp_2; Classification_Result.xyzi];
-            grav_avg_array_temp_2     = [grav_avg_array_temp_2; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'asphalt')
-            asph_array_temp_2         = [asph_array_temp_2; Classification_Result.xyzi];
-            asph_avg_array_temp_2     = [asph_avg_array_temp_2; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'grass')
-            gras_array_temp_2         = [gras_array_temp_2; Classification_Result.xyzi];
-            gras_avg_array_temp_2     = [gras_avg_array_temp_2; Classification_Result.avg_xyz];
-
-        end
-
-    elseif ~isempty(Classification_Result.label) && chan_number == 3
-
-        if isequal(cell2mat(label), 'gravel')
-            grav_array_temp_3         = [grav_array_temp_3; Classification_Result.xyzi];
-            grav_avg_array_temp_3     = [grav_avg_array_temp_3; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'asphalt')
-            asph_array_temp_3         = [asph_array_temp_3; Classification_Result.xyzi];
-            asph_avg_array_temp_3     = [asph_avg_array_temp_3; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'grass')
-            gras_array_temp_3         = [gras_array_temp_3; Classification_Result.xyzi];
-            gras_avg_array_temp_3     = [gras_avg_array_temp_3; Classification_Result.avg_xyz];
-        end
-
-    elseif ~isempty(Classification_Result.label) && chan_number == 5
-
-        if isequal(cell2mat(label), 'gravel')
-            grav_array_temp_5         = [grav_array_temp_5; Classification_Result.xyzi];
-            grav_avg_array_temp_5     = [grav_avg_array_temp_5; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'asphalt')
-            asph_array_temp_5         = [asph_array_temp_5; Classification_Result.xyzi];
-            asph_avg_array_temp_5     = [asph_avg_array_temp_5; Classification_Result.avg_xyz];
-        end
-
-        if isequal(cell2mat(label), 'grass')
-            gras_array_temp_5         = [gras_array_temp_5; Classification_Result.xyzi];
-            gras_avg_array_temp_5     = [gras_avg_array_temp_5; Classification_Result.avg_xyz];
-        end
-
-    end % Go through all the result
+%     if ~isempty(Classification_Result.label) && chan_number == 2
+% 
+%         if isequal(cell2mat(label), 'gravel')
+%             grav_array_temp_2         = [grav_array_temp_2; Classification_Result.xyzi];
+%             grav_avg_array_temp_2     = [grav_avg_array_temp_2; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'asphalt')
+%             asph_array_temp_2         = [asph_array_temp_2; Classification_Result.xyzi];
+%             asph_avg_array_temp_2     = [asph_avg_array_temp_2; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'grass')
+%             gras_array_temp_2         = [gras_array_temp_2; Classification_Result.xyzi];
+%             gras_avg_array_temp_2     = [gras_avg_array_temp_2; Classification_Result.avg_xyz];
+% 
+%         end
+% 
+%     elseif ~isempty(Classification_Result.label) && chan_number == 3
+% 
+%         if isequal(cell2mat(label), 'gravel')
+%             grav_array_temp_3         = [grav_array_temp_3; Classification_Result.xyzi];
+%             grav_avg_array_temp_3     = [grav_avg_array_temp_3; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'asphalt')
+%             asph_array_temp_3         = [asph_array_temp_3; Classification_Result.xyzi];
+%             asph_avg_array_temp_3     = [asph_avg_array_temp_3; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'grass')
+%             gras_array_temp_3         = [gras_array_temp_3; Classification_Result.xyzi];
+%             gras_avg_array_temp_3     = [gras_avg_array_temp_3; Classification_Result.avg_xyz];
+%         end
+% 
+%     elseif ~isempty(Classification_Result.label) && chan_number == 5
+% 
+%         if isequal(cell2mat(label), 'gravel')
+%             grav_array_temp_5         = [grav_array_temp_5; Classification_Result.xyzi];
+%             grav_avg_array_temp_5     = [grav_avg_array_temp_5; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'asphalt')
+%             asph_array_temp_5         = [asph_array_temp_5; Classification_Result.xyzi];
+%             asph_avg_array_temp_5     = [asph_avg_array_temp_5; Classification_Result.avg_xyz];
+%         end
+% 
+%         if isequal(cell2mat(label), 'grass')
+%             gras_array_temp_5         = [gras_array_temp_5; Classification_Result.xyzi];
+%             gras_avg_array_temp_5     = [gras_avg_array_temp_5; Classification_Result.avg_xyz];
+%         end
+% 
+%     end % Go through all the result
 
     %% Apphending all results
     
@@ -571,51 +574,51 @@ for class_idx = 1:1:num_files
     % having the average xyz of the points per classified quadrant
 
     % Channel 2
-    if ~isempty(grav_array_temp_2)
-        Grav_All_Append_Array_2           = [Grav_All_Append_Array_2; grav_array_temp_2];
-        Grav_Avg_Append_Array_2           = [Grav_Avg_Append_Array_2; grav_avg_array_temp_2];
+    if isequal(cell2mat(label), 'gravel')   && chan_number == 2
+        Grav_All_Append_Array_2             = [Grav_All_Append_Array_2; Classification_Result.xyzi];
+        Grav_Avg_Append_Array_2             = [Grav_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(asph_array_temp_2)
-        Asph_All_Append_Array_2           = [Asph_All_Append_Array_2; asph_array_temp_2];
-        Asph_Avg_Append_Array_2           = [Asph_Avg_Append_Array_2; asph_avg_array_temp_2];
+    if isequal(cell2mat(label), 'asphalt')  && chan_number == 2
+        Asph_All_Append_Array_2             = [Asph_All_Append_Array_2; Classification_Result.xyzi];
+        Asph_Avg_Append_Array_2             = [Asph_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(gras_array_temp_2)
-        Gras_All_Append_Array_2           = [Gras_All_Append_Array_2; gras_array_temp_2];
-        Gras_Avg_Append_Array_2           = [Gras_Avg_Append_Array_2; gras_avg_array_temp_2];
+    if isequal(cell2mat(label), 'grass')    && chan_number == 2
+        Gras_All_Append_Array_2             = [Gras_All_Append_Array_2; Classification_Result.xyzi];
+        Gras_Avg_Append_Array_2             = [Gras_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
     % Channel 3
-    if ~isempty(grav_array_temp_3)
-        Grav_All_Append_Array_3           = [Grav_All_Append_Array_3; grav_array_temp_3];
-        Grav_Avg_Append_Array_3           = [Grav_Avg_Append_Array_3; grav_avg_array_temp_3];
+    if isequal(cell2mat(label), 'gravel')   && chan_number == 3
+        Grav_All_Append_Array_3             = [Grav_All_Append_Array_3; Classification_Result.xyzi];
+        Grav_Avg_Append_Array_3             = [Grav_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(asph_array_temp_3)
-        Asph_All_Append_Array_3           = [Asph_All_Append_Array_3; asph_array_temp_3];
-        Asph_Avg_Append_Array_3           = [Asph_Avg_Append_Array_3; asph_avg_array_temp_3];
+    if isequal(cell2mat(label), 'asphalt')  && chan_number == 3
+        Asph_All_Append_Array_3             = [Asph_All_Append_Array_3; Classification_Result.xyzi];
+        Asph_Avg_Append_Array_3             = [Asph_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(gras_array_temp_3)
-        Gras_All_Append_Array_3           = [Gras_All_Append_Array_3; gras_array_temp_3];
-        Gras_Avg_Append_Array_3           = [Gras_Avg_Append_Array_3; gras_avg_array_temp_3];
+    if isequal(cell2mat(label), 'grass') 	&& chan_number == 3
+        Gras_All_Append_Array_3             = [Gras_All_Append_Array_3; Classification_Result.xyzi];
+        Gras_Avg_Append_Array_3             = [Gras_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
     % Channel 5
-    if ~isempty(grav_array_temp_5)
-        Grav_All_Append_Array_5           = [Grav_All_Append_Array_5; grav_array_temp_5];
-        Grav_Avg_Append_Array_5           = [Grav_Avg_Append_Array_5; grav_avg_array_temp_5];
+    if isequal(cell2mat(label), 'gravel')   && chan_number == 5
+        Grav_All_Append_Array_5             = [Grav_All_Append_Array_5; Classification_Result.xyzi];
+        Grav_Avg_Append_Array_5             = [Grav_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(asph_array_temp_5)
-        Asph_All_Append_Array_5           = [Asph_All_Append_Array_5; asph_array_temp_5];
-        Asph_Avg_Append_Array_5           = [Asph_Avg_Append_Array_5; asph_avg_array_temp_5];
+    if isequal(cell2mat(label), 'asphalt')  && chan_number == 5
+        Asph_All_Append_Array_5             = [Asph_All_Append_Array_5; Classification_Result.xyzi];
+        Asph_Avg_Append_Array_5             = [Asph_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
     
-    if ~isempty(gras_array_temp_5)
-        Gras_All_Append_Array_5           = [Gras_All_Append_Array_5; gras_array_temp_5];
-        Gras_Avg_Append_Array_5           = [Gras_Avg_Append_Array_5; gras_avg_array_temp_5];
+    if isequal(cell2mat(label), 'grass')    && chan_number == 5
+        Gras_All_Append_Array_5             = [Gras_All_Append_Array_5; Classification_Result.xyzi];
+        Gras_Avg_Append_Array_5             = [Gras_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
     
     %% Weightbar
@@ -632,6 +635,23 @@ for class_idx = 1:1:num_files
 end % Going through the transform list
 
 close(load_result_bar)
+
+%% Score the Results
+
+avg_cell_store{2}.Grav = Grav_Avg_Append_Array_2;
+avg_cell_store{2}.Asph = Asph_Avg_Append_Array_2;
+avg_cell_store{2}.Gras = Gras_Avg_Append_Array_2;
+
+avg_cell_store{3}.Grav = Grav_Avg_Append_Array_3;
+avg_cell_store{3}.Asph = Asph_Avg_Append_Array_3;
+avg_cell_store{3}.Gras = Gras_Avg_Append_Array_3;
+
+avg_cell_store{5}.Grav = Grav_Avg_Append_Array_5;
+avg_cell_store{5}.Asph = Asph_Avg_Append_Array_5;
+avg_cell_store{5}.Gras = Gras_Avg_Append_Array_5;
+
+% Score Fun
+class_score_function(avg_cell_store, Manual_Classfied_Areas)
 
 
 %% Plotting all points
