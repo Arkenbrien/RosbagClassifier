@@ -16,9 +16,11 @@
 % terrain types. TreeBagger then saves the data as a .mat file.
 %
 %==========================================================================
-close all
-clear all
-clc
+
+%% Clearing Workspace
+
+close all; clear all; clc
+
 
 %% OPTIONS
 
@@ -39,6 +41,7 @@ addpath(export_dir)
 default_test_num = export_name(1:7);
 default_test_nam = export_name(9:end);
 
+
 %% Training Setup
 
 prompt                  = {'Min Tree Num', 'Step Size', 'Max Tree Num', 'MaxNumSplits?', 'Test Number?', 'Special Tag?'};
@@ -56,6 +59,7 @@ spec_tag                = string(setup_answers(6));
 
 % Creating the array for the number of trees
 Tree_Num_Array          = [Min_Num_Trees:Step_Size:Max_Num_Trees];
+
 
 %% Load Training Data - Indv training sources
 
@@ -90,8 +94,8 @@ Tree_Num_Array          = [Min_Num_Trees:Step_Size:Max_Num_Trees];
 
 %% Load Training Data - All-in-one
 
-[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/*.csv','Grab CSV training data');
-% 
+[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/*.csv','Grab CSV training data');
+
 import_file = string(train_dat_path) + string(train_dat_file);
 
 Mdl_Trainer_Table       = readtable(import_file);
@@ -117,11 +121,13 @@ def_val_num_feat        = round(sqrt(width(Mdl_Trainer_Table)));
 
 Num_Feats = def_val_num_feat;
 
+
 %% Setting up cost array
 
 % cost_array = ([0 0.75 1.25 1.25; 0.75 0 1.25 1.25; 1 1 0 1; 1 1 1 0]);
 % S.ClassNames = ["gravel","chipseal","foliage","grass"];
 % S.ClassificationCosts = cost_array;
+
 
 %% Creating the Trees :D
 
@@ -139,14 +145,14 @@ parfor tree_idx = 1:length(Tree_Num_Array)
     % array
 
     % Creating the Model
-    Mdl                     = TreeBagger(Tree_Num_Array(tree_idx),Mdl_Trainer_Table, ...
+    Mdl                     = TreeBagger(Tree_Num_Array(tree_idx), Mdl_Trainer_Table, ...
                                         terrain_types, ...
                                         "Method", "classification", ...
                                         "MaxNumSplits", NumSplits, ...
                                         "NumPredictorsToSample", Num_Feats, ...
                                         "OOBPredictorImportance", "on", ...
                                         OOBPrediction = "on" ,...
-                                        InBagFraction = 0.5);  
+                                        InBagFraction = 0.5);
     
     %% Saving the files
 %     disp('Created, saving file...')
@@ -177,7 +183,7 @@ toc
 % disp('Training Table saved! Name: ')
 % disp(Filename_Opt)
 
-%% End Program
+%% Prog End
 
 % gong_gong()
 

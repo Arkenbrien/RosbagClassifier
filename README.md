@@ -17,4 +17,4 @@ This allows for creating of manually defined areas for use in scoring the classi
 
 ===========================================================================
 
-RDFs may be created from .csv files containing training data, using the RDF_Training.m and RDF_Validation.m scripts.
+RDFs may be trained with scripts from the RDF_Creation_Scripts folder.

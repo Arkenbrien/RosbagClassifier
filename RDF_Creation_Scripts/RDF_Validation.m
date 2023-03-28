@@ -28,7 +28,7 @@ feat_export = []; terrain_types = []; data_files = []; feat_name_export = []; cu
 
 %% Selecting the RDF Folder
 
-rdf_dir                 = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/DECISION_TREES/Week_Ov_03_14_2023','Grab Tree Import Directory');
+rdf_dir                 = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/DECISION_TREES/','Grab Tree Import Directory');
 [~,rdf_dir_name,~]      = fileparts(rdf_dir); 
 addpath(rdf_dir);
 rdf_files               = [dir(fullfile(rdf_dir,'/*.mat'))];
@@ -66,7 +66,7 @@ rdf_files               = [dir(fullfile(rdf_dir,'/*.mat'))];
 
 %% Load Validation Data - One source
 
-[train_dat_file, train_dat_path]       = uigetfile('*.csv','Grab CSV testing data');
+[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/*.csv','Grab CSV testing data');
 
 import_file = string(train_dat_path) + string(train_dat_file);
 
@@ -143,11 +143,6 @@ parfor rdf_idx = 1:length(rdf_files)-1
         % Timing for the things
         rdf_begin_tic = tic;
 
-    %     g = waitbar(0,'0','Name','Subset Progress');
-
-
-%         for score_idx = 1:size_tester_table(1)
-
         %% Plugging into the BIG RDF
 
         classification_time_start = tic;
@@ -171,17 +166,6 @@ parfor rdf_idx = 1:length(rdf_files)-1
         
         % Overall Accuracy          
         Overall_Acc = sum(diag(conf_mat.NormalizedValues)) / size_tester_table(1);
-
-%         % Individual Accuracy
-%         grav_acc                    = conf_mat.NormalizedValues(4,4) / sum_grav;
-%         chip_acc                    = conf_mat.NormalizedValues(1,1) / sum_chip;
-%         foli_acc                    = conf_mat.NormalizedValues(2,2) / sum_foli;
-%         gras_acc                    = conf_mat.NormalizedValues(3,3) / sum_gras;
-
-        % Individual Accuracy
-%         grav_acc                    = conf_mat.NormalizedValues(3,3) / min_dat_size;
-%         asph_acc                    = conf_mat.NormalizedValues(1,1) / min_dat_size;
-%         gras_acc                    = conf_mat.NormalizedValues(2,2) / min_dat_size;
 
         %% Options Saving
 
@@ -232,3 +216,10 @@ fprintf("End of Verification! This sucker took %f seconds (%f minutes) to comple
 disp('End Program!')
 
 % gong_gong()
+
+
+
+
+
+
+
