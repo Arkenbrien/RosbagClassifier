@@ -32,7 +32,7 @@ function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot
     
     %% Non-Road Area
     
-%     for gras_rea_idx = 1:length(tot_in_gras_score)
+%     for gras_area_idx = 1:length(tot_in_gras_score)
 %         
 %         
 %         
@@ -74,11 +74,7 @@ function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot
     
     header_Top = {'Asphalt', 'Gravel'};
     header_Row = {'Asphalt', 'Grass', 'Gravel'};
-%     temp_head = categorical(header_Top);
-    temp_table = array2table(acc_array, 'VariableNames', header_Top, 'RowNames', header_Row)
-
-%     heatmap(temp_table, 'Asphalt', 'Gravel')
-    
+    accuracy_table = array2table(acc_array, 'VariableNames', header_Top, 'RowNames', header_Row)    
     
     
 end

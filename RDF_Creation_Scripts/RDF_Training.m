@@ -43,7 +43,7 @@ default_test_nam = export_name(9:end);
 
 prompt                  = {'Min Tree Num', 'Step Size', 'Max Tree Num', 'MaxNumSplits?', 'Test Number?', 'Special Tag?'};
 dlgtitle                = 'Tree Creation Setup';
-definput                = {'1','5', '301',  '100', default_test_num, default_test_nam};
+definput                = {'1','5', '301',  '20', default_test_num, default_test_nam};
 dims                    = [1 35];
 setup_answers           = inputdlg(prompt,dlgtitle,dims,definput);
 

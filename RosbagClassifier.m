@@ -16,6 +16,16 @@ format compact
 
 %% Options
 
+% Reference Point
+% RANGE from LiDAR Point of origin
+range_bool  = 1;
+
+% Height from RANSAC projected plane
+ransac_bool = 0;
+
+% Height from MLS projected plane
+mls_bool    = 0;
+
 % LL | L | C | R | RR
 % More Left
 chan_2_ll_cent      = 130 * pi/180;
@@ -58,10 +68,28 @@ fig_size_array          = [10 10 3500 1600];
 %% RDF / Rosbag selection
 
 % Which RDF to load?
-% rdf_load_string = 'test_07_chan_2_20_spltz.mat';
-chan_2_rdf_load_string = '26_3_10_Test_0720_splits_TreeBagger.mat';
-chan_5_rdf_load_string = '86_3_10_Test_11_100_splitz_TreeBagger.mat';
-chan_3_rdf_load_string = 'chan_3_rdf.mat';
+
+if range_bool
+    
+    chan_2_rdf_load_string = 'chan_2_RANGE_rdf.mat';
+    chan_5_rdf_load_string = 'chan_5_RANGE_rdf.mat';
+    chan_3_rdf_load_string = 'chan_3_RANGE_rdf.mat';
+    
+elseif ransac_bool
+    
+    chan_2_rdf_load_string = 'chan_2_RANSAC_rdf.mat';
+    chan_5_rdf_load_string = 'chan_5_RANSAC_rdf.mat';
+    chan_3_rdf_load_string = 'chan_3_RANSAC_rdf.mat';
+    
+elseif mls_bool
+    
+    chan_2_rdf_load_string = 'chan_2_MLS_rdf.mat';
+    chan_5_rdf_load_string = 'chan_5_MLS_rdf.mat';
+    chan_3_rdf_load_string = 'chan_3_MLS_rdf.mat';
+    
+end
+
+
 
 % roi/rosbag PAIRS - 1 ROI per file
 
@@ -75,11 +103,7 @@ chan_3_rdf_load_string = 'chan_3_rdf.mat';
 % roi_file = 'shortened_coach_sturbois.mat'; % Past training source
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_13_2023_shortened_coach_sturbois/2023-03-13-10-56-38.bag';
 
-% Pavement 2 VERIFICAION BAD BAD BAD D: ANGEL RIDGE ROAD
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manuall_Classified_Areas_Wide_SoR/angel_ridge_1_pcd.pcd.pcd_20231923130322.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_23_23_SHORTENED_CAOCH/angel_ridge_1.bag';
-
-% Pavement 3  VERIFICAION MULIGAN ROAD
+% Pavement 2  VERIFICAION MULIGAN ROAD
 bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_bags_03_23_23/Mulligan_Road_2.bag';
 roi_file = 'mulligan_road_2.pcd_20234423140304.mat';
 
@@ -216,16 +240,16 @@ disp('Messages Loaded')
 time_now        = datetime("now","Format","uuuuMMddhhmmss");
 time_now        = datestr(time_now,'yyyyMMddhhmmss');
 
-CLASSIFICATION_STACK_FOLDER = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_3_5_" + string(time_now);
+export_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_3_5_" + string(time_now);
 
-if ~exist(CLASSIFICATION_STACK_FOLDER,'dir')
-    mkdir(CLASSIFICATION_STACK_FOLDER)
+if ~exist(export_dir,'dir')
+    mkdir(export_dir)
 end
 
 % addpath(root_dir)
 % CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
 % mkdir(CLASSIFICATION_STACK_FOLDER);
-addpath(CLASSIFICATION_STACK_FOLDER);
+addpath(export_dir);
 
 
 %% More Var Init
@@ -339,22 +363,23 @@ parfor cloud = 1:cloud_break
     
     %% RANSAC and MLS
     
-%     if mls_bool
-%         
-%         % MLS
-%         xyz_mll                     = [xyz_cloud(:,1) xyz_cloud(:,2) xyz_cloud(:,3)];
-%         model_MLS                   = MLL_plane_proj(xyz_mll(isfinite(xyz_mll(:,1)), :));
-%         abcd                        = [];
-%         
-%     elseif ran_bool
-%         
-%         % RANSAC - MATLAB
-%         ptCloudSource               = pointCloud(xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3), 'Intensities', xyz_cloud(:,4));
-%         model_RANSAC                = pcfitplane(ptCloudSource, maxDistance);
-%         abcd                        = [];
-%         
-%     end
-
+    if mls_bool
+        
+        % MLS
+        xyz_mll                     = [xyz_cloud(:,1) xyz_cloud(:,2) xyz_cloud(:,3)];
+        model_MLS                   = MLL_plane_proj(xyz_mll(isfinite(xyz_mll(:,1)), :));
+        abcd                        = [model_MLS.a, model_MLS.b, model_MLS.c, model_MLS.d];
+        
+    elseif ransac_bool
+        
+        % RANSAC - MATLAB
+        ptCloudSource               = pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)], 'Intensity', xyz_cloud(:,4));
+        model_RANSAC                = pcfitplane(ptCloudSource, maxDistance);
+        abcd                        = [model_RANSAC.Parameters(1), model_RANSAC.Parameters(2), model_RANSAC.Parameters(3), model_RANSAC.Parameters(4)];
+        
+    end
+    
+    
     %% Trimming data
     
     % Data Clean-up
@@ -385,14 +410,20 @@ parfor cloud = 1:cloud_break
             arc_idx     = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  all_end_angs(area_find_idx));
 
             % Grabbing Features
-            table_export = get_feats_2(xyz_cloud_2(arc_idx,:),[]);
+            if range_bool
+                table_export = get_feats_2(xyz_cloud_2(arc_idx,:), []);
+            elseif ransac_bool
+                table_export = get_RANSAC_feats_2(xyz_cloud_2(arc_idx,:),abcd);
+            elseif mls_bool
+                disp('nothing here');
+            end
 
             % Classifying
             [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
 
             %Creates pcd file name
             n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/2_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
+            Classification_FileName = string(export_dir) + "/2_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
 
             % Saves it
             RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(arc_idx,:), tform)
@@ -403,14 +434,20 @@ parfor cloud = 1:cloud_break
             arc_idx     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  all_end_angs(area_find_idx));
 
             % Grabbing Features
-            table_export = get_feats_2(xyz_cloud_3(arc_idx,:),[]);
+            if range_bool
+                table_export = get_feats_2(xyz_cloud_3(arc_idx,:), []);
+            elseif ransac_bool
+                table_export = get_RANSAC_feats_2(xyz_cloud_3(arc_idx,:),abcd);
+            elseif mls_bool
+                disp('nothing here');
+            end
 
             % Classifying
             [Yfit, scores, stdevs]              = predict(chan_3_rdf.Mdl, table_export);
 
             %Creates pcd file name
             n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/3_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
+            Classification_FileName = string(export_dir) + "/3_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
 
             % Saves it
             RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_3(arc_idx,:), tform)
@@ -421,14 +458,20 @@ parfor cloud = 1:cloud_break
             arc_idx     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  all_end_angs(area_find_idx));
 
             % Grabbing Features
-            table_export = get_feats_2(xyz_cloud_5(arc_idx,:),[]);
-
+            if range_bool
+                table_export = get_feats_2(xyz_cloud_5(arc_idx,:), []);
+            elseif ransac_bool
+                table_export = get_RANSAC_feats_2(xyz_cloud_5(arc_idx,:),abcd);
+            elseif mls_bool
+                disp('nothing here');
+            end
+            
             % Classifying
             [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
 
             %Creates pcd file name
             n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(CLASSIFICATION_STACK_FOLDER) + "/5_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
+            Classification_FileName = string(export_dir) + "/5_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
 
             % Saves it
             RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(arc_idx,:), tform)
@@ -453,7 +496,7 @@ parfor_progress(0);
 
 %% Load the Classification folder and grab the results
 
-classification_list             = dir(fullfile(CLASSIFICATION_STACK_FOLDER,'/*.mat'));
+classification_list             = dir(fullfile(export_dir,'/*.mat'));
 
 num_files                       = length(classification_list);
 
@@ -884,7 +927,7 @@ l.Interpreter = 'tex';
 hold off
 % axis('equal')
 
-xlabel('Quadrant')
+xlabel('360 Scan')
 ylabel('Time (s)')
 
 ylim([min_time max_time])
@@ -902,7 +945,7 @@ plot(Move_mean_Hz, 'r', 'LineWidth', 3)
 
 % axis('equal')
 
-xlabel('Quadrant')
+xlabel('360 Scan')
 ylabel('Hz')
 
  l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');

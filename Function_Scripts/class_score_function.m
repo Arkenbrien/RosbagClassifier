@@ -36,7 +36,7 @@ function class_score_function(avg_cell_store, Manual_Classfied_Areas)
                 grav_in_grav        = sum(inpolygon(Grav_Avg_Array(:,1), Grav_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
                 asph_in_grav        = sum(inpolygon(Asph_Avg_Array(:,1), Asph_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
                 gras_in_grav        = sum(inpolygon(Gras_Avg_Array(:,1), Gras_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
-                tot_in_area         = grav_in_grav + asph_in_grav + gras_in_grav
+                tot_in_area         = grav_in_grav + asph_in_grav + gras_in_grav;
                 
                 if tot_in_area ~= 0 
 
@@ -175,7 +175,7 @@ function class_score_function(avg_cell_store, Manual_Classfied_Areas)
     
     %% For all areas all channels
     
-%     accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score);
+    accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score);
     
     
     %% Plotting all channels' scores and areas
