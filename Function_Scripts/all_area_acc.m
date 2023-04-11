@@ -1,4 +1,6 @@
 function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score)
+
+    disp('Entered accuracy_table.m')
     
     %% Var Init
     
@@ -76,5 +78,8 @@ function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot
     header_Row = {'Asphalt', 'Grass', 'Gravel'};
     accuracy_table = array2table(acc_array, 'VariableNames', header_Top, 'RowNames', header_Row)    
     
+    %% End Script
     
+    disp('Completed accuracy_table.m')
+
 end

@@ -1,5 +1,7 @@
 function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score] = tot_in_area_score(channel_in_grav_area_score, channel_in_asph_area_score, channel_in_nonroad_area_score, channel_in_other_road_area_score, used_chans, Manual_Classfied_Areas)
 
+    disp('Entered tot_in_area_score.m')
+    
     %% Get Total Score / Area: Gravel
     
     try
@@ -151,5 +153,10 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
         tot_in_or_score = [];
 
     end
+    
+    %% End Script
+    
+    disp('Completed tot_in_area_score.m')
+
 
 end

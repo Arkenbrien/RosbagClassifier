@@ -18,8 +18,8 @@ clc
 
 %% Options
 
-% Comment this out and un-comment next section to get a nice dialogue box 
-load_prev_MCA_file  = 0; 
+load_prev_MCA_file = 0;
+
 
 %% Ask user to load previous file
 
@@ -31,10 +31,13 @@ load_prev_MCA_file  = 0;
 %     "Load Previous File?",...
 %     "Yes", "No", "No");
 
+
 %% Loading point cloud
 
 % Ask user for location of pcd
-[pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/pcd_exports/*.pcd','Get PCD');
+[pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/*.pcd','Get PCD');
+
+addpath(string(pcfolder));
 
 disp('Loading PCD...')
 ptCloudSource = pcread(pcfile);
@@ -45,17 +48,17 @@ axis equal
 view([0 0 90])
 
 % Loading the old MCA file if selected
-if load_prev_MCA_file
-    
-    % Load File
-    Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/", "Grab old MCA");
-    load(Manual_Classfied_Areas_File)
-    
-    mca_plot_fun(Manual_Classfied_Areas)
-    
-end
-
-disp('PCD Loaded!')
+% if load_prev_MCA_file
+%     
+%     % Load File
+%     Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/", "Grab old MCA");
+%     load(Manual_Classfied_Areas_File)
+%     
+%     mca_plot_fun(Manual_Classfied_Areas)
+%     
+% end
+% 
+% disp('PCD Loaded!')
 
 
 %% Creating Export Location
@@ -79,11 +82,11 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 %     
 % end
 
-Filename = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manuall_Classified_Areas_Wide_SoR/' + string(pcfile) + "_" + string(time_now) + ".mat";
+Filename = string(pcfolder) + string(pcfile) + "_" + string(time_now) + ".mat";
 
 
 %% Var Init
-% 
+
 grav_ind_start          = 1;
 chip_ind_start          = 1;
 gras_ind_start          = 1;
@@ -401,19 +404,19 @@ end
 
 try
     if road_ind ~= road_ind_start
-        Manual_Classfied_Areas.road_roi = road_roi;
+        Manual_Classfied_Areas.road_roi = road;
     end
 end
 
 try
     if non_road_ind ~= non_road_ind_start
-        Manual_Classfied_Areas.non_road_roi = non_road_roi;
+        Manual_Classfied_Areas.non_road_roi = non_road;
     end
 end
 
 try
     if asph_ind ~= asph_ind_start
-        Manual_Classfied_Areas.asph_roi = asph_roi;
+        Manual_Classfied_Areas.asph_roi = asph;
     end
 end
 

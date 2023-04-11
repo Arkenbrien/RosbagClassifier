@@ -6,8 +6,13 @@ clc
 
 %% Options
 
-mls_bool = 0;
-ran_bool = 1;
+% Which reference point
+% RANGE from LiDAR Point of origin
+range_bool  = 1;
+% Height from RANSAC projected plane
+ransac_bool = 0;
+% Height from MLS projected plane
+mls_bool    = 0;
 
 
 %% Var Init
@@ -16,7 +21,7 @@ ran_bool = 1;
 %% Inport data
 
 % Ask user for file & load
-import_file = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/Save_Bulk_All_4/*.mat', 'Get raw data!')
+import_file = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/*.mat', 'Get raw data!')
 load(import_file);
 
 % get size of import file (maybe we have a bigger/smaller LiDAR in future, no?
@@ -26,7 +31,7 @@ import_dims = size(raw_data_export);
 
 % Select desired type
 disp('Select terrain type')
-dlg_list                    = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Asphalt'};
+dlg_list                    = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Asphalt', 'Asphalt_2'};
 [terrain_opt,~]           = listdlg('ListString', dlg_list,'SelectionMode','single');
 
 if terrain_opt == 1
@@ -39,12 +44,14 @@ elseif terrain_opt == 4
     terrain_type = 'foliage';
 elseif terrain_opt == 5
     terrain_type = 'asphalt';
+elseif terrain_opt == 6
+    terrain_type = 'asphalt_2';
 end
 
 %% Export Location 
 
 % Ask user for directory, make file, add to path
-export_location = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA','Get||Make export location')
+export_location = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/02_RDF_Training_Data_Extraction_Result_Handler_Export','Get||Make export location')
 
 if ~exist(export_location,'dir')
     mkdir(export_location)
@@ -72,7 +79,7 @@ for ring_idx = 1:1:import_dims(2)
             xyzi = raw_data_export{row_idx, ring_idx}.xyzi;
             
             % If we're using RANSAC or MLL as plane projection method
-            if ran_bool
+            if ransac_bool
                 
                 abcd = [raw_data_export{row_idx, ring_idx}.rana,...
                         raw_data_export{row_idx, ring_idx}.ranb,...

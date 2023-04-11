@@ -1,5 +1,6 @@
 function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score, Manual_Classfied_Areas)
 
+    disp('Entered per_area_score_plot.m')
 
     %% Var Init
     
@@ -18,7 +19,7 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
     axis('equal')
     axis off
 %     view([-pi/2 0 90])
-    view([-pi 0 90])
+    view([pi 0 90])
 
     hold all
     
@@ -111,6 +112,10 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
         disp('No OR areas to plot!')
         
     end
+    
+    %% End Script
+    
+    disp('Completed per_area_score_plot.m')
 
     
     

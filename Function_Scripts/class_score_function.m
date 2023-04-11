@@ -1,5 +1,7 @@
 function class_score_function(avg_cell_store, Manual_Classfied_Areas)
 
+    disp('Entered class_score_function')
+
     %% Options
     
     
@@ -182,6 +184,10 @@ function class_score_function(avg_cell_store, Manual_Classfied_Areas)
     
     per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score, Manual_Classfied_Areas)
 
+    
+    %% End Script
+    
+    disp('End of class_score_function')
     
     
 end

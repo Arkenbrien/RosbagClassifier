@@ -26,37 +26,13 @@ ransac_bool = 0;
 % Height from MLS projected plane
 mls_bool    = 0;
 
-% LL | L | C | R | RR
-% More Left
-chan_2_ll_cent      = 130 * pi/180;
-chan_3_ll_cent      = 120 * pi/180;
-chan_5_ll_cent      = 110 * pi/180;
+% Center angle variance +- idk what you call this
+chan_2_d_ang        = 3;
+chan_3_d_ang        = 3;
+chan_4_d_ang        = 3;
 
-% Left
-chan_2_l_cent       = 110 * pi/180;
-chan_3_l_cent       = 105 * pi/180;
-chan_5_l_cent       = 100 * pi/180;
-
-% Center is Constant
-cent_cent           = 90 * pi/180;
-
-% Right
-chan_2_r_cent       = 70 * pi/180;
-chan_3_r_cent       = 75 * pi/180;
-chan_5_r_cent       = 80 * pi/180;
-
-% More Right
-chan_2_rr_cent      = 50 * pi/180;
-chan_3_rr_cent      = 60 * pi/180;
-chan_5_cent_rr      = 70 * pi/180;
-
-% Angle +- to add to each arc center
-chan_2_d_ang        = 4 * pi/180;
-chan_3_d_ang        = 3 * pi/180;
-chan_5_d_ang        = 2 * pi/180;
-
-% RANSAC - not used atm
-% maxDistance         = 0.5;
+% RANSAC Options
+maxDistance         = 0.5;
 
 % Plotting the moving average - how many samples per average?
 move_avg_size       = 15;
@@ -64,58 +40,135 @@ move_avg_size       = 15;
 % Size of figures
 fig_size_array          = [10 10 3500 1600];
 
+% Do we compare the data to be classified to the training data????
+data_comp_bool = 0;
 
-%% RDF / Rosbag selection
+
+%% RDF selection
 
 % Which RDF to load?
 
-if range_bool
+% if range_bool
     
-    chan_2_rdf_load_string = 'chan_2_RANGE_rdf.mat';
-    chan_5_rdf_load_string = 'chan_5_RANGE_rdf.mat';
-    chan_3_rdf_load_string = 'chan_3_RANGE_rdf.mat';
+    chan_2_rdf_load_string = 'trainedModeltrilayeredNN20235510140440.mat';
+%     chan_3_rdf_load_string = 'chan3stupid.mat';
+%     chan_4_rdf_load_string = 'chan4stupid.mat';
+%     chan_5_rdf_load_string = 'chan_5_RANGE_rdf.mat';
+%     chan_3_rdf_load_string = 'chan_3_RANGE_rdf.mat';
+%     chan_2_rdf_load_string = 'chan_2_81_3_10_Test_05chan_2_Asph2_RANGE_TreeBagger.mat';
+%     chan_5_rdf_load_string = 'chan_5_56_3_10_Test_07chan_5_Asph2_RANGE_TreeBagger.mat';
+%     chan_3_rdf_load_string = 'chan_3_81_3_10_Test_06chan_3_Asph2_RANGE_TreeBagger.mat';
+%     
+% elseif ransac_bool
+%     
+% %     chan_2_rdf_load_string = 'chan_2_RANSAC_rdf.mat';
+% %     chan_5_rdf_load_string = 'chan_5_RANSAC_rdf.mat';
+% %     chan_3_rdf_load_string = 'chan_3_RANSAC_rdf.mat';
+% %     chan_2_rdf_load_string = 'chan_2_RANSAC_ASPH2.mat';
+% %     chan_5_rdf_load_string = 'chan_3_RANSAC_ASPH2.mat';
+% %     chan_3_rdf_load_string = 'chan_5_RANSAC_ASPH2.mat';
+%     
+% elseif mls_bool
+%     
+%     chan_2_rdf_load_string = 'chan_2_MLS_rdf.mat';
+%     chan_5_rdf_load_string = 'chan_5_MLS_rdf.mat';
+%     chan_3_rdf_load_string = 'chan_3_MLS_rdf.mat';
     
-elseif ransac_bool
-    
-    chan_2_rdf_load_string = 'chan_2_RANSAC_rdf.mat';
-    chan_5_rdf_load_string = 'chan_5_RANSAC_rdf.mat';
-    chan_3_rdf_load_string = 'chan_3_RANSAC_rdf.mat';
-    
-elseif mls_bool
-    
-    chan_2_rdf_load_string = 'chan_2_MLS_rdf.mat';
-    chan_5_rdf_load_string = 'chan_5_MLS_rdf.mat';
-    chan_3_rdf_load_string = 'chan_3_MLS_rdf.mat';
-    
-end
-
-
+% end
 
 % roi/rosbag PAIRS - 1 ROI per file
 
-% Gravel Lot TRAINING
-% roi_file =
-% '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_arc_width_controlol.mat.mat'; % Training source - two seperate one-lane chunks
+
+%% roi/rosbag PAIRS - 1 ROI per file
+
+% Gravel Lot 1
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_arc_width_controlol.mat.mat';
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-09-14-46-23.bag';
+% terrain_opt = 1;
+% roi_select = 1;
 
-% Pavement 1 TRAINING/VERIFICATION MULIGAN ROAD
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_pavement_1_roi.mat.mat'; % TRAINING SOURCE - Two seperate lanes
-% roi_file = 'shortened_coach_sturbois.mat'; % Past training source
+% Gravel Lot 2, 3
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_gravel_lot_2_2rois.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-14-13-12-31.bag';
+% terrain_opt = 1;
+% roi_select = 1; % 1, 2
+
+% Lawn Grass 1
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-17-31_CHIP_ALL_for_grass.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-17-31_CHIP.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Lawn Grass 2
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-21-54_CHIP_ALL_for_grass.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-21-54_CHIP.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Pavement 1, 2
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_pavement_1_roi.mat.mat';
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_13_2023_shortened_coach_sturbois/2023-03-13-10-56-38.bag';
+% terrain_opt = 5;
+% roi_select = 2; %1,2
 
-% Pavement 2  VERIFICAION MULIGAN ROAD
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/shortened_bags_03_23_23/Mulligan_Road_2.bag';
-roi_file = 'mulligan_road_2.pcd_20234423140304.mat';
+% Lawn Grass 3
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_grass_roi.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Pavement 3, 4 - blue_route
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
+% terrain_opt = 5;
+% roi_select = 1; %1,2,3
+
+% Gravel Lot Interception files
+% Down 1Lucin Cutoff
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/03_29_14_54_16_all.pcd_20232103130404.mat'; terrain_opt = 6; % asph2
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-54-16.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/foliage_grab_2FROMFILE2023-03-29-14-54-16.pcd_20230904140433.mat';
+% terrain_opt = 3; foliage
+roi_select = 1;
+
+% Down 2
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_2_03_29_14_57_17_25to150.pcd.pcd_20233803100451.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-57-17.bag';
+% roi_select = 1;
+% terrain_opt = 1;
+
+% Down 3
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_3_29_14_59_48_250to400.pcd.pcd_20234003100412.mat';
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-59-48.bag';
+roi_select = 1;
+terrain_opt = 1;
+
+% % Up 1
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_1_29_14_53_21_1tolen.pcd_20234103100425.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-53-21.bag';
+% roi_select = 1;
+% terrain_opt = 1;
+
+% Up 2
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag.mat'; terrain_opt = 6;
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/foliage_grab_FROM_FILE_2023-03-29-14-55-44_20230104140446.mat'; terrain_opt = 3;
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag';
+% roi_select = 1;
+
+% Up 3
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_3_14_58_13_325to450.pcd.pcd_20234303100447.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-58-13.bag';
+% roi_select = 1;
 
 
 %% Loading RDF
 
 raw_data_export = {};
-disp('Loading RDF...')
+disp('Loading RDFs...')
 chan_2_rdf = load(chan_2_rdf_load_string);
-chan_3_rdf = load(chan_3_rdf_load_string);
-chan_5_rdf = load(chan_5_rdf_load_string);
-disp('RDF Loaded!')
+% chan_3_rdf = load(chan_3_rdf_load_string);
+% chan_4_rdf = load(chan_4_rdf_load_string);
+disp('RDFs Loaded!')
 
 
 %% Variable Initiation
@@ -128,51 +181,9 @@ IMU_Ref_Frame               = [0; 0.336; -0.046];
 gps_to_lidar_diff           = [(LiDAR_Ref_Frame(1) - IMU_Ref_Frame(1)), (LiDAR_Ref_Frame(2) - IMU_Ref_Frame(2)), (LiDAR_Ref_Frame(3) - IMU_Ref_Frame(3))]; 
 
 % Angle array creation
-
-% Channel 2
-% chan_2_ll_angs  = [chan_2_ll_cent   - chan_2_d_ang,     chan_2_ll_cent  + chan_2_d_ang];
-% chan_2_l_angs   = [chan_2_l_cent    - chan_2_d_ang,     chan_2_l_cent   + chan_2_d_ang];
-% chan_2_c_angs   = [cent_cent        - chan_2_d_ang,     cent_cent       + chan_2_d_ang];
-% chan_2_r_angs   = [chan_2_r_cent    - chan_2_d_ang,     chan_2_r_cent   + chan_2_d_ang];
-% chan_2_rr_angs  = [chan_2_rr_cent   - chan_2_d_ang,     chan_2_rr_cent  + chan_2_d_ang];
-
-% chan_2_angs     = [chan_2_ll_angs chan_2_l_angs chan_2_c_angs chan_2_r_angs chan_2_rr_angs];
-chan_2_strt_angs = [chan_2_ll_cent-chan_2_d_ang chan_2_l_cent-chan_2_d_ang cent_cent-chan_2_d_ang chan_2_r_cent-chan_2_d_ang chan_2_rr_cent-chan_2_d_ang];
-chan_2_end_angs  = [chan_2_ll_cent+chan_2_d_ang chan_2_l_cent+chan_2_d_ang cent_cent+chan_2_d_ang chan_2_r_cent+chan_2_d_ang chan_2_rr_cent+chan_2_d_ang];
-
-% Channel 3
-% chan_3_ll_angs  = [chan_3_ll_cent   - chan_3_d_ang,     chan_3_ll_cent  + chan_3_d_ang];
-% chan_3_l_angs   = [chan_3_l_cent    - chan_3_d_ang,     chan_3_l_cent   + chan_3_d_ang];
-% chan_3_c_angs   = [cent_cent        - chan_3_d_ang,     cent_cent       + chan_3_d_ang];
-% chan_3_r_angs   = [chan_3_r_cent    - chan_3_d_ang,     chan_3_r_cent   + chan_3_d_ang];
-% chan_3_rr_angs  = [chan_3_rr_cent   - chan_3_d_ang,     chan_3_rr_cent  + chan_3_d_ang];
-
-% chan_3_angs     = [chan_3_ll_angs chan_3_l_angs chan_3_c_angs chan_3_r_angs chan_3_rr_angs];
-chan_3_strt_angs = [chan_3_ll_cent-chan_3_d_ang chan_3_l_cent-chan_3_d_ang cent_cent-chan_3_d_ang chan_3_r_cent-chan_3_d_ang chan_3_rr_cent-chan_3_d_ang];
-chan_3_end_angs  = [chan_3_ll_cent+chan_3_d_ang chan_3_l_cent+chan_3_d_ang cent_cent+chan_3_d_ang chan_3_r_cent+chan_3_d_ang chan_3_rr_cent+chan_3_d_ang];
-
-% Channel 5
-% chan_5_ll_angs  = [chan_5_ll_cent   - chan_5_d_ang,     chan_5_ll_cent  + chan_5_d_ang];
-% chan_5_l_angs   = [chan_5_l_cent    - chan_5_d_ang,     chan_5_l_cent   + chan_5_d_ang];
-% chan_5_c_angs   = [cent_cent        - chan_5_d_ang,     cent_cent       + chan_5_d_ang];
-% chan_5_r_angs   = [chan_5_r_cent    - chan_5_d_ang,     chan_5_r_cent   + chan_5_d_ang];
-% chan_5_rr_angs  = [chan_5_cent_rr   - chan_5_d_ang,     chan_5_cent_rr  + chan_5_d_ang];
-
-% chan_5_angs     = [chan_5_ll_angs chan_5_l_angs chan_5_c_angs chan_5_r_angs chan_5_rr_angs];
-chan_5_strt_angs = [chan_5_ll_cent-chan_5_d_ang chan_5_l_cent-chan_5_d_ang cent_cent-chan_5_d_ang chan_5_r_cent-chan_5_d_ang chan_5_cent_rr-chan_5_d_ang];
-chan_5_end_angs  = [chan_5_ll_cent+chan_5_d_ang chan_5_l_cent+chan_5_d_ang cent_cent+chan_5_d_ang chan_5_r_cent+chan_5_d_ang chan_5_cent_rr+chan_5_d_ang];
-
-% all_angs        = [chan_2_angs chan_3_angs chan_5_angs];
-all_start_angs  = [chan_2_strt_angs,    chan_3_strt_angs,   chan_5_strt_angs];
-all_end_angs    = [chan_2_end_angs,     chan_3_end_angs,    chan_5_end_angs];
-
-% Only certain channels
-% all_start_angs  = [chan_2_strt_angs];
-% all_end_angs    = [chan_2_end_angs];
-% all_start_angs  = [chan_3_strt_angs];
-% all_end_angs    = [chan_3_end_angs];
-% all_start_angs  = [chan_5_strt_angs];
-% all_end_angs    = [chan_5_end_angs];
+chan_2_c_bounds     = [((90 - chan_2_d_ang) * pi/180), ((90 + chan_2_d_ang) * pi/180)];
+chan_3_c_bounds     = [((90 - chan_3_d_ang) * pi/180), ((90 + chan_3_d_ang) * pi/180)];
+chan_4_c_bounds     = [((90 - chan_4_d_ang) * pi/180), ((90 + chan_4_d_ang) * pi/180)];
 
 % Names for channel
 area_names = [];
@@ -190,6 +201,12 @@ grav_avg_array_temp_3     = []; asph_avg_array_temp_3   = []; foli_avg_array_tem
 Grav_All_Append_Array_3   = []; Asph_All_Append_Array_3 = []; Foli_All_Append_Array_3 = []; Gras_All_Append_Array_3 = [];
 Grav_Avg_Append_Array_3   = []; Asph_Avg_Append_Array_3 = []; Foli_Avg_Append_Array_3 = []; Gras_Avg_Append_Array_3 = [];
 
+% Chan 4
+grav_array_temp_4         = []; asph_array_temp_4       = []; foli_array_temp_4       = []; gras_array_temp_4       = []; 
+grav_avg_array_temp_4     = []; asph_avg_array_temp_4   = []; foli_avg_array_temp_4   = []; gras_avg_array_temp_4   = []; 
+Grav_All_Append_Array_4   = []; Asph_All_Append_Array_4 = []; Foli_All_Append_Array_4 = []; Gras_All_Append_Array_4 = [];
+Grav_Avg_Append_Array_4   = []; Asph_Avg_Append_Array_4 = []; Foli_Avg_Append_Array_4 = []; Gras_Avg_Append_Array_4 = [];
+
 % Chan 5
 grav_array_temp_5         = []; asph_array_temp_5       = []; foli_array_temp_5       = []; gras_array_temp_5       = []; 
 grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; foli_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
@@ -203,6 +220,9 @@ pcd_class_rate = [];
 
 % Legend Stuff
 h = zeros(1,3);
+
+% table exports
+% chan_2_c_table_export = table(); chan_3_c_table_export = table(); chan_4_c_table_export = table();
 
 
 
@@ -234,6 +254,11 @@ gps_msgs = readMessages(gps_topic, 'DataFormat', 'struct');
 
 disp('Messages Loaded')
 
+% cloud_break                 = 20;
+cloud_break                 = length(lidar_msgs);
+gps_pos_store               = zeros(cloud_break,3);
+lidar_pos_store             = gps_pos_store;
+
 
 %% Save Location
 
@@ -251,16 +276,21 @@ end
 % mkdir(CLASSIFICATION_STACK_FOLDER);
 addpath(export_dir);
 
+%% ROI Setup
 
-%% More Var Init
-
-% cloud_break                 = 20;
-cloud_break                 = length(lidar_msgs);
-gps_pos_store               = zeros(cloud_break,3);
-lidar_pos_store             = gps_pos_store;
-
-% RANSAC - MATLAB
-maxDistance                 = 0.5;
+if terrain_opt == 1
+    xy_roi          = Manual_Classfied_Areas.grav{:,roi_select};
+elseif terrain_opt == 2
+    xy_roi          = Manual_Classfied_Areas.chip{:,roi_select};
+elseif terrain_opt == 3
+    xy_roi          = Manual_Classfied_Areas.foli{:,roi_select};
+elseif terrain_opt == 4
+    xy_roi          = Manual_Classfied_Areas.gras{:,roi_select};
+elseif terrain_opt == 5
+    xy_roi          = Manual_Classfied_Areas.asph{:,roi_select};
+elseif terrain_opt == 6
+    xy_roi          = Manual_Classfied_Areas.asph_roi{:,roi_select};
+end
 
 
 %% Timestamps
@@ -302,6 +332,9 @@ pcd_class_rate = Par(int64(cloud_break));
 % Progress bar
 parfor_progress(cloud_break);
 
+% Par Timing asdjfklajsdlfkjas;ldfjlasjdfl;kasdj;fkljas;dkfj
+Par.tic;
+
 % Classifying per 360 scan
 parfor cloud = 1:cloud_break
   
@@ -313,6 +346,9 @@ parfor cloud = 1:cloud_break
     current_cloud = [];
     intensities = [];
     ring = [];
+    abcd = [];
+    table_export = [];
+    
     
     %% Grabbing Data
     
@@ -327,6 +363,7 @@ parfor cloud = 1:cloud_break
     roll                        = matched_stamp.Roll;
     pitch                       = matched_stamp.Pitch;
     yaw                         = matched_stamp.Track+180;
+    
     
     %% Rectifying Frames
      
@@ -361,6 +398,7 @@ parfor cloud = 1:cloud_break
     xyz_cloud(:,4)              = intensities;
     xyz_cloud(:,5)              = ring;
     
+    
     %% RANSAC and MLS
     
     if mls_bool
@@ -389,97 +427,129 @@ parfor cloud = 1:cloud_break
     % Channel Split
     xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
     xyz_cloud_3 = xyz_cloud(xyz_cloud(:,5) == 2, :); % indexes start @ 0
-    xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 4, :); % indexes start @ 0
+    xyz_cloud_4 = xyz_cloud(xyz_cloud(:,5) == 3, :); % indexes start @ 0
     
-    % DEBUG
-%     figure
-%     ptCloudSource = pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)], 'Intensity',  xyz_cloud(:,4));
-%     pcshow(ptCloudSource)
-%     pause
-
-
-    %% Getting Left | Center | Right areas
     
-    Par.tic;
+    %% Find Indexes CHANNEL 2
+
+    % Find points in the arc
+    arc_idx_2 = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_c_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_c_bounds(2));
+
+    % Apply Transformation
+    xyz_cloud_2(:,1:3)      = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
     
-    for area_find_idx = 1:length(all_start_angs)
+    % Grab Data
+    chan_2_c_feat_table   = get_feats_2(xyz_cloud_2(arc_idx_2,:));
+    
+    % Chekcing if we compare what the extracted data to be classified looks
+    % like compared to the training data
+    if data_comp_bool
 
-        if any(area_find_idx == 1:5) % Channel 2
+        % Check if in manually defined truth area
+        in_polygon_check = inpolygon(xyz_cloud_2(arc_idx_2,1), xyz_cloud_2(arc_idx_2,2), xy_roi(:,1), xy_roi(:,2));
 
-            % Find Indexes
-            arc_idx     = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  all_end_angs(area_find_idx));
+        % Compare to see if the majority of arc is in manually defined
+        % area - if so extract data
+        if sum(in_polygon_check) >= (length(xyz_cloud_2(arc_idx_2,1)) - 3)
 
-            % Grabbing Features
-            if range_bool
-                table_export = get_feats_2(xyz_cloud_2(arc_idx,:), []);
-            elseif ransac_bool
-                table_export = get_RANSAC_feats_2(xyz_cloud_2(arc_idx,:),abcd);
-            elseif mls_bool
-                disp('nothing here');
-            end
+            chan_2_c_table_export{cloud} = chan_2_c_feat_table;
 
-            % Classifying
-            [Yfit, scores, stdevs]              = predict(chan_2_rdf.Mdl, table_export);
-
-            %Creates pcd file name
-            n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(export_dir) + "/2_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
-
-            % Saves it
-            RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_2(arc_idx,:), tform)
-            
-        elseif any(area_find_idx == 6:10) % Channel 5
-
-            % Find Indexes
-            arc_idx     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  all_end_angs(area_find_idx));
-
-            % Grabbing Features
-            if range_bool
-                table_export = get_feats_2(xyz_cloud_3(arc_idx,:), []);
-            elseif ransac_bool
-                table_export = get_RANSAC_feats_2(xyz_cloud_3(arc_idx,:),abcd);
-            elseif mls_bool
-                disp('nothing here');
-            end
-
-            % Classifying
-            [Yfit, scores, stdevs]              = predict(chan_3_rdf.Mdl, table_export);
-
-            %Creates pcd file name
-            n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(export_dir) + "/3_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
-
-            % Saves it
-            RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_3(arc_idx,:), tform)
-
-        elseif any(area_find_idx == 11:15) % Channel 5
-
-            % Find Indexes
-            arc_idx     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > all_start_angs(area_find_idx) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  all_end_angs(area_find_idx));
-
-            % Grabbing Features
-            if range_bool
-                table_export = get_feats_2(xyz_cloud_5(arc_idx,:), []);
-            elseif ransac_bool
-                table_export = get_RANSAC_feats_2(xyz_cloud_5(arc_idx,:),abcd);
-            elseif mls_bool
-                disp('nothing here');
-            end
-            
-            % Classifying
-            [Yfit, scores, stdevs]              = predict(chan_5_rdf.Mdl, table_export);
-
-            %Creates pcd file name
-            n_strPadded             = sprintf('%08d', cloud);
-            Classification_FileName = string(export_dir) + "/5_" + string(area_find_idx) + "_" + string(n_strPadded) + ".mat";
-
-            % Saves it
-            RosbagClassifier_parsave(Classification_FileName, Yfit, scores, stdevs, xyz_cloud_5(arc_idx,:), tform)
-            
         end
         
     end
     
+     % Classifying
+%     [Yfit2, scores2, stdevs2]  = predict(chan_2_rdf.Mdl, chan_2_c_feat_table);
+    Yfit2 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_2_c_feat_table)
+    
+    %Creates pcd file name
+    n_strPadded             = sprintf('%08d', cloud);
+    Classification_FileName = string(export_dir) + "/2_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
+
+    % Saves it
+    RosbagClassifier_parsave(Classification_FileName, Yfit2, [], [], xyz_cloud_2(arc_idx_2,:), tform)
+    
+    
+    %% Find Indexes CHANNEL 3
+
+    % Find points in the arc
+    arc_idx_3     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_c_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_c_bounds(2));
+
+   
+    % Grab Data
+    chan_3_c_feat_table   = get_feats_2(xyz_cloud_3(arc_idx_3,:));
+    
+    % Chekcing if we compare what the extracted data to be classified looks
+    % like compared to the training data
+    if data_comp_bool
+
+        % Check if in manually defined truth area
+        in_polygon_check = inpolygon(xyz_cloud_3(arc_idx_3,1), xyz_cloud_3(arc_idx_3,2), xy_roi(:,1), xy_roi(:,2));
+
+        % Compare to see if the majority of arc is in manually defined
+        % area - if so extract data
+        if sum(in_polygon_check) >= (length(xyz_cloud_3(arc_idx_3,1)) - 3)
+
+            chan_3_c_table_export{cloud} = chan_3_c_feat_table;
+
+        end
+
+    end
+    
+     % Classifying
+%     [Yfit3, scores3, stdevs3]  = predict(chan_3_rdf.Mdl, chan_3_c_feat_table);
+    Yfit3 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_3_c_feat_table);
+     % Apply Transformation
+    xyz_cloud_3(:,1:3) = xyz_cloud_3(:,1:3) * tform.Rotation + tform.Translation;
+
+    %Creates pcd file name
+    n_strPadded             = sprintf('%08d', cloud);
+    Classification_FileName = string(export_dir) + "/3_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
+
+    % Saves it
+    RosbagClassifier_parsave(Classification_FileName, Yfit3, [], [], xyz_cloud_3(arc_idx_3,:), tform)
+    
+    
+    %% Find Indexes CHANNEL 4
+    
+    % Find points in the arc
+    arc_idx_4     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_c_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_c_bounds(2));
+
+    % Apply Transformation
+    xyz_cloud_4(:,1:3) = xyz_cloud_4(:,1:3) * tform.Rotation + tform.Translation;
+
+    % Grab Data
+    chan_4_c_feat_table   = get_feats_2(xyz_cloud_4(arc_idx_4,:));
+    
+    % Chekcing if we compare what the extracted data to be classified looks
+    % like compared to the training data
+    if data_comp_bool
+
+        % Check if in manually defined truth area
+        in_polygon_check = inpolygon(xyz_cloud_4(arc_idx_4,1), xyz_cloud_4(arc_idx_4,2), xy_roi(:,1), xy_roi(:,2));
+
+        % Compare to see if the majority of arc is in manually defined
+        % area - if so extract data
+        if sum(in_polygon_check) >= (length(xyz_cloud_4(arc_idx_4,1)) - 3)
+
+            chan_4_c_table_export{cloud} = chan_4_c_feat_table;
+
+        end  
+
+    end
+    
+     % Classifying
+%     [Yfit4, scores4, stdevs4]  = predict(chan_3_rdf.Mdl, chan_4_c_feat_table);
+    Yfit4 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_3_c_feat_table)
+
+    %Creates pcd file name
+    n_strPadded             = sprintf('%08d', cloud);
+    Classification_FileName = string(export_dir) + "/4_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
+
+    % Saves it
+    RosbagClassifier_parsave(Classification_FileName, Yfit4, [], [], xyz_cloud_4(arc_idx_4,:), tform)
+
+    % Timing
     pcd_class_rate(cloud) = Par.toc;
     
 
@@ -492,6 +562,14 @@ end
 stop(pcd_class_rate)
 
 parfor_progress(0);
+
+%% Quickly export the discovered features into a table
+
+if data_comp_bool
+    
+    export_chans(chan_2_c_table_export, chan_3_c_table_export, chan_4_c_table_export, terrain_opt);
+    
+end
 
 
 %% Load the Classification folder and grab the results
@@ -507,20 +585,8 @@ load_result_bar = waitbar(0, "Loading Files...");
 
 for class_idx = 1:1:num_files
     
-    % Starting the timer for the progress bar estimated time
-%     tform_start = tic;
-
-    %% Clearing Vars
-
-%     grav_array_temp_2         = []; asph_array_temp_2       = []; gras_array_temp_2       = []; 
-%     grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; gras_avg_array_temp_2   = []; 
-%     
-%     grav_array_temp_3         = []; asph_array_temp_3       = []; gras_array_temp_3       = []; 
-%     grav_avg_array_temp_3     = []; asph_avg_array_temp_3   = []; gras_avg_array_temp_3   = []; 
-%     
-%     grav_array_temp_5         = []; asph_array_temp_5       = []; gras_array_temp_5       = []; 
-%     grav_avg_array_temp_5     = []; asph_avg_array_temp_5   = []; gras_avg_array_temp_5   = []; 
-%     
+    %% Var Init
+  
     label_cell = [];
 
     
@@ -538,91 +604,32 @@ for class_idx = 1:1:num_files
     % Go through all the classification results
 %     parfor result_idx = 1:1:length(Classification_Result)
         
-        label                       = Classification_Result.label;
-        
-        % I was messing around with the MATLAB machine learning app, this
-        % catches the classification label and re-formats it to the correct
-        % format for the later code. 
-        
-        try
-            label = cellstr(label);
-        catch
-%             warning('Label may be incorrectly formatted')
-        end
-        
-%         scores                      = Classification_Result(result_idx).scores;
-%         stdevs                      = Classification_Result(result_idx).stdevs;
-        
-        % If the labelresult is not empty, grab the xyz data according to 
-        % the label. 
-        % I supply two types of arrays - one having all the points and one
-        % having the average xyz of the points per classified quadrant
-%     if ~isempty(Classification_Result.label) && chan_number == 2
-% 
-%         if isequal(cell2mat(label), 'gravel')
-%             grav_array_temp_2         = [grav_array_temp_2; Classification_Result.xyzi];
-%             grav_avg_array_temp_2     = [grav_avg_array_temp_2; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'asphalt')
-%             asph_array_temp_2         = [asph_array_temp_2; Classification_Result.xyzi];
-%             asph_avg_array_temp_2     = [asph_avg_array_temp_2; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'grass')
-%             gras_array_temp_2         = [gras_array_temp_2; Classification_Result.xyzi];
-%             gras_avg_array_temp_2     = [gras_avg_array_temp_2; Classification_Result.avg_xyz];
-% 
-%         end
-% 
-%     elseif ~isempty(Classification_Result.label) && chan_number == 3
-% 
-%         if isequal(cell2mat(label), 'gravel')
-%             grav_array_temp_3         = [grav_array_temp_3; Classification_Result.xyzi];
-%             grav_avg_array_temp_3     = [grav_avg_array_temp_3; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'asphalt')
-%             asph_array_temp_3         = [asph_array_temp_3; Classification_Result.xyzi];
-%             asph_avg_array_temp_3     = [asph_avg_array_temp_3; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'grass')
-%             gras_array_temp_3         = [gras_array_temp_3; Classification_Result.xyzi];
-%             gras_avg_array_temp_3     = [gras_avg_array_temp_3; Classification_Result.avg_xyz];
-%         end
-% 
-%     elseif ~isempty(Classification_Result.label) && chan_number == 5
-% 
-%         if isequal(cell2mat(label), 'gravel')
-%             grav_array_temp_5         = [grav_array_temp_5; Classification_Result.xyzi];
-%             grav_avg_array_temp_5     = [grav_avg_array_temp_5; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'asphalt')
-%             asph_array_temp_5         = [asph_array_temp_5; Classification_Result.xyzi];
-%             asph_avg_array_temp_5     = [asph_avg_array_temp_5; Classification_Result.avg_xyz];
-%         end
-% 
-%         if isequal(cell2mat(label), 'grass')
-%             gras_array_temp_5         = [gras_array_temp_5; Classification_Result.xyzi];
-%             gras_avg_array_temp_5     = [gras_avg_array_temp_5; Classification_Result.avg_xyz];
-%         end
-% 
-%     end % Go through all the result
+    label                       = Classification_Result.label;
+
+    % I was messing around with the MATLAB machine learning app, this
+    % catches the classification label and re-formats it to the correct
+    % format for the later code. 
+    
+    try
+        label = cellstr(label);
+    catch
+            warning('Label may be incorrectly formatted')
+    end
+
 
     %% Apphending all results
     
     % I supply two types of arrays - one having all the points and one
     % having the average xyz of the points per classified quadrant
-
+    
+    
     % Channel 2
     if isequal(cell2mat(label), 'gravel')   && chan_number == 2
         Grav_All_Append_Array_2             = [Grav_All_Append_Array_2; Classification_Result.xyzi];
         Grav_Avg_Append_Array_2             = [Grav_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
-    if isequal(cell2mat(label), 'asphalt')  && chan_number == 2
+    if isequal(cell2mat(label), 'asphalt_2')  && chan_number == 2
         Asph_All_Append_Array_2             = [Asph_All_Append_Array_2; Classification_Result.xyzi];
         Asph_Avg_Append_Array_2             = [Asph_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
@@ -632,13 +639,14 @@ for class_idx = 1:1:num_files
         Gras_Avg_Append_Array_2             = [Gras_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
+    
     % Channel 3
     if isequal(cell2mat(label), 'gravel')   && chan_number == 3
         Grav_All_Append_Array_3             = [Grav_All_Append_Array_3; Classification_Result.xyzi];
         Grav_Avg_Append_Array_3             = [Grav_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
-    if isequal(cell2mat(label), 'asphalt')  && chan_number == 3
+    if isequal(cell2mat(label), 'asphalt_2')  && chan_number == 3
         Asph_All_Append_Array_3             = [Asph_All_Append_Array_3; Classification_Result.xyzi];
         Asph_Avg_Append_Array_3             = [Asph_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
@@ -648,13 +656,31 @@ for class_idx = 1:1:num_files
         Gras_Avg_Append_Array_3             = [Gras_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
+    
+    % Channel 4
+    if isequal(cell2mat(label), 'gravel')   && chan_number == 4
+        Grav_All_Append_Array_4             = [Grav_All_Append_Array_4; Classification_Result.xyzi];
+        Grav_Avg_Append_Array_4             = [Grav_Avg_Append_Array_4; Classification_Result.avg_xyz];
+    end
+    
+    if isequal(cell2mat(label), 'asphalt_2')  && chan_number == 4
+        Asph_All_Append_Array_4             = [Asph_All_Append_Array_4; Classification_Result.xyzi];
+        Asph_Avg_Append_Array_4             = [Asph_Avg_Append_Array_4; Classification_Result.avg_xyz];
+    end
+    
+    if isequal(cell2mat(label), 'grass') 	&& chan_number == 4
+        Gras_All_Append_Array_4             = [Gras_All_Append_Array_4; Classification_Result.xyzi];
+        Gras_Avg_Append_Array_4             = [Gras_Avg_Append_Array_4; Classification_Result.avg_xyz];
+    end
+    
+    
     % Channel 5
     if isequal(cell2mat(label), 'gravel')   && chan_number == 5
         Grav_All_Append_Array_5             = [Grav_All_Append_Array_5; Classification_Result.xyzi];
         Grav_Avg_Append_Array_5             = [Grav_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
     
-    if isequal(cell2mat(label), 'asphalt')  && chan_number == 5
+    if isequal(cell2mat(label), 'asphalt_2')  && chan_number == 5
         Asph_All_Append_Array_5             = [Asph_All_Append_Array_5; Classification_Result.xyzi];
         Asph_Avg_Append_Array_5             = [Asph_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
@@ -663,6 +689,7 @@ for class_idx = 1:1:num_files
         Gras_All_Append_Array_5             = [Gras_All_Append_Array_5; Classification_Result.xyzi];
         Gras_Avg_Append_Array_5             = [Gras_Avg_Append_Array_5; Classification_Result.avg_xyz];
     end
+    
     
     %% Weightbar
     
@@ -681,23 +708,43 @@ close(load_result_bar)
 
 %% Score the Results
 
-avg_cell_store{2}.Grav = Grav_Avg_Append_Array_2;
-avg_cell_store{2}.Asph = Asph_Avg_Append_Array_2;
-avg_cell_store{2}.Gras = Gras_Avg_Append_Array_2;
+if ~isempty(Grav_Avg_Append_Array_2) || ~isempty(Asph_Avg_Append_Array_2) || ~isempty(Gras_Avg_Append_Array_2)
+    
+    avg_cell_store{2}.Grav = Grav_Avg_Append_Array_2;
+    avg_cell_store{2}.Asph = Asph_Avg_Append_Array_2;
+    avg_cell_store{2}.Gras = Gras_Avg_Append_Array_2;
 
-avg_cell_store{3}.Grav = Grav_Avg_Append_Array_3;
-avg_cell_store{3}.Asph = Asph_Avg_Append_Array_3;
-avg_cell_store{3}.Gras = Gras_Avg_Append_Array_3;
+end
 
-avg_cell_store{5}.Grav = Grav_Avg_Append_Array_5;
-avg_cell_store{5}.Asph = Asph_Avg_Append_Array_5;
-avg_cell_store{5}.Gras = Gras_Avg_Append_Array_5;
+if ~isempty(Grav_Avg_Append_Array_3) || ~isempty(Asph_Avg_Append_Array_3) || ~isempty(Gras_Avg_Append_Array_3)
+
+    avg_cell_store{3}.Grav = Grav_Avg_Append_Array_3;
+    avg_cell_store{3}.Asph = Asph_Avg_Append_Array_3;
+    avg_cell_store{3}.Gras = Gras_Avg_Append_Array_3;
+
+end
+
+if ~isempty(Grav_Avg_Append_Array_4) || ~isempty(Asph_Avg_Append_Array_4) || ~isempty(Gras_Avg_Append_Array_4)
+
+    avg_cell_store{4}.Grav = Grav_Avg_Append_Array_4;
+    avg_cell_store{4}.Asph = Asph_Avg_Append_Array_4;
+    avg_cell_store{4}.Gras = Gras_Avg_Append_Array_4;
+
+end
+
+if ~isempty(Grav_Avg_Append_Array_5) || ~isempty(Asph_Avg_Append_Array_5) || ~isempty(Gras_Avg_Append_Array_5)
+
+    avg_cell_store{5}.Grav = Grav_Avg_Append_Array_5;
+    avg_cell_store{5}.Asph = Asph_Avg_Append_Array_5;
+    avg_cell_store{5}.Gras = Gras_Avg_Append_Array_5;
+
+end
 
 % Score Fun
-class_score_function(avg_cell_store, Manual_Classfied_Areas)
+% class_score_function(avg_cell_store, Manual_Classfied_Areas)
 
 
-%% Plotting all points
+%% Get Plot Limits
 
 disp('Plotting Results')
 
@@ -718,6 +765,9 @@ catch
     y_max_lim = 100;
     
 end
+
+
+%% Plotting All Points
 
 % All points
 result_all_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
@@ -747,19 +797,38 @@ end
 try
     plot3(Grav_All_Append_Array_3(:,1), Grav_All_Append_Array_3(:,2), Grav_All_Append_Array_3(:,3), 'c^', 'MarkerSize', 10)
 catch
-    disp('No Grav Data on Chan 2!')
+    disp('No Grav Data on Chan 3!')
 end
    
 try
     plot3(Asph_All_Append_Array_3(:,1), Asph_All_Append_Array_3(:,2), Asph_All_Append_Array_3(:,3), 'k^', 'MarkerSize', 10)
 catch
-    disp('No Asph Dataon Chan 2!')
+    disp('No Asph Dataon Chan 3!')
 end
 
 try
     plot3(Gras_All_Append_Array_3(:,1), Gras_All_Append_Array_3(:,2), Gras_All_Append_Array_3(:,3), 'g^', 'MarkerSize', 10)
 catch
-    disp('No Gras Dataon Chan 2!')
+    disp('No Gras Dataon Chan 3!')
+end
+
+% Channel 4
+try
+    plot3(Grav_All_Append_Array_4(:,1), Grav_All_Append_Array_4(:,2), Grav_All_Append_Array_4(:,3), 'cv', 'MarkerSize', 10)
+catch
+    disp('No Grav Data on Chan 4!')
+end
+   
+try
+    plot3(Asph_All_Append_Array_4(:,1), Asph_All_Append_Array_4(:,2), Asph_All_Append_Array_4(:,3), 'kv', 'MarkerSize', 10)
+catch
+    disp('No Asph Dataon Chan 4!')
+end
+
+try
+    plot3(Gras_All_Append_Array_4(:,1), Gras_All_Append_Array_4(:,2), Gras_All_Append_Array_4(:,3), 'gv', 'MarkerSize', 10)
+catch
+    disp('No Gras Dataon Chan 4!')
 end
 
 % Channel 5
@@ -845,6 +914,25 @@ catch
     disp('No Gras Data on Chan 3!')
 end
 
+% Channel 3
+try
+    plot3(Grav_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'c^', 'MarkerSize', 8.5, 'Linewidth', 5)
+catch
+    disp('No Grav Data on Chan 4!')
+end
+
+try   
+    plot3(Asph_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'k^', 'MarkerSize', 8.5, 'Linewidth', 5)
+catch
+    disp('No Asph Data on Chan 4!')
+end
+
+try
+    plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'g^', 'MarkerSize', 8.5, 'Linewidth', 5)
+catch
+    disp('No Gras Data on Chan 4!')
+end
+
 
 % Channel 5
 try
@@ -896,63 +984,63 @@ ax2 = gca;
 ax2.Clipping = 'off';
 
 
-%% PCD Classification Rate
-
-% plot(pcd_class_rate)
-
-time_extract        = pcd_class_rate.par2struct;
-time_extract        = (time_extract.ItStop - time_extract.ItStart) / max(time_extract.Worker);
-
-max_time            = max(time_extract); %s
-min_time            = min(time_extract); %s
-
-max_Hz              = 1 / min(time_extract); %Hz
-min_Hz              = 1 / max(time_extract); %Hz
-
-pcd_class_rate_Hz    =  time_extract.^(-1);
-
-Move_mean_time      = movmean(time_extract, move_avg_size);
-Move_mean_Hz        = movmean(pcd_class_rate_Hz, move_avg_size);
-
-rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10  1400 500]);
-
-hold on
-
-plot(time_extract, 'b')
-plot(Move_mean_time, 'r', 'LineWidth', 3)
-
-l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
-l.Interpreter = 'tex';
-
-hold off
-% axis('equal')
-
-xlabel('360 Scan')
-ylabel('Time (s)')
-
-ylim([min_time max_time])
-
-hold off
-
-% Classification Rate Hz
-
-hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
-
-hold all
-
-plot(pcd_class_rate_Hz, 'b')
-plot(Move_mean_Hz, 'r', 'LineWidth', 3)
-
-% axis('equal')
-
-xlabel('360 Scan')
-ylabel('Hz')
-
- l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
-    l.Interpreter = 'tex';
-
-hold off
-
+% %% PCD Classification Rate
+% 
+% % plot(pcd_class_rate)
+% 
+% time_extract        = pcd_class_rate.par2struct;
+% time_extract        = (time_extract.ItStop - time_extract.ItStart) / max(time_extract.Worker);
+% 
+% max_time            = max(time_extract); %s
+% min_time            = min(time_extract); %s
+% 
+% max_Hz              = 1 / min(time_extract); %Hz
+% min_Hz              = 1 / max(time_extract); %Hz
+% 
+% pcd_class_rate_Hz    =  time_extract.^(-1);
+% 
+% Move_mean_time      = movmean(time_extract, move_avg_size);
+% Move_mean_Hz        = movmean(pcd_class_rate_Hz, move_avg_size);
+% 
+% rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10  1400 500]);
+% 
+% hold on
+% 
+% plot(time_extract, 'b')
+% plot(Move_mean_time, 'r', 'LineWidth', 3)
+% 
+% l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
+% l.Interpreter = 'tex';
+% 
+% hold off
+% % axis('equal')
+% 
+% xlabel('360 Scan')
+% ylabel('Time (s)')
+% 
+% ylim([min_time max_time])
+% 
+% hold off
+% 
+% % Classification Rate Hz
+% 
+% hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
+% 
+% hold all
+% 
+% plot(pcd_class_rate_Hz, 'b')
+% plot(Move_mean_Hz, 'r', 'LineWidth', 3)
+% 
+% % axis('equal')
+% 
+% xlabel('360 Scan')
+% ylabel('Hz')
+% 
+%  l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
+%     l.Interpreter = 'tex';
+% 
+% hold off
+% 
 
 %% End Program 
 

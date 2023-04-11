@@ -28,7 +28,7 @@ feat_export = []; terrain_types = []; data_files = []; feat_name_export = []; cu
 
 %% Selecting the RDF Folder
 
-rdf_dir                 = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/DECISION_TREES/','Grab Tree Import Directory');
+rdf_dir                 = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/RDFs/','Grab Tree Import Directory');
 [~,rdf_dir_name,~]      = fileparts(rdf_dir); 
 addpath(rdf_dir);
 rdf_files               = [dir(fullfile(rdf_dir,'/*.mat'))];
@@ -66,7 +66,7 @@ rdf_files               = [dir(fullfile(rdf_dir,'/*.mat'))];
 
 %% Load Validation Data - One source
 
-[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/*.csv','Grab CSV testing data');
+[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/*.csv','Grab CSV testing data');
 
 import_file = string(train_dat_path) + string(train_dat_file);
 

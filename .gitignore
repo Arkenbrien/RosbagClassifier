@@ -10,3 +10,9 @@ parfor_progress.txt
 *.ods
 ransac_scoring_elimination.txt
 /Delete
+/NN_Test
+/Image_Dump*
+trainNNClassifier.m
+/TRAINING_DATA
+/Manuall_Classified_Areas_Wide_SoR*
+/RDFs

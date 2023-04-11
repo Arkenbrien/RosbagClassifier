@@ -34,7 +34,7 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 
 %% Selecting the export folder
 
-export_dir              = uigetdir('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/DECISION_TREES/Weak_Ov_03_14_2023','Grab Tree Export Directory');
+export_dir              = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/RDFs/','Grab Tree Export Directory');
 addpath(export_dir)
 
 [~, export_name, ~] = fileparts(export_dir);
@@ -94,7 +94,8 @@ Tree_Num_Array          = [Min_Num_Trees:Step_Size:Max_Num_Trees];
 
 %% Load Training Data - All-in-one
 
-[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/*.csv','Grab CSV training data');
+% [train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_DATA/*.csv','Grab CSV training data');
+[train_dat_file, train_dat_path]       = uigetfile('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/*.csv','Grab CSV training data');
 
 import_file = string(train_dat_path) + string(train_dat_file);
 
