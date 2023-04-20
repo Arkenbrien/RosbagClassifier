@@ -4,7 +4,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
     
     %% Get Total Score / Area: Gravel
     
-    try
+    if isfield(Manual_Classfied_Areas, 'grav')        
         
         for grav_idx = 1:length(Manual_Classfied_Areas.grav)    
             
@@ -15,7 +15,10 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             
             for chan_idx = 1:length(used_chans)
                 
-                if ~isempty(channel_in_grav_area_score{chan_idx, grav_idx})
+%                 if ~isempty(channel_in_grav_area_score{chan_idx, grav_idx})
+                if isfield(channel_in_grav_area_score{chan_idx, grav_idx}, 'grav_score') && isfield(channel_in_grav_area_score{chan_idx, grav_idx}, 'asph_score')
+                    
+                    
                     
                     % Get them scores
                     tot_grav_in_grav_score_tmp = [tot_grav_in_grav_score_tmp; channel_in_grav_area_score{chan_idx, grav_idx}.grav_score];
@@ -33,7 +36,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             
         end
         
-    catch
+    else
         
         disp('Nothing in gravel areas!')
         tot_in_grav_score = [];
@@ -42,9 +45,9 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
     
     %% Get Total Score / Area: Asphalt
     
-    try
+    if isfield(Manual_Classfied_Areas, 'asph')
         
-        for asph_idx = 1:length(Manual_Classfied_Areas.asph_roi)    
+        for asph_idx = 1:length(Manual_Classfied_Areas.asph)    
             
             % Var Init
             tot_grav_in_asph_score_tmp = [];
@@ -54,7 +57,8 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             for chan_idx = 1:length(used_chans)
                 
                 % Get them scores
-                if ~isempty(channel_in_asph_area_score{chan_idx, asph_idx})
+%                 if ~isempty(channel_in_asph_area_score{chan_idx, asph_idx})
+                if isfield(channel_in_asph_area_score{chan_idx, asph_idx}, 'grav_score') && isfield(channel_in_asph_area_score{chan_idx, asph_idx}, 'asph_score')
                     
                     tot_grav_in_asph_score_tmp = [tot_grav_in_asph_score_tmp; channel_in_asph_area_score{chan_idx, asph_idx}.grav_score];
                     tot_asph_in_asph_score_tmp = [tot_asph_in_asph_score_tmp; channel_in_asph_area_score{chan_idx, asph_idx}.asph_score];
@@ -71,7 +75,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             
         end
         
-    catch
+    else
         
         disp('Nothing in Asphalt areas!')
         tot_in_asph_score = [];
@@ -80,7 +84,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
     
         %% Get Total Score / Area: Non-Road
     
-    try
+    if isfield(Manual_Classfied_Areas, 'non_road')
         
         for nr_idx = 1:length(Manual_Classfied_Areas.non_road_roi)    
             
@@ -109,7 +113,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             
         end
         
-    catch
+    else
         
         disp('Nothing in Non-Road areas!')
         tot_in_nr_score = [];
@@ -118,9 +122,9 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
     
         %% Get Total Score / Area: Other-Road
     
-    try
+    if isfield(Manual_Classfied_Areas, 'road')
         
-        for or_idx = 1:length(Manual_Classfied_Areas.road_roi)    
+        for or_idx = 1:length(Manual_Classfied_Areas.road)    
             
             % Var Init
             tot_grav_in_or_score_tmp = [];
@@ -147,7 +151,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             
         end
         
-    catch
+    else
         
         disp('Nothing in Other-Road areas!')
         tot_in_or_score = [];

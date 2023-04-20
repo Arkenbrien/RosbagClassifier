@@ -48,6 +48,9 @@ function manual_classifier_pcd_display(roi_file, lidar_msgs, gps_msgs,terrain_op
             xy_roi = Manual_Classfied_Areas.asph{roi_select};
         end
         color = 'yellow';
+    elseif terrain_opt == 7
+        xy_roi = Manual_Classfied_Areas.non_road{roi_select};
+        color = 'magenta';    
     end
 
     % Loading PCD
@@ -265,8 +268,8 @@ function manual_classifier_pcd_display(roi_file, lidar_msgs, gps_msgs,terrain_op
     end
 
     % Plotting the lidar and gps points
-    scatter3(gps_pos_store(1,1),gps_pos_store(1,2),gps_pos_store(1,3),420,'^','MarkerFaceColor','yellow')
-    scatter3(gps_pos_store(end,1),gps_pos_store(end,2),gps_pos_store(end,3),420,'^','MarkerFaceColor','blue')
+    scatter3(gps_pos_store(1,1),gps_pos_store(1,2),gps_pos_store(1,3),420,'^','MarkerFaceColor','green')
+    scatter3(gps_pos_store(end,1),gps_pos_store(end,2),gps_pos_store(end,3),420,'^','MarkerFaceColor','red')
     scatter3(gps_pos_store(:,1),gps_pos_store(:,2),gps_pos_store(:,3),50,'^','MarkerFaceColor','magenta')
     scatter3(lidar_pos_store(:,1),lidar_pos_store(:,2),lidar_pos_store(:,3),50,'^','MarkerFaceColor','cyan')
 

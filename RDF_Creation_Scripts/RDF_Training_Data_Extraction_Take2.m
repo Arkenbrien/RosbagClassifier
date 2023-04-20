@@ -43,11 +43,22 @@ mls_bool    = 0;
 chan_2_d_ang        = 3;
 chan_3_d_ang        = 3;
 chan_4_d_ang        = 3;
+chan_5_d_ang        = 2.5;
 
 chan_2_c_bounds     = [((90 - chan_2_d_ang) * pi/180), ((90 + chan_2_d_ang) * pi/180)];
 chan_3_c_bounds     = [((90 - chan_3_d_ang) * pi/180), ((90 + chan_3_d_ang) * pi/180)];
 chan_4_c_bounds     = [((90 - chan_4_d_ang) * pi/180), ((90 + chan_4_d_ang) * pi/180)];
+chan_5_c_bounds     = [((90 - chan_5_d_ang) * pi/180), ((90 + chan_5_d_ang) * pi/180)];
 
+chan_2_l_bounds     = [((135 - chan_2_d_ang) * pi/180), ((135 + chan_2_d_ang) * pi/180)];
+chan_3_l_bounds     = [((135 - chan_3_d_ang) * pi/180), ((135 + chan_3_d_ang) * pi/180)];
+chan_4_l_bounds     = [((135 - chan_4_d_ang) * pi/180), ((135 + chan_4_d_ang) * pi/180)];
+chan_5_l_bounds     = [((135 - chan_5_d_ang) * pi/180), ((135 + chan_5_d_ang) * pi/180)];
+
+chan_2_r_bounds     = [((45 - chan_2_d_ang) * pi/180), ((45 + chan_2_d_ang) * pi/180)];
+chan_3_r_bounds     = [((45 - chan_3_d_ang) * pi/180), ((45 + chan_3_d_ang) * pi/180)];
+chan_4_r_bounds     = [((45 - chan_4_d_ang) * pi/180), ((45 + chan_4_d_ang) * pi/180)];
+chan_5_r_bounds     = [((45 - chan_5_d_ang) * pi/180), ((45 + chan_5_d_ang) * pi/180)];
 
 % Right
 % chan_2_r_cent       = 75 * pi/180;
@@ -113,10 +124,10 @@ fig_size_array          = [10 10 3500 1600];
 % roi_select = 1;
 
 % Pavement 3, 4 - blue_route
-roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
-terrain_opt = 5;
-roi_select = 1; %1,2,3
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
+% terrain_opt = 5;
+% roi_select = 1; %1,2,3
 
 % Gravel Lot Interception files
 % Down 1
@@ -151,9 +162,35 @@ roi_select = 1; %1,2,3
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-58-13.bag';
 % roi_select = 1;
 
+% ======================================================================= %
 
+% Redmen Gravel Lot: rm_1 - rm_11
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_1.bag';
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_1.mat';
+terrain_opt = 1;
+roi_select = 1; %1 = 1,2,3; 2 = 1,2
+side_select = 3; %1 = l, 2 = c, 3 = r
+
+% Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_6_2.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/SoR_Looks/rm_db_6_SOR.mat'; terrain_opt = 7; 
+% terrain_opt = 5;
+% roi_select = 1;
+
+% Redmen Gravel Lot Grass Collection: rm_13 15 17 18 19 20 22 23 25 27 29 30 32
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_13.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_13.mat';
+% terrain_opt = 4;
+% roi_select = 1;
+% side_select = 3;
 
 %% Variable Initiation
+
+thing2_count = 1;
+thing3_count = 1;
+thing4_count = 1;
+thing5_count = 1;
 
 % Reference Frames
 LiDAR_Ref_Frame             = [0; 1.584; 1.444];
@@ -169,7 +206,7 @@ grav_avg_array_temp_2     = []; asph_avg_array_temp_2   = []; foli_avg_array_tem
 Grav_All_Append_Array_2   = []; Asph_All_Append_Array_2 = []; Foli_All_Append_Array_2 = []; Gras_All_Append_Array_2 = [];
 Grav_Avg_Append_Array_2   = []; Asph_Avg_Append_Array_2 = []; Foli_Avg_Append_Array_2 = []; Gras_Avg_Append_Array_2 = [];
 
-chan_2_c_feat_table = table(); chan_3_c_feat_table = table(); chan_4_c_feat_table = table();
+chan_2_feat_table = table(); chan_3_feat_table = table(); chan_4_feat_table = table(); chan_5_feat_table = table();
 
 % Chan 3
 grav_array_temp_3         = []; asph_array_temp_3       = []; foli_array_temp_3       = []; gras_array_temp_3       = []; 
@@ -203,7 +240,7 @@ else
 end
 
 % Load the rosbag into the workspace
-disp('Loading ROSBAG')
+disp('Loading ROSBAG (takes a while!)')
 bag = rosbag(bag_file);
 disp('ROSBAG Loaded')
 
@@ -235,28 +272,44 @@ time_now        = datestr(time_now,'yyyyMMddhhmmss');
 
 if terrain_opt == 1
     terrain_type    = 'gravel';
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.grav{:,roi_select};
 elseif terrain_opt == 2
     terrain_type    = 'chipseal';    
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.chip{:,roi_select};
 elseif terrain_opt == 3
     terrain_type    = 'foliage';
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.foli{:,roi_select};
 elseif terrain_opt == 4
     terrain_type    = 'grass';
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.gras{:,roi_select};
 elseif terrain_opt == 5
     terrain_type    = 'asphalt';
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.asph{:,roi_select};
 elseif terrain_opt == 6
     terrain_type    = 'asphalt_2';
-    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/" + string(terrain_type)
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
     xy_roi          = Manual_Classfied_Areas.asph_roi{:,roi_select};
+elseif terrain_opt == 7
+    terrain_type    = 'dirt';
+    save_folder     = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm";
+    xy_roi          = Manual_Classfied_Areas.non_road{:,roi_select};
+end
+
+if range_bool
+    
+    save_folder = save_folder + "/" + string(terrain_type);
+    disp(save_folder)
+
+elseif ransac_bool 
+    
+    save_folder = save_folder + "_RAN/" + string(terrain_type);
+    disp(save_folder)
+    
 end
 
 mkdir(save_folder)
@@ -300,13 +353,11 @@ pause
 
 close all
 
+disp('Okay, Extracting Data.......')
 
 %% Extracting Data
 
-% figure
-% pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-% plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha',0.15)
-% hold all
+extract_bar = waitbar(0, "Extracting Files...");
 
 % Classifying per 360 scan
 for cloud = 1:cloud_break
@@ -398,6 +449,7 @@ for cloud = 1:cloud_break
     xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
     xyz_cloud_3 = xyz_cloud(xyz_cloud(:,5) == 2, :); % indexes start @ 0
     xyz_cloud_4 = xyz_cloud(xyz_cloud(:,5) == 3, :); % indexes start @ 0
+    xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 4, :); % indexes start @ 0
     
     % DEBUG
 %     figure
@@ -409,59 +461,162 @@ for cloud = 1:cloud_break
     %% Find Indexes CHANNEL 2
 
     % Find points in the arc
-    arc_idx_2 = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_c_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_c_bounds(2));
+    if side_select == 1
+        arc_idx_2 = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_l_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_l_bounds(2));
+    elseif side_select == 2
+        arc_idx_2 = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_c_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_c_bounds(2));
+    elseif side_select == 3
+        arc_idx_2 = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_r_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_r_bounds(2));
+    end
 
     % Apply Transformation
     xyz_cloud_2(:,1:3) = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
 
     % Check if in manually defined truth area
-    in_polygon_check = inpolygon(xyz_cloud_2(arc_idx_2,1), xyz_cloud_2(arc_idx_2,2), xy_roi(:,1), xy_roi(:,2));
+    in_polygon_check_2 = inpolygon(xyz_cloud_2(arc_idx_2,1), xyz_cloud_2(arc_idx_2,2), xy_roi(:,1), xy_roi(:,2));
+    sum(in_polygon_check_2)
 
     % Compare to see if the majority of arc is in manually defined
     % area - if so extract data
-    if sum(in_polygon_check) >= (length(xyz_cloud_2(arc_idx_2,1)) - 3)
+    if sum(in_polygon_check_2) > 0 % && sum(in_polygon_check_2) > (length(xyz_cloud_2(arc_idx_2,1)) - 3)
 
-        chan_2_c_feat_table = [chan_2_c_feat_table; get_feats_2(xyz_cloud_2(arc_idx_2,:),[])];
+        if range_bool
+            
+            chan_2_feat_table = [chan_2_feat_table; get_RANGE_feats_2(xyz_cloud_2(arc_idx_2,:),[])];
+
+            chan_2_xyzi{thing2_count} = xyz_cloud_2(arc_idx_2,:);
+            thing2_count = thing2_count + 1;
+            
+        elseif ransac_bool
+            
+            chan_2_feat_table = [chan_2_feat_table; get_RANSAC_feats_2(xyz_cloud_2(arc_idx_2,:),abcd)];
+
+            chan_2_xyzi{thing2_count} = xyz_cloud_2(arc_idx_2,:);
+            thing2_count = thing2_count + 1;
+            
+        end
         
     end
     
-    %% Find Indexes CHANNEL 2
+    %% Find Indexes CHANNEL 3
 
     % Find points in the arc
-    arc_idx_3     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_c_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_c_bounds(2));
-
+    if side_select == 1
+        arc_idx_3     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_l_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_l_bounds(2));
+    elseif side_select == 2
+        arc_idx_3     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_c_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_c_bounds(2));
+    elseif side_select == 3
+        arc_idx_3     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_r_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_r_bounds(2));
+    end
+    
     % Apply Transformation
     xyz_cloud_3(:,1:3) = xyz_cloud_3(:,1:3) * tform.Rotation + tform.Translation;
 
     % Check if in manually defined truth area
-    in_polygon_check = inpolygon(xyz_cloud_3(arc_idx_3,1), xyz_cloud_3(arc_idx_3,2), xy_roi(:,1), xy_roi(:,2));
-
+    in_polygon_check_3 = inpolygon(xyz_cloud_3(arc_idx_3,1), xyz_cloud_3(arc_idx_3,2), xy_roi(:,1), xy_roi(:,2));
+%     sum(in_polygon_check_3)
+    
     % Compare to see if the majority of arc is in manually defined
     % area - if so extract data
-    if sum(in_polygon_check) >= (length(xyz_cloud_3(arc_idx_3,1)) - 3)
+    if sum(in_polygon_check_3) > 0 && sum(in_polygon_check_3) > (length(xyz_cloud_3(arc_idx_3,1)) - 3)
 
-        chan_3_c_feat_table = [chan_3_c_feat_table; get_feats_2(xyz_cloud_3(arc_idx_3,:),[])];
+        if range_bool
+            
+            chan_3_feat_table = [chan_3_feat_table; get_RANGE_feats_2(xyz_cloud_3(arc_idx_3,:),[])];
+            
+            chan_3_xyzi{thing3_count} = xyz_cloud_3(arc_idx_3,:);
+            thing3_count = thing3_count + 1;
+            
+        elseif ransac_bool
+            
+            chan_3_feat_table = [chan_3_feat_table; get_RANSAC_feats_2(xyz_cloud_3(arc_idx_3,:),abcd)];
+            
+            chan_3_xyzi{thing3_count} = xyz_cloud_3(arc_idx_3,:);
+            thing3_count = thing3_count + 1;
+            
+        end
 
     end
     
     
-    %% Find Indexes CHANNEL 2
+    %% Find Indexes CHANNEL 4
 
     % Find points in the arc
-    arc_idx_4     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_c_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_c_bounds(2));
+    if side_select == 1
+        arc_idx_4     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_l_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_l_bounds(2));
+    elseif side_select == 2
+        arc_idx_4     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_c_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_c_bounds(2));
+    elseif side_select == 3
+        arc_idx_4     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_r_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_r_bounds(2));
+    end
 
     % Apply Transformation
     xyz_cloud_4(:,1:3) = xyz_cloud_4(:,1:3) * tform.Rotation + tform.Translation;
 
     % Check if in manually defined truth area
-    in_polygon_check = inpolygon(xyz_cloud_4(arc_idx_4,1), xyz_cloud_4(arc_idx_4,2), xy_roi(:,1), xy_roi(:,2));
-
+    in_polygon_check_4 = inpolygon(xyz_cloud_4(arc_idx_4,1), xyz_cloud_4(arc_idx_4,2), xy_roi(:,1), xy_roi(:,2));
+%     sum(in_polygon_check_4)
+    
     % Compare to see if the majority of arc is in manually defined
     % area - if so extract data
-    if sum(in_polygon_check) >= (length(xyz_cloud_4(arc_idx_4,1)) - 3)
+    if sum(in_polygon_check_4) > 0 && sum(in_polygon_check_4) > (length(xyz_cloud_4(arc_idx_4,1)) - 3)
 
-        chan_4_c_feat_table = [chan_4_c_feat_table; get_feats_2(xyz_cloud_4(arc_idx_4,:),[])];
+        if range_bool
+            
+            chan_4_feat_table = [chan_4_feat_table; get_RANGE_feats_2(xyz_cloud_4(arc_idx_4,:),[])];
+            
+            chan_4_xyzi{thing4_count} = xyz_cloud_4(arc_idx_4,:);
+            thing4_count = thing4_count + 1;
+            
+        elseif ransac_bool
+            
+            chan_4_feat_table = [chan_4_feat_table; get_RANSAC_feats_2(xyz_cloud_4(arc_idx_4,:),abcd)];
+            
+            chan_4_xyzi{thing4_count} = xyz_cloud_4(arc_idx_4,:);
+            thing4_count = thing4_count + 1;
+            
+        end
 
+    end
+    
+    %% Find Indexes CHANNEL 5
+
+    % Find points in the arc
+    if side_select == 1
+            arc_idx_5     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_l_bounds(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_l_bounds(2));
+    elseif side_select == 2
+            arc_idx_5     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_c_bounds(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_c_bounds(2));
+    elseif side_select == 3
+            arc_idx_5     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_r_bounds(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_r_bounds(2));
+    end
+
+    % Apply Transformation
+    xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
+
+    % Check if in manually defined truth area
+    in_polygon_check_5 = inpolygon(xyz_cloud_5(arc_idx_5,1), xyz_cloud_5(arc_idx_5,2), xy_roi(:,1), xy_roi(:,2));
+%     sum(in_polygon_check_5)
+    
+    % Compare to see if the majority of arc is in manually defined
+    % area - if so extract data
+    if sum(in_polygon_check_5) > 0 && sum(in_polygon_check_5) > (length(xyz_cloud_5(arc_idx_5,1)) - 3)
+        
+        if range_bool
+            
+            chan_5_feat_table = [chan_5_feat_table; get_RANGE_feats_2(xyz_cloud_5(arc_idx_5,:),[])];
+            
+            chan_5_xyzi{thing5_count} = xyz_cloud_5(arc_idx_5,:);
+            thing5_count = thing5_count + 1;
+            
+        elseif ransac_bool
+            
+            chan_5_feat_table = [chan_5_feat_table; get_RANSAC_feats_2(xyz_cloud_5(arc_idx_5,:),abcd)];
+            
+            chan_5_xyzi{thing5_count} = xyz_cloud_5(arc_idx_5,:);
+            thing5_count = thing5_count + 1;
+            
+        end
+            
     end
     
     %% Debug - plotting
@@ -471,34 +626,132 @@ for cloud = 1:cloud_break
     %% Weightbar
     
 % 	parfor_progress;
+    waitbar(cloud/cloud_break, extract_bar, sprintf('cloud %d out of %d', cloud, cloud_break))
 
 
 end
 
-%% Save extracted table
+close(extract_bar)
+
+%% Save xyzi
+
+% fn2_temp = "chan_2_xyzi_" + string(bag_name) + "_" + string(roi_select) + ".mat"; 
+% fn3_temp = "chan_3_xyzi_" + string(bag_name) + "_" + string(roi_select) + ".mat"; 
+% fn4_temp = "chan_4_xyzi_" + string(bag_name) + "_" + string(roi_select) + ".mat"; 
+% fn5_temp = "chan_5_xyzi_" + string(bag_name) + "_" + string(roi_select) + ".mat"; 
+% 
+% % Overalldir
+% file2_ovrl_name = string(fn2_temp);
+% file3_ovrl_name = string(fn3_temp);
+% file4_ovrl_name = string(fn4_temp);
+% file5_ovrl_name = string(fn5_temp);
+% 
+% % Save
+% save(file2_ovrl_name, 'chan_2_xyzi')
+% save(file3_ovrl_name, 'chan_3_xyzi')
+% save(file4_ovrl_name, 'chan_4_xyzi')
+% save(file5_ovrl_name, 'chan_5_xyzi')
+
+%% Save extracted table CENT
 
 % Adding the terrain type to the table
 
-if height(chan_2_c_feat_table) > 3
-    
-    chan_2_c_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_2_c_feat_table),1);
-    chan_3_c_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_3_c_feat_table),1);
-    chan_4_c_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_4_c_feat_table),1);
+if side_select == 2
 
-    % Creating filenames
-    chan_2_c_filename        = save_folder + "/2_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
-    chan_3_c_filename        = save_folder + "/3_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
-    chan_4_c_filename        = save_folder + "/4_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+    if height(chan_2_feat_table) > 3 && height(chan_3_feat_table) > 3 
 
-    % Saving the table
-    writetable(chan_2_c_feat_table, chan_2_c_filename)
-    writetable(chan_3_c_feat_table, chan_3_c_filename)
-    writetable(chan_4_c_feat_table, chan_4_c_filename)
+        chan_2_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_2_feat_table),1);
+        chan_3_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_3_feat_table),1);
+        chan_4_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_4_feat_table),1);
+        chan_5_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_5_feat_table),1);
+
+        % Creating filenames
+        chan_2_c_filename        = save_folder + "/2_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_3_c_filename        = save_folder + "/3_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_4_c_filename        = save_folder + "/4_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_5_c_filename        = save_folder + "/5_c_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+
+        % Saving the table
+        writetable(chan_2_feat_table, chan_2_c_filename)
+        writetable(chan_3_feat_table, chan_3_c_filename)
+        writetable(chan_4_feat_table, chan_4_c_filename)
+        writetable(chan_5_feat_table, chan_5_c_filename)
+
+    else
+
+        warning('No C data!')
+
+    end
+
+end
+
+
+%% Save extracted table LEFT
+
+if side_select == 1
+
+    % Adding the terrain type to the table
+
+    if height(chan_2_feat_table) > 3 && height(chan_3_feat_table) > 3 
+
+        chan_2_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_2_feat_table),1);
+        chan_3_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_3_feat_table),1);
+        chan_4_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_4_feat_table),1);
+        chan_5_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_5_feat_table),1);
+
+        % Creating filenames
+        chan_2_l_filename        = save_folder + "/2_l_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_3_l_filename        = save_folder + "/3_l_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_4_l_filename        = save_folder + "/4_l_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_5_l_filename        = save_folder + "/5_l_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+
+        % Saving the table
+        writetable(chan_2_feat_table, chan_2_l_filename)
+        writetable(chan_3_feat_table, chan_3_l_filename)
+        writetable(chan_4_feat_table, chan_4_l_filename)
+        writetable(chan_5_feat_table, chan_5_l_filename)
+
+    else
+
+        warning('No L data!')
+
+    end
+
+end
+
+
+%% Save extracted table RIGHT
+
+
+if side_select == 3
     
-else
-    
-    warning('Not enough data!')
-    
+    % Adding the terrain type to the table
+
+    if height(chan_2_feat_table) > 3
+
+        chan_2_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_2_feat_table),1);
+        chan_3_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_3_feat_table),1);
+        chan_4_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_4_feat_table),1);
+        chan_5_feat_table.terrain_type = repelem(categorical({terrain_type}), height(chan_5_feat_table),1);
+
+        % Creating filenames
+        chan_2_r_filename        = save_folder + "/2_r_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_3_r_filename        = save_folder + "/3_r_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_4_r_filename        = save_folder + "/4_r_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+        chan_5_r_filename        = save_folder + "/5_r_" + string(terrain_type) + "_" + string(bag_name) + "_" + string(roi_select) + ".csv";
+
+        % Saving the table
+        writetable(chan_2_feat_table, chan_2_r_filename)
+        writetable(chan_3_feat_table, chan_3_r_filename)
+        writetable(chan_4_feat_table, chan_4_r_filename)
+        writetable(chan_5_feat_table, chan_5_r_filename)
+
+    else
+
+        warning('No R data!')
+
+    end
+
 end
 
 

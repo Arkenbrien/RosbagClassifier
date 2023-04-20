@@ -13,12 +13,12 @@
 %% Clear Workspace
 
 clear all
-% close all
+close all
 clc
 
 %% Options
 
-load_prev_MCA_file = 1;
+load_prev_MCA_file = 0;
 
 
 %% Ask user to load previous file
@@ -32,41 +32,12 @@ load_prev_MCA_file = 1;
 %     "Yes", "No", "No");
 
 
-%% Loading point cloud
-
-% Ask user for location of pcd
-% [pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/*.pcd','Get PCD');
-[pcfile, pcfolder, ~] = uigetfile('*.pcd','Get PCD');
-
-addpath(string(pcfolder));
-
-disp('Loading PCD...')
-ptCloudSource = pcread(pcfile);
-
-ptCloudSource_figure = figure('Name','pcd','NumberTitle','off');
-pcshow(ptCloudSource)
-axis equal
-view([0 0 90])
-
-%% Loading the old MCA file if selected
-if load_prev_MCA_file
-    
-    % Load File
-    Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/", "Grab old MCA");
-    load(Manual_Classfied_Areas_File)
-    
-    mca_plot_fun(Manual_Classfied_Areas)
-    
-end
-
-disp('PCD Loaded!')
-
 
 %% Creating Export Location
 
 % Time of Run
-time_now                = datetime("now","Format","uuuuMMddhhmmss");
-time_now                = datestr(time_now,'yyyyMMddhhmmss');
+% time_now                = datetime("now","Format","uuuuMMddhhmmss");
+% time_now                = datestr(time_now,'yyyyMMddhhmmss');
 
 % if load_prev_MCA_file == "Yes"
 %     
@@ -83,75 +54,36 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 %     
 % end
 
-Filename = string(pcfolder) + string(pcfile) + ".mat";
-
 
 %% Var Init
 
-grav_ind_start          = 1;
-chip_ind_start          = 1;
-gras_ind_start          = 1;
-foli_ind_start          = 1;
-non_road_ind_start      = 1;
-road_ind_start          = 1;
-asph_ind_start          = 1;
+fig_size_array          = [10 10 3500 1600];
 
-if load_prev_MCA_file
-    
-    try
-        grav_ind_start      = length(Manual_Classfied_Areas.grav);
-        grav_ind            = grav_ind_start + 1;
-    catch
-        grav_ind        = 1;
-    end
-    try
-        chip_ind_start      = length(Manual_Classfied_Areas.chip);
-        chip_ind            = chip_ind_start + 1;
-    catch
-        chip_ind        = 1;
-    end
-    try
-        gras_ind_start      = length(Manual_Classfied_Areas.gras);
-        gras_ind            = gras_ind_start + 1;
-    catch
-        gras_ind        = 1;
-    end
-    try
-        foli_ind_start      = length(Manual_Classfied_Areas.foli);
-        foli_ind            = foli_ind_start + 1;
-    catch
-        foli_ind        = 1;
-    end
-    try
-        asph_ind_start      = length(Manual_Classfied_Areas.asph);
-        asph_ind            = asph_ind_start + 1;
-    catch
-        asph_ind        = 1;
-    end
-    try
-        non_road_ind_start  = length(Manual_Classfied_Areas.non_road_roi);
-        non_road_ind        = non_road_ind_start + 1;
-    catch
-        non_road_ind    = 1;
-    end
-    try
-        road_ind_start      = length(Manual_Classfied_Areas.road_roi);
-        road_ind            = road_ind_start + 1;
-    catch
-        road_ind        = 1;
-    end
-    
-else
-    
-    grav_ind        = 1;
-    chip_ind        = 1;
-    gras_ind        = 1;
-    foli_ind        = 1;
-    asph_ind        = 1;
-    non_road_ind    = 1;
-    road_ind        = 1;
-    
-end
+grav_ind        = 1;
+chip_ind        = 1;
+gras_ind        = 1;
+foli_ind        = 1;
+asph_ind        = 1;
+non_road_ind    = 1;
+road_ind        = 1;
+
+%% Loading point cloud
+
+% Ask user for location of pcd
+[figfile, figfolder, ~] = uigetfile('*.fig','Get fig');
+
+addpath(string(figfolder));
+
+disp('Loading fig...')
+
+fig = open(figfile);
+axis equal
+view([0 0 90])
+
+Filename = string(figfolder) + string(figfile) + ".mat";
+
+axis on
+
 
 %% Selecting ROIs
 
@@ -179,7 +111,7 @@ while true
     
     % Selecting the zoom tool by default
     disp('Zoom to where you want, Sahib')
-    zoom(ptCloudSource_figure)
+    zoom(fig)
     
     % Pausing until ready for ROI selection
     disp('Pausing until you are ready, Sahib')
@@ -200,28 +132,28 @@ while true
     %% Verification
 
     % Query points, this is the X,Y of the point cloud data
-    xq = ptCloudSource.Location(:,1);
-    yq = ptCloudSource.Location(:,2);
+%     xq = fig.Location(:,1);
+%     yq = fig.Location(:,2);
 
     % Returns binary results of each point (X/Y)
-    in = inpolygon(xq,yq,x_roi,y_roi);
+%     in = inpolygon(xq,yq,x_roi,y_roi);
 
     % Get array of ones
-    idx_in = find(in==1);
+%     idx_in = find(in==1);
 
     % Point cloud B with JUST the indexed points
-    disp('Verify that this is okay')
-    ptCloudROI = select(ptCloudSource,idx_in);
+%     disp('Verify that this is okay')
+%     figROI = select(fig,idx_in);
 
-    hold off
+%     hold off
 
-    roi_fig = figure('Name','roi fig','NumberTitle','off');
-    pcshow(ptCloudROI)
-    view([0 0 90]);
+%     roi_fig = figure('Name','roi fig','NumberTitle','off');
+%     pcshow(figROI)
+%     view([0 0 90]);
 
-    disp('Pausing until ready')
-    pause
-    close(roi_fig)
+%     disp('Pausing until ready')
+%     pause
+%     close(roi_fig)
     
     
     %% Save or discard
@@ -379,48 +311,48 @@ while true
 end
 
 %% Assigning to Struct
-% 
-% try
-%     if foli_ind ~= foli_ind_start
-%         Manual_Classfied_Areas.foli = foli_roi;
-%     end
-% end
-% 
-% try
-%     if gras_ind ~= gras_ind_start
-%         Manual_Classfied_Areas.gras = gras_roi;
-%     end
-% end
-% 
-% try
-%     if grav_ind ~= grav_ind_start
-%         Manual_Classfied_Areas.grav = grav_roi;
-%     end
-% end
-% 
-% try
-%     if chip_ind ~= chip_ind_start
-%         Manual_Classfied_Areas.chip = chip_roi;
-%     end
-% end
-% 
-% try
-%     if road_ind ~= road_ind_start
-%         Manual_Classfied_Areas.road = road_roi;
-%     end
-% end
-% 
-% try
-%     if non_road_ind ~= non_road_ind_start
-%         Manual_Classfied_Areas.non_road = non_road_roi;
-%     end
-% end
-% 
-% try
-%     if asph_ind ~= asph_ind_start
-%         Manual_Classfied_Areas.asph = asph_roi;
-%     end
-% end
+
+try
+    if foli_ind ~= foli_ind_start
+        Manual_Classfied_Areas.foli = foli_roi;
+    end
+end
+
+try
+    if gras_ind ~= gras_ind_start
+        Manual_Classfied_Areas.gras = gras_roi;
+    end
+end
+
+try
+    if grav_ind ~= grav_ind_start
+        Manual_Classfied_Areas.grav = grav_roi;
+    end
+end
+
+try
+    if chip_ind ~= chip_ind_start
+        Manual_Classfied_Areas.chip = chip_roi;
+    end
+end
+
+try
+    if road_ind ~= road_ind_start
+        Manual_Classfied_Areas.road = road_roi;
+    end
+end
+
+try
+    if non_road_ind ~= non_road_ind_start
+        Manual_Classfied_Areas.non_road = non_road_roi;
+    end
+end
+
+try
+    if asph_ind ~= asph_ind_start
+        Manual_Classfied_Areas.asph = asph_roi;
+    end
+end
 
 
 %% Saving MCA file

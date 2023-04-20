@@ -27,12 +27,11 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
     ax3.Clipping = 'off';
     
     % Legend
-    h2(1) = plot(NaN,NaN,'s', 'Color', [0.75,0.00,0.00]);
-    h2(2) = plot(NaN,NaN,'s', 'Color', [0.50,0.50,0.00]);
+    h2(1) = plot(NaN,NaN,'s', 'Color', [0.75, 0.00, 0.00]);
+    h2(2) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 0.00]);
     h2(3) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 1.00]);
     l = legend(h2, {'\color[rgb]{0.75,0.00,0.00} Gravel',...
-                    '\color[rgb]{0.50,0.50,0.00} Asphalt',...
-                    '\color[rgb]{0.50, 0.50, 1.00} Other Pavement'},...
+                    '\color[rgb]{0.50,0.50,0.00} Asphalt'},...
                     'FontSize', 28,...
                     'FontWeight', 'bold',... 
                     'LineWidth', 4);
@@ -48,12 +47,13 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
 
             % Grabbing values
             asph_pc     = tot_in_grav_score{grav_area_idx}.tot_asph_in_grav_score;
-            gras_pc     = tot_in_grav_score{grav_area_idx}.tot_gras_in_grav_score;
+            unkn_pc     = tot_in_grav_score{grav_area_idx}.tot_unkn_in_grav_score;
             grav_pc     = tot_in_grav_score{grav_area_idx}.tot_grav_in_grav_score;
             loc         = tot_in_grav_score{grav_area_idx}.avg_loc;
 
             % Making the text to be printed
-            txt = sprintf('Asph %0.2f\nGras %0.2f\nGrav %0.2f', asph_pc, gras_pc, grav_pc);
+            txt = sprintf('Asph %0.2f\nGrav %0.2f\nUnkn %0.2f', asph_pc, grav_pc, unkn_pc);
+%             txt = sprintf('Asph %0.2f\nGrav %0.2f', asph_pc, grav_pc);
             text(loc(1), loc(2), txt, 'Color', [0.75,0.00,0.00], 'FontWeight', 'bold', 'FontSize', 14);
 
         end
@@ -72,12 +72,13 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
         for asph_area_idx = 1:length(tot_in_asph_score)
 
             asph_pc     = tot_in_asph_score{asph_area_idx}.tot_asph_in_asph_score;
-            gras_pc     = tot_in_asph_score{asph_area_idx}.tot_gras_in_asph_score;
+            unkn_pc     = tot_in_asph_score{asph_area_idx}.tot_unkn_in_asph_score;
             grav_pc     = tot_in_asph_score{asph_area_idx}.tot_grav_in_asph_score;
             loc         = tot_in_asph_score{asph_area_idx}.avg_loc;
 
             % Making the text to be printed
-            txt = sprintf('Asph %0.2f\nGras %0.2f\nGrav %0.2f', asph_pc, gras_pc, grav_pc);
+            txt = sprintf('Asph %0.2f\nGrav %0.2f\nUnkn %0.2f', asph_pc, grav_pc, unkn_pc);
+%             txt = sprintf('Asph %0.2f\nGrav %0.2f', asph_pc, grav_pc);
             text(loc(1), loc(2), txt, 'Color', [0.50,0.50,0.00], 'FontWeight', 'bold', 'FontSize', 14);
 
         end
@@ -97,12 +98,13 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
         for or_area_idx = 1:length(tot_in_or_score)
 
             asph_pc     = tot_in_or_score{or_area_idx}.tot_asph_in_or_score;
-            gras_pc     = tot_in_or_score{or_area_idx}.tot_gras_in_or_score;
+            unkn_pc     = tot_in_or_score{or_area_idx}.tot_unkn_in_or_score;
             grav_pc     = tot_in_or_score{or_area_idx}.tot_grav_in_or_score;
             loc         = tot_in_or_score{or_area_idx}.avg_loc;
 
             % Making the text to be printed
-            txt = sprintf('Asph %0.2f\nGras %0.2f\nGrav %0.2f', asph_pc, gras_pc, grav_pc);
+            txt = sprintf('Asph %0.2f\nGrav %0.2f\nUnkn %0.2f', asph_pc, grav_pc, unkn_pc);
+%             txt = sprintf('Asph %0.2f\nGrav %0.2f', asph_pc, grav_pc);
             text(loc(1), loc(2), txt, 'Color', [0.50, 0.50, 1.00], 'FontWeight', 'bold', 'FontSize', 14);
 
         end

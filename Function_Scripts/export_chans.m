@@ -10,17 +10,17 @@ function export_chans(chan_2_c_table_export, chan_3_c_table_export, chan_4_c_tab
     time_now        = datestr(time_now,'yyyymmddhhMMss');
     
     if terrain_opt == 1
-        leg = 'Grav from TD';
+        leg = 'Grav from Classification';
     elseif terrain_opt == 2
-        leg = 'Chip from TD';
+        leg = 'Chip from Classification';
     elseif terrain_opt == 3
-        leg = 'Foli from TD';
+        leg = 'Foli from Classification';
     elseif terrain_opt == 4
-        leg = 'Gras from TD';
+        leg = 'Gras from Classification';
     elseif terrain_opt == 5
-        leg = 'Asph from TD';
+        leg = 'Asph from Classification';
     elseif terrain_opt == 6
-        leg = 'Asph2 from TD';
+        leg = 'Asph2 from Classification';
     end
     
     %% Save location
@@ -39,7 +39,7 @@ function export_chans(chan_2_c_table_export, chan_3_c_table_export, chan_4_c_tab
     
     mkdir(xy_export_dir_4)
     addpath(xy_export_dir_4)
-    
+%     
     
     %% Load training data csv into workspace
 
@@ -165,7 +165,7 @@ function export_chans(chan_2_c_table_export, chan_3_c_table_export, chan_4_c_tab
                 hold on
                 scatter(asph_array_chan_2(:,x_axis_idx), asph_array_chan_2(:,y_axis_idx), 50, 'k*', 'Linewidth', 10)
                 hold on
-                scatter(grav_array_chan_2(:,x_axis_idx), grav_array_chan_2(:,y_axis_idx), 50, 'm*')
+                scatter(grav_array_chan_2(:,x_axis_idx), grav_array_chan_2(:,y_axis_idx), 50, 'm*', 'Linewidth', 10)
                 hold off
                 xlabel(string(labels(x_axis_idx)))
                 ylabel(string(labels(y_axis_idx)))

@@ -63,11 +63,27 @@ data_comp_bool = 0;
 %     chan_4_rdf_load_string = 'trainedModelchan4tirlayerNN20233111140453.mat';
 %      
 % else 
+%     
+%     chan_5_rdf_load_string = 'chan_5_trainedModel_optimized.mat';
+%     chan_4_rdf_load_string = 'chan_4_trainedModel_optimized.mat';
+%     chan_3_rdf_load_string = 'chan_3_trainedModel_optimized.mat';
+%     chan_2_rdf_load_string = 'chan_2_trainedModel_optimized.mat';
+
     
-    chan_5_rdf_load_string = 'chan_5_trainedModel_optimized.mat';
-    chan_4_rdf_load_string = 'chan_4_trainedModel_optimized.mat';
-    chan_3_rdf_load_string = 'chan_3_trainedModel_optimized.mat';
-    chan_2_rdf_load_string = 'chan_2_trainedModel_optimized.mat';
+%     chan_5_rdf_load_string = 'chan_5_Mdl.mat';
+    chan_4_c_rdf_load_string = 'chan_4_Mdl.mat';
+    chan_3_c_rdf_load_string = 'chan_3_Mdl.mat';
+    chan_2_c_rdf_load_string = 'chan_2_Mdl.mat';
+    
+    chan_4_l_rdf_load_string = 'chan_4_Mdl.mat';
+    chan_3_l_rdf_load_string = 'chan_3_Mdl.mat';
+    chan_2_l_rdf_load_string = 'chan_2_Mdl.mat';
+    
+    chan_4_r_rdf_load_string = 'chan_4_Mdl.mat';
+    chan_3_r_rdf_load_string = 'chan_3_Mdl.mat';
+    chan_2_r_rdf_load_string = 'chan_2_Mdl.mat';
+    
+    DvG_load_string = 'DvG.mat';
     
 % end
 %     chan_5_rdf_load_string = 'chan_5_56_3_10_Test_07chan_5_Asph2_RANGE_TreeBagger.mat';
@@ -178,20 +194,36 @@ data_comp_bool = 0;
 
 
 % Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_1.bag';
-roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_1_ALL.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
 terrain_opt = 5;
 roi_select = 1;
+
+% % Redmen Gravel Lot: rm_1 - rm_11
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_3.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_3.mat';
+% terrain_opt = 1;
+% roi_select = 1; %1,2,3
 
 
 %% Loading RDF
 
 raw_data_export = {};
 disp('Loading RDFs...')
-chan_2_rdf = load(chan_2_rdf_load_string);
-chan_3_rdf = load(chan_3_rdf_load_string);
-chan_4_rdf = load(chan_4_rdf_load_string);
-chan_5_rdf = load(chan_5_rdf_load_string);
+chan_2_c_rdf = load(chan_2_c_rdf_load_string);
+chan_3_c_rdf = load(chan_3_c_rdf_load_string);
+chan_4_c_rdf = load(chan_4_c_rdf_load_string);
+% chan_5_rdf = load(chan_5_rdf_load_string);
+
+chan_2_l_rdf = load(chan_2_l_rdf_load_string);
+chan_3_l_rdf = load(chan_3_l_rdf_load_string);
+chan_4_l_rdf = load(chan_4_l_rdf_load_string);
+
+chan_2_r_rdf = load(chan_2_r_rdf_load_string);
+chan_3_r_rdf = load(chan_3_r_rdf_load_string);
+chan_4_r_rdf = load(chan_4_r_rdf_load_string);
+
+DvG = load(DvG_load_string);
 disp('RDFs Loaded!')
 
 
@@ -224,30 +256,57 @@ chan_5_r_bounds     = [((45 - chan_5_d_ang) * pi/180), ((45 + chan_5_d_ang) * pi
 area_names = [];
 
 % Array Inits
+% % Chan 2
+% Grav_All_Append_Array_2   = [0 0 0]; Asph_All_Append_Array_2 = [0 0 0]; Foli_All_Append_Array_2 = [0 0 0]; Gras_All_Append_Array_2 = [0 0 0];
+% Grav_Avg_Append_Array_2   = [0 0 0]; Asph_Avg_Append_Array_2 = [0 0 0]; Foli_Avg_Append_Array_2 = [0 0 0]; Gras_Avg_Append_Array_2 = [0 0 0];
+% Unkn_All_Append_Array_2   = [0 0 0];
+% Unkn_Avg_Append_Array_2   = [0 0 0];
+% 
+% % Chan 3
+% Grav_All_Append_Array_3   = [0 0 0]; Asph_All_Append_Array_3 = [0 0 0]; Foli_All_Append_Array_3 = [0 0 0]; Gras_All_Append_Array_3 = [0 0 0];
+% Grav_Avg_Append_Array_3   = [0 0 0]; Asph_Avg_Append_Array_3 = [0 0 0]; Foli_Avg_Append_Array_3 = [0 0 0]; Gras_Avg_Append_Array_3 = [0 0 0];
+% Unkn_All_Append_Array_3   = [0 0 0];
+% Unkn_Avg_Append_Array_3   = [0 0 0];
+% 
+% % Chan 4
+% Grav_All_Append_Array_4   = [0 0 0]; Asph_All_Append_Array_4 = [0 0 0]; Foli_All_Append_Array_4 = [0 0 0]; Gras_All_Append_Array_4 = [0 0 0];
+% Grav_Avg_Append_Array_4   = [0 0 0]; Asph_Avg_Append_Array_4 = [0 0 0]; Foli_Avg_Append_Array_4 = [0 0 0]; Gras_Avg_Append_Array_4 = [0 0 0];
+% Unkn_All_Append_Array_4   = [0 0 0];
+% Unkn_Avg_Append_Array_4   = [0 0 0];
+% 
+% % Chan 5
+% Grav_All_Append_Array_5   = [0 0 0]; Asph_All_Append_Array_5 = [0 0 0]; Foli_All_Append_Array_5 = [0 0 0]; Gras_All_Append_Array_5 = [0 0 0];
+% Grav_Avg_Append_Array_5   = [0 0 0]; Asph_Avg_Append_Array_5 = [0 0 0]; Foli_Avg_Append_Array_5 = [0 0 0]; Gras_Avg_Append_Array_5 = [0 0 0];
+% Unkn_All_Append_Array_5   = [0 0 0];
+% Unkn_Avg_Append_Array_5   = [0 0 0];
+
+% Array Inits
 % Chan 2
-grav_array_temp_2         = [0 0 0]; asph_array_temp_2       = [0 0 0]; foli_array_temp_2       = [0 0 0]; gras_array_temp_2       = [0 0 0]; 
-grav_avg_array_temp_2     = [0 0 0]; asph_avg_array_temp_2   = [0 0 0]; foli_avg_array_temp_2   = [0 0 0]; gras_avg_array_temp_2   = [0 0 0]; 
-Grav_All_Append_Array_2   = [0 0 0]; Asph_All_Append_Array_2 = [0 0 0]; Foli_All_Append_Array_2 = [0 0 0]; Gras_All_Append_Array_2 = [0 0 0];
-Grav_Avg_Append_Array_2   = [0 0 0]; Asph_Avg_Append_Array_2 = [0 0 0]; Foli_Avg_Append_Array_2 = [0 0 0]; Gras_Avg_Append_Array_2 = [0 0 0];
+Grav_All_Append_Array_2   = []; Asph_All_Append_Array_2 = []; Foli_All_Append_Array_2 = []; Gras_All_Append_Array_2 = [];
+Grav_Avg_Append_Array_2   = []; Asph_Avg_Append_Array_2 = []; Foli_Avg_Append_Array_2 = []; Gras_Avg_Append_Array_2 = [];
+Unkn_All_Append_Array_2   = [];
+Unkn_Avg_Append_Array_2   = [];
 
 % Chan 3
-grav_array_temp_3         = [0 0 0]; asph_array_temp_3       = [0 0 0]; foli_array_temp_3       = [0 0 0]; gras_array_temp_3       = [0 0 0]; 
-grav_avg_array_temp_3     = [0 0 0]; asph_avg_array_temp_3   = [0 0 0]; foli_avg_array_temp_3   = [0 0 0]; gras_avg_array_temp_3   = [0 0 0]; 
-Grav_All_Append_Array_3   = [0 0 0]; Asph_All_Append_Array_3 = [0 0 0]; Foli_All_Append_Array_3 = [0 0 0]; Gras_All_Append_Array_3 = [0 0 0];
-Grav_Avg_Append_Array_3   = [0 0 0]; Asph_Avg_Append_Array_3 = [0 0 0]; Foli_Avg_Append_Array_3 = [0 0 0]; Gras_Avg_Append_Array_3 = [0 0 0];
+Grav_All_Append_Array_3   = []; Asph_All_Append_Array_3 = []; Foli_All_Append_Array_3 = []; Gras_All_Append_Array_3 = [];
+Grav_Avg_Append_Array_3   = []; Asph_Avg_Append_Array_3 = []; Foli_Avg_Append_Array_3 = []; Gras_Avg_Append_Array_3 = [];
+Unkn_All_Append_Array_3   = [];
+Unkn_Avg_Append_Array_3   = [];
 
 % Chan 4
-grav_array_temp_4         = [0 0 0]; asph_array_temp_4       = [0 0 0]; foli_array_temp_4       = [0 0 0]; gras_array_temp_4       = [0 0 0]; 
-grav_avg_array_temp_4     = [0 0 0]; asph_avg_array_temp_4   = [0 0 0]; foli_avg_array_temp_4   = [0 0 0]; gras_avg_array_temp_4   = [0 0 0]; 
-Grav_All_Append_Array_4   = [0 0 0]; Asph_All_Append_Array_4 = [0 0 0]; Foli_All_Append_Array_4 = [0 0 0]; Gras_All_Append_Array_4 = [0 0 0];
-Grav_Avg_Append_Array_4   = [0 0 0]; Asph_Avg_Append_Array_4 = [0 0 0]; Foli_Avg_Append_Array_4 = [0 0 0]; Gras_Avg_Append_Array_4 = [0 0 0];
+Grav_All_Append_Array_4   = []; Asph_All_Append_Array_4 = []; Foli_All_Append_Array_4 = []; Gras_All_Append_Array_4 = [];
+Grav_Avg_Append_Array_4   = []; Asph_Avg_Append_Array_4 = []; Foli_Avg_Append_Array_4 = []; Gras_Avg_Append_Array_4 = [];
+Unkn_All_Append_Array_4   = [];
+Unkn_Avg_Append_Array_4   = [];
 
 % Chan 5
-grav_array_temp_5         = [0 0 0]; asph_array_temp_5       = [0 0 0]; foli_array_temp_5       = [0 0 0]; gras_array_temp_5       = [0 0 0]; 
-grav_avg_array_temp_5     = [0 0 0]; asph_avg_array_temp_5   = [0 0 0]; foli_avg_array_temp_5   = [0 0 0]; gras_avg_array_temp_5   = [0 0 0]; 
-Grav_All_Append_Array_5   = [0 0 0]; Asph_All_Append_Array_5 = [0 0 0]; Foli_All_Append_Array_5 = [0 0 0]; Gras_All_Append_Array_5 = [0 0 0];
-Grav_Avg_Append_Array_5   = [0 0 0]; Asph_Avg_Append_Array_5 = [0 0 0]; Foli_Avg_Append_Array_5 = [0 0 0]; Gras_Avg_Append_Array_5 = [0 0 0];
+Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Array_5 = []; Gras_All_Append_Array_5 = [];
+Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
+Unkn_All_Append_Array_5   = [];
+Unkn_Avg_Append_Array_5   = [];
 
+
+% Other Stuff
 raw_data_export = []; save_folder = [];
 model_RANSAC = []; model_MLS = [];
 
@@ -327,7 +386,6 @@ elseif terrain_opt == 6
     xy_roi          = Manual_Classfied_Areas.asph_roi{:,roi_select};
 end
 
-
 %% Timestamps
 
 % Matching timestamps
@@ -361,17 +419,19 @@ fprintf('Max time delta is %f sec \n',max(abs(diffs)));
 % TO-DO: Re-make so that the results are not saved to disk but saved to
 % memory, makes loading results way faster.
 
+disp('Starting Classification!')
+
 % Rate of classification rate per 360 scan
 pcd_class_rate = Par(int64(cloud_break));
 
 % Progress bar
 parfor_progress(cloud_break);
 
-% Par Timing asdjfklajsdlfkjas;ldfjlasjdfl;kasdj;fkljas;dkfj
+% Par Timing
 Par.tic;
 
 % Classifying per 360 scan
-for cloud = 1:cloud_break
+parfor cloud = 1:cloud_break
     
     %% Clearing Vars
     
@@ -457,7 +517,7 @@ for cloud = 1:cloud_break
     
     % Data Clean-up
     xyz_cloud = xyz_cloud( ~any( isnan(xyz_cloud) | isinf(xyz_cloud), 2),:);
-    xyz_cloud = xyz_cloud(xyz_cloud(:,1) >= 0, :);
+%     xyz_cloud = xyz_cloud(xyz_cloud(:,1) >= 0, :);
 
     % Channel Split
     xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
@@ -465,498 +525,55 @@ for cloud = 1:cloud_break
     xyz_cloud_4 = xyz_cloud(xyz_cloud(:,5) == 3, :); % indexes start @ 0
 %     xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 4, :); % indexes start @ 0
     
+    %% Classification Area
     
-    %% CHANNEL 2 CENT
+    % CHANNEL 2 CENT
+
+    diag_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform, cloud, export_dir, DvG, "2c")
+
+    % CHANNEL 3 CENT
+
+    diag_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform, cloud, export_dir, DvG, "3c")
+
+    % CHANNEL 4 CENT
     
-    % Find points in the arc
-    arc_idx_2c = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_c_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_c_bounds(2))
+    diag_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, cloud, export_dir, DvG, "4c")
+
+    % CHANNEL 5 CENT
     
-    classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_rdf, tform, "2c")
+        % nothing yet in chan 5 - maybe later?
 
-    if ~isempty(arc_idx_2c)
-
-        % Apply Transformation
-        xyz_cloud_2(:,1:3)      = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_2_c_feat_table   = get_feats_2(xyz_cloud_2(arc_idx_2c,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_2(arc_idx_2c,1), xyz_cloud_2(arc_idx_2c,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_2(arc_idx_2c,1)) - 3)
-
-                chan_2_c_table_export{cloud} = chan_2_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-
-        if nn
-            Yfit2 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_2_c_feat_table)
-        elseif app
-            Yfit2 = chan_2_rdf.chan_2_trainedModel_optimized.predictFcn(chan_2_c_feat_table);
-        else
-            [Yfit2, scores2, stdevs2]  = predict(chan_2_rdf.Mdl, chan_2_c_feat_table);    
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/2_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit2, [], [], xyz_cloud_2(arc_idx_2c,:), tform)
-
-    end
+    % CHANNEL 2 LEFT
     
+    diag_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, cloud, export_dir, DvG, "2l")
+
+    % CHANNEL 3 LEFT
+
+    diag_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform, cloud, export_dir, DvG, "3l")
+
+    % CHANNEL 4 LEFT
     
-    %% CHANNEL 3 CENT
-
-    % Find points in the arc
-    arc_idx_3c     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_c_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_c_bounds(2));
+    diag_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, cloud, export_dir, DvG, "4l")
     
-    if ~isempty(arc_idx_3c)
-
-        % Apply Transformation
-        xyz_cloud_3(:,1:3) = xyz_cloud_3(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_3_c_feat_table   = get_feats_2(xyz_cloud_3(arc_idx_3c,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_3(arc_idx_3c,1), xyz_cloud_3(arc_idx_3c,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_3(arc_idx_3c,1)) - 5)
-
-                chan_3_c_table_export{cloud} = chan_3_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-        if nn
-            Yfit3 = chan_3_rdf.trainedModelchan3trilayeredNN.predictFcn(chan_3_c_feat_table);
-        elseif app
-            Yfit3 = chan_3_rdf.chan_3_trainedModel_optimized.predictFcn(chan_3_c_feat_table);
-        else
-            [Yfit3, scores3, stdevs3]  = predict(chan_3_rdf.Mdl, chan_3_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/3_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit3, [], [], xyz_cloud_3(arc_idx_3c,:), tform)
-
-    end
+    % CHANNEL 5 CENT
     
-    %% CHANNEL 4 CENT
+        % nothing yet in chan 5 - maybe later?
     
-    % Find points in the arc
-    arc_idx_4c     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_c_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_c_bounds(2));
+    % CHANNEL 2 RIGHT
     
-    if ~isempty(arc_idx_4c)
-
-        % Apply Transformation
-        xyz_cloud_4(:,1:3) = xyz_cloud_4(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_4_c_feat_table   = get_feats_2(xyz_cloud_4(arc_idx_4c,:));
-
-        % Checking if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_4(arc_idx_4c,1), xyz_cloud_4(arc_idx_4c,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_4(arc_idx_4c,1)) - 5)
-
-                chan_4_c_table_export{cloud} = chan_4_c_feat_table;
-
-            end  
-
-        end
-
-        % Classifying
-        if nn
-            Yfit4 = chan_4_rdf.trainedModelchan4tirlayerNN.predictFcn(chan_4_c_feat_table)
-        elseif app
-            Yfit4 = chan_4_rdf.chan_4_trainedModel_optimized.predictFcn(chan_4_c_feat_table);
-        else
-            [Yfit4, scores4, stdevs4]  = predict(chan_4_rdf.Mdl, chan_4_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/4_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit4, [], [], xyz_cloud_4(arc_idx_4c,:), tform)
-        
-    end
-        
+    diag_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, cloud, export_dir, DvG, "2r")
     
-    %% CHANNEL 5 CENT
+    % CHANNEL 3 RIGHT
+
+    diag_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform, cloud, export_dir, DvG, "3r")
     
-%     % Find points in the arc
-%     arc_idx_5c     = find((atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) > chan_5_c_bounds(1) & (atan2(xyz_cloud_5(:,1), xyz_cloud_5(:,2))) <  chan_5_c_bounds(2));
-%         
-%     if ~isempty(arc_idx_5c)
-% 
-%         % Grab Data
-%         chan_5_c_feat_table   = get_feats_2(xyz_cloud_5(arc_idx_5c,:));
-% 
-%         % Apply Transformation
-%         xyz_cloud_5(:,1:3) = xyz_cloud_5(:,1:3) * tform.Rotation + tform.Translation;
-% 
-%         % Checking if we compare what the extracted data to be classified looks
-%         % like compared to the training data
-%         if data_comp_bool
-% 
-%             % Check if in manually defined truth area
-%             in_polygon_check = inpolygon(xyz_cloud_5(arc_idx_5c,1), xyz_cloud_5(arc_idx_5c,2), xy_roi(:,1), xy_roi(:,2));
-% 
-%             % Compare to see if the majority of arc is in manually defined
-%             % area - if so extract data
-%             if sum(in_polygon_check) >= (length(xyz_cloud_5(arc_idx_5c,1)) - 5)
-% 
-%                 chan_5_c_table_export{cloud} = chan_5_c_feat_table;
-% 
-%             end  
-% 
-%         end
-% 
-%         % Classifying
-%         if nn
-%             Yfit5 = chan_5_rdf.trainedModelchan5tirlayerNN.predictFcn(chan_5_c_feat_table)
-%         elseif app
-%             Yfit5 = chan_5_rdf.chan_5_trainedModel_optimized.predictFcn(chan_5_c_feat_table);
-%         else
-%             [Yfit5, scores5 stdevs5]  = predict(chan_5_rdf.Mdl, chan_5_c_feat_table);
-%         end
-% 
-%         %Creates pcd file name
-%         n_strPadded             = sprintf('%08d', cloud);
-%         Classification_FileName = string(export_dir) + "/5_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-% 
-%         % Saves it
-%         RosbagClassifier_parsave(Classification_FileName, Yfit5, [], [], xyz_cloud_5(arc_idx_5c,:), tform)
-%     
-%     end
+    % CHANNEL 4 RIGHT
 
-
-    %% CHANNEL 2 LEFT
+    diag_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, cloud, export_dir, DvG, "4r")
     
-    % Find points in the arc
-    arc_idx_2l = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_l_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_l_bounds(2))
-
-    if ~isempty(arc_idx_2l)
-
-        % Apply Transformation
-        xyz_cloud_2(:,1:3)      = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_2_c_feat_table   = get_feats_2(xyz_cloud_2(arc_idx_2l,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_2(arc_idx_2l,1), xyz_cloud_2(arc_idx_2l,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_2(arc_idx_2l,1)) - 3)
-
-                chan_2_c_table_export{cloud} = chan_2_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-
-        if nn
-            Yfit2 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_2_c_feat_table)
-        elseif app
-            Yfit2 = chan_2_rdf.chan_2_trainedModel_optimized.predictFcn(chan_2_c_feat_table);
-        else
-            [Yfit2, scores2, stdevs2]  = predict(chan_2_rdf.Mdl, chan_2_c_feat_table);    
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/2_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit2, [], [], xyz_cloud_2(arc_idx_2l,:), tform)
-
-    end
+    % CHANNEL 5 CENT
     
-    
-    %% CHANNEL 3 LEFT
-
-    % Find points in the arc
-    arc_idx_3l     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_l_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_l_bounds(2));
-    
-    if ~isempty(arc_idx_3l)
-
-        % Apply Transformation
-        xyz_cloud_3(:,1:3) = xyz_cloud_3(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_3_c_feat_table   = get_feats_2(xyz_cloud_3(arc_idx_3l,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_3(arc_idx_3l,1), xyz_cloud_3(arc_idx_3l,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_3(arc_idx_3l,1)) - 5)
-
-                chan_3_c_table_export{cloud} = chan_3_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-        if nn
-            Yfit3 = chan_3_rdf.trainedModelchan3trilayeredNN.predictFcn(chan_3_c_feat_table);
-        elseif app
-            Yfit3 = chan_3_rdf.chan_3_trainedModel_optimized.predictFcn(chan_3_c_feat_table);
-        else
-            [Yfit3, scores3, stdevs3]  = predict(chan_3_rdf.Mdl, chan_3_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/3_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit3, [], [], xyz_cloud_3(arc_idx_3l,:), tform)
-
-    end
-    
-    %% CHANNEL 4 LEFT
-    
-    % Find points in the arc
-    arc_idx_4l     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_l_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_l_bounds(2));
-    
-    if ~isempty(arc_idx_4l)
-
-        % Apply Transformation
-        xyz_cloud_4(:,1:3) = xyz_cloud_4(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_4_c_feat_table   = get_feats_2(xyz_cloud_4(arc_idx_4l,:));
-
-        % Checking if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_4(arc_idx_4l,1), xyz_cloud_4(arc_idx_4l,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_4(arc_idx_4l,1)) - 5)
-
-                chan_4_c_table_export{cloud} = chan_4_c_feat_table;
-
-            end  
-
-        end
-
-        % Classifying
-        if nn
-            Yfit4 = chan_4_rdf.trainedModelchan4tirlayerNN.predictFcn(chan_4_c_feat_table)
-        elseif app
-            Yfit4 = chan_4_rdf.chan_4_trainedModel_optimized.predictFcn(chan_4_c_feat_table);
-        else
-            [Yfit4, scores4, stdevs4]  = predict(chan_4_rdf.Mdl, chan_4_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/4_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit4, [], [], xyz_cloud_4(arc_idx_4l,:), tform)
-        
-    end
-    
-    
-    
-    %% CHANNEL 2 RIGHT
-    
-    % Find points in the arc
-    arc_idx_2r = find((atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) > chan_2_r_bounds(1) & (atan2(xyz_cloud_2(:,1), xyz_cloud_2(:,2))) <  chan_2_r_bounds(2));
-
-    if ~isempty(arc_idx_2r)
-
-        % Apply Transformation
-        xyz_cloud_2(:,1:3)      = xyz_cloud_2(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_2_c_feat_table   = get_feats_2(xyz_cloud_2(arc_idx_2r,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_2(arc_idx_2r,1), xyz_cloud_2(arc_idx_2r,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_2(arc_idx_2r,1)) - 3)
-
-                chan_2_c_table_export{cloud} = chan_2_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-
-        if nn
-            Yfit2 = chan_2_rdf.trainedModeltrilayeredNN.predictFcn(chan_2_c_feat_table)
-        elseif app
-            Yfit2 = chan_2_rdf.chan_2_trainedModel_optimized.predictFcn(chan_2_c_feat_table);
-        else
-            [Yfit2, scores2, stdevs2]  = predict(chan_2_rdf.Mdl, chan_2_c_feat_table);    
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/2_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit2, [], [], xyz_cloud_2(arc_idx_2r,:), tform)
-
-    end
-    
-    
-    %% CHANNEL 3 RIGHT
-
-    % Find points in the arc
-    arc_idx_3r     = find((atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) > chan_3_r_bounds(1) & (atan2(xyz_cloud_3(:,1), xyz_cloud_3(:,2))) <  chan_3_r_bounds(2));
-    
-    if ~isempty(arc_idx_3r)
-
-        % Apply Transformation
-        xyz_cloud_3(:,1:3) = xyz_cloud_3(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_3_c_feat_table   = get_feats_2(xyz_cloud_3(arc_idx_3r,:));
-
-        % Chekcing if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_3(arc_idx_3r,1), xyz_cloud_3(arc_idx_3r,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_3(arc_idx_3r,1)) - 5)
-
-                chan_3_c_table_export{cloud} = chan_3_c_feat_table;
-
-            end
-
-        end
-
-         % Classifying
-        if nn
-            Yfit3 = chan_3_rdf.trainedModelchan3trilayeredNN.predictFcn(chan_3_c_feat_table);
-        elseif app
-            Yfit3 = chan_3_rdf.chan_3_trainedModel_optimized.predictFcn(chan_3_c_feat_table);
-        else
-            [Yfit3, scores3, stdevs3]  = predict(chan_3_rdf.Mdl, chan_3_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/3_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit3, [], [], xyz_cloud_3(arc_idx_3r,:), tform)
-
-    end
-    
-    %% CHANNEL 4 RIGHT
-    
-    % Find points in the arc
-    arc_idx_4r     = find((atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) > chan_4_r_bounds(1) & (atan2(xyz_cloud_4(:,1), xyz_cloud_4(:,2))) <  chan_4_r_bounds(2));
-    
-    if ~isempty(arc_idx_4r)
-
-        % Apply Transformation
-        xyz_cloud_4(:,1:3) = xyz_cloud_4(:,1:3) * tform.Rotation + tform.Translation;
-
-        % Grab Data
-        chan_4_c_feat_table   = get_feats_2(xyz_cloud_4(arc_idx_4r,:));
-
-        % Checking if we compare what the extracted data to be classified looks
-        % like compared to the training data
-        if data_comp_bool
-
-            % Check if in manually defined truth area
-            in_polygon_check = inpolygon(xyz_cloud_4(arc_idx_4r,1), xyz_cloud_4(arc_idx_4r,2), xy_roi(:,1), xy_roi(:,2));
-
-            % Compare to see if the majority of arc is in manually defined
-            % area - if so extract data
-            if sum(in_polygon_check) >= (length(xyz_cloud_4(arc_idx_4r,1)) - 5)
-
-                chan_4_c_table_export{cloud} = chan_4_c_feat_table;
-
-            end  
-
-        end
-
-        % Classifying
-        if nn
-            Yfit4 = chan_4_rdf.trainedModelchan4tirlayerNN.predictFcn(chan_4_c_feat_table)
-        elseif app
-            Yfit4 = chan_4_rdf.chan_4_trainedModel_optimized.predictFcn(chan_4_c_feat_table);
-        else
-            [Yfit4, scores4, stdevs4]  = predict(chan_4_rdf.Mdl, chan_4_c_feat_table);
-        end
-
-        %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(export_dir) + "/4_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
-
-        % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit4, [], [], xyz_cloud_4(arc_idx_4r,:), tform)
-        
-    end
+        % nothing yet in chan 5 - maybe later?
     
     
     %% Weightbar
@@ -974,6 +591,7 @@ stop(pcd_class_rate)
 
 parfor_progress(0);
 
+disp('Classification Complete!')
 
 %% Quickly export the discovered features into a table
 
@@ -992,6 +610,8 @@ num_files                       = length(classification_list);
 
 
 %% Apphending all the results to an array
+
+disp('Loading Files...')
 
 load_result_bar = waitbar(0, "Loading Files...");
 
@@ -1051,6 +671,11 @@ for class_idx = 1:1:num_files
         Gras_Avg_Append_Array_2             = [Gras_Avg_Append_Array_2; Classification_Result.avg_xyz];
     end
     
+    if isequal(cell2mat(label), 'unknown')    && chan_number == 2
+        Unkn_All_Append_Array_2             = [Unkn_All_Append_Array_2; Classification_Result.xyzi];
+        Unkn_Avg_Append_Array_2             = [Unkn_Avg_Append_Array_2; Classification_Result.avg_xyz];
+    end
+    
     
     % Channel 3
     if isequal(cell2mat(label), 'gravel')   && chan_number == 3
@@ -1068,6 +693,11 @@ for class_idx = 1:1:num_files
         Gras_Avg_Append_Array_3             = [Gras_Avg_Append_Array_3; Classification_Result.avg_xyz];
     end
     
+    if isequal(cell2mat(label), 'unknown')    && chan_number == 3
+        Unkn_All_Append_Array_3             = [Unkn_All_Append_Array_3; Classification_Result.xyzi];
+        Unkn_Avg_Append_Array_3             = [Unkn_Avg_Append_Array_3; Classification_Result.avg_xyz];
+    end
+    
     
     % Channel 4
     if isequal(cell2mat(label), 'gravel')   && chan_number == 4
@@ -1083,6 +713,11 @@ for class_idx = 1:1:num_files
     if isequal(cell2mat(label), 'grass') 	&& chan_number == 4
         Gras_All_Append_Array_4             = [Gras_All_Append_Array_4; Classification_Result.xyzi];
         Gras_Avg_Append_Array_4             = [Gras_Avg_Append_Array_4; Classification_Result.avg_xyz];
+    end
+    
+    if isequal(cell2mat(label), 'unknown')    && chan_number == 4
+        Unkn_All_Append_Array_4             = [Unkn_All_Append_Array_4; Classification_Result.xyzi];
+        Unkn_Avg_Append_Array_4             = [Unkn_Avg_Append_Array_4; Classification_Result.avg_xyz];
     end
     
     
@@ -1118,44 +753,45 @@ end % Going through the transform list
 
 close(load_result_bar)
 
+disp('Files loaded!')
 
-%% Score the Results
+%% Arrays to single struct
 
-if ~isempty(Grav_Avg_Append_Array_2) || ~isempty(Asph_Avg_Append_Array_2) || ~isempty(Gras_Avg_Append_Array_2)
+if ~isempty(Grav_Avg_Append_Array_2) || ~isempty(Asph_Avg_Append_Array_2) || ~isempty(Unkn_Avg_Append_Array_2)
     
     avg_cell_store{2}.Grav = Grav_Avg_Append_Array_2;
     avg_cell_store{2}.Asph = Asph_Avg_Append_Array_2;
-    avg_cell_store{2}.Gras = Gras_Avg_Append_Array_2;
+    avg_cell_store{2}.Unkn = Unkn_Avg_Append_Array_2;
 
 end
 
-if ~isempty(Grav_Avg_Append_Array_3) || ~isempty(Asph_Avg_Append_Array_3) || ~isempty(Gras_Avg_Append_Array_3)
+if ~isempty(Grav_Avg_Append_Array_3) || ~isempty(Asph_Avg_Append_Array_3) || ~isempty(Unkn_Avg_Append_Array_3)
 
     avg_cell_store{3}.Grav = Grav_Avg_Append_Array_3;
     avg_cell_store{3}.Asph = Asph_Avg_Append_Array_3;
-    avg_cell_store{3}.Gras = Gras_Avg_Append_Array_3;
+    avg_cell_store{3}.Unkn = Unkn_Avg_Append_Array_3;
 
 end
 
-if ~isempty(Grav_Avg_Append_Array_4) || ~isempty(Asph_Avg_Append_Array_4) || ~isempty(Gras_Avg_Append_Array_4)
+if ~isempty(Grav_Avg_Append_Array_4) || ~isempty(Asph_Avg_Append_Array_4) || ~isempty(Unkn_Avg_Append_Array_4)
 
     avg_cell_store{4}.Grav = Grav_Avg_Append_Array_4;
     avg_cell_store{4}.Asph = Asph_Avg_Append_Array_4;
-    avg_cell_store{4}.Gras = Gras_Avg_Append_Array_4;
+    avg_cell_store{4}.Unkn = Unkn_Avg_Append_Array_4;
 
 end
 
-if ~isempty(Grav_Avg_Append_Array_5) || ~isempty(Asph_Avg_Append_Array_5) || ~isempty(Gras_Avg_Append_Array_5)
+% if ~isempty(Grav_Avg_Append_Array_5) || ~isempty(Asph_Avg_Append_Array_5) || ~isempty(Unkn_Avg_Append_Array_5)
+% 
+%     avg_cell_store{5}.Grav = Grav_Avg_Append_Array_5;
+%     avg_cell_store{5}.Asph = Asph_Avg_Append_Array_5;
+%     avg_cell_store{5}.Unkn = Unkn_Avg_Append_Array_5;
+% 
+% end
 
-    avg_cell_store{5}.Grav = Grav_Avg_Append_Array_5;
-    avg_cell_store{5}.Asph = Asph_Avg_Append_Array_5;
-    avg_cell_store{5}.Gras = Gras_Avg_Append_Array_5;
+%% Score the Results
 
-end
-
-%% Score Fun
-
-class_score_function(avg_cell_store, Manual_Classfied_Areas)
+class_score_function_test(avg_cell_store, Manual_Classfied_Areas)
 
 
 %% Get Plot Limits
@@ -1202,10 +838,16 @@ catch
     disp('No Asph Dataon Chan 2!')
 end
 
+% try
+%     plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', 10)
+% catch
+%     disp('No Gras Dataon Chan 2!')
+% end
+
 try
-    plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', 10)
+    plot3(Unkn_All_Append_Array_2(:,1), Unkn_All_Append_Array_2(:,2), Unkn_All_Append_Array_2(:,3), 'r.', 'MarkerSize', 10)
 catch
-    disp('No Gras Dataon Chan 2!')
+    disp('No Asph Dataon Chan 2!')
 end
 
 % Channel 3
@@ -1221,10 +863,16 @@ catch
     disp('No Asph Dataon Chan 3!')
 end
 
+% try
+%     plot3(Gras_All_Append_Array_3(:,1), Gras_All_Append_Array_3(:,2), Gras_All_Append_Array_3(:,3), 'g^', 'MarkerSize', 10)
+% catch
+%     disp('No Gras Dataon Chan 3!')
+% end
+
 try
-    plot3(Gras_All_Append_Array_3(:,1), Gras_All_Append_Array_3(:,2), Gras_All_Append_Array_3(:,3), 'g^', 'MarkerSize', 10)
+    plot3(Unkn_All_Append_Array_3(:,1), Unkn_All_Append_Array_3(:,2), Unkn_All_Append_Array_3(:,3), 'r^', 'MarkerSize', 10)
 catch
-    disp('No Gras Dataon Chan 3!')
+    disp('No Asph Dataon Chan 3!')
 end
 
 % Channel 4
@@ -1240,10 +888,16 @@ catch
     disp('No Asph Dataon Chan 4!')
 end
 
+% try
+%     plot3(Gras_All_Append_Array_4(:,1), Gras_All_Append_Array_4(:,2), Gras_All_Append_Array_4(:,3), 'gv', 'MarkerSize', 10)
+% catch
+%     disp('No Gras Dataon Chan 4!')
+% end
+
 try
-    plot3(Gras_All_Append_Array_4(:,1), Gras_All_Append_Array_4(:,2), Gras_All_Append_Array_4(:,3), 'gv', 'MarkerSize', 10)
+    plot3(Unkn_All_Append_Array_4(:,1), Unkn_All_Append_Array_4(:,2), Unkn_All_Append_Array_4(:,3), 'rv', 'MarkerSize', 10)
 catch
-    disp('No Gras Dataon Chan 4!')
+    disp('No Asph Dataon Chan 4!')
 end
 
 % Channel 5
@@ -1259,25 +913,31 @@ catch
     disp('No Asph Data on Chan 5!')
 end
 
+% try
+%     plot3(Gras_All_Append_Array_5(:,1), Gras_All_Append_Array_5(:,2), Gras_All_Append_Array_5(:,3), 'gx', 'MarkerSize', 10)
+% catch
+%     disp('No Gras Data on Chan 5!')
+% end
+
 try
-    plot3(Gras_All_Append_Array_5(:,1), Gras_All_Append_Array_5(:,2), Gras_All_Append_Array_5(:,3), 'gx', 'MarkerSize', 10)
+    plot3(Unkn_All_Append_Array_5(:,1), Unkn_All_Append_Array_5(:,2), Unkn_All_Append_Array_5(:,3), 'rx', 'MarkerSize', 10)
 catch
-    disp('No Gras Data on Chan 5!')
+    disp('No Asph Data on Chan 5!')
 end
 
 axis('equal')
 axis off
 view([pi/2 0 90])
 
-MCA_plotter(Manual_Classfied_Areas)
+% MCA_plotter(Manual_Classfied_Areas)
 
 xlim([x_min_lim x_max_lim]);
 ylim([y_min_lim y_max_lim]);
 
 h(1) = plot(NaN,NaN,'oc');
 h(2) = plot(NaN,NaN,'ok');
-h(3) = plot(NaN,NaN,'og');
-l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+h(3) = plot(NaN,NaN,'or');
+l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
 l.Interpreter = 'tex';
 
 ax = gca;
@@ -1303,10 +963,16 @@ catch
     disp('No Asph Data on Chan 2!')
 end
 
+% try
+%     plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'go', 'MarkerSize', 8.5, 'Linewidth', 5)
+% catch
+%     disp('No Gras Data on Chan 2!')
+% end
+
 try
-    plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'go', 'MarkerSize', 8.5, 'Linewidth', 5)
+    plot3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'ro', 'MarkerSize', 8.5, 'Linewidth', 5)
 catch
-    disp('No Gras Data on Chan 2!')
+    disp('No Unkn Data on Chan 2!')
 end
 
 
@@ -1329,6 +995,12 @@ catch
     disp('No Gras Data on Chan 3!')
 end
 
+try
+    plot3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'r^', 'MarkerSize', 8.5, 'Linewidth', 5)
+catch
+    disp('No Unkn Data on Chan 3!')
+end
+
 % Channel 4
 try
     plot3(Grav_Avg_Append_Array_4(:,1), Grav_Avg_Append_Array_4(:,2), Grav_Avg_Append_Array_4(:,3), 'cv', 'MarkerSize', 8.5, 'Linewidth', 5)
@@ -1342,31 +1014,37 @@ catch
     disp('No Asph Data on Chan 4!')
 end
 
+% try
+%     plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'gv', 'MarkerSize', 8.5, 'Linewidth', 5)
+% catch
+%     disp('No Gras Data on Chan 4!')
+% end
+
 try
-    plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'gv', 'MarkerSize', 8.5, 'Linewidth', 5)
+    plot3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'rv', 'MarkerSize', 8.5, 'Linewidth', 5)
 catch
-    disp('No Gras Data on Chan 4!')
+    disp('No Unkn Data on Chan 4!')
 end
 
 
 % Channel 5
-try
-    plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_5(:,2), Grav_Avg_Append_Array_5(:,3), 'cx', 'MarkerSize', 15, 'Linewidth', 5)
-catch
-    disp('No Grav Data on Chan 5!')
-end
-
-try   
-    plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_5(:,2), Asph_Avg_Append_Array_5(:,3), 'kx', 'MarkerSize', 15, 'Linewidth', 5)
-catch
-    disp('No Asph Data on Chan 5!')
-end
-
-try
-    plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_5(:,2), Gras_Avg_Append_Array_5(:,3), 'gx', 'MarkerSize', 15, 'Linewidth', 5)
-catch
-    disp('No Gras Data on Chan 5!')
-end
+% try
+%     plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_5(:,2), Grav_Avg_Append_Array_5(:,3), 'cx', 'MarkerSize', 15, 'Linewidth', 5)
+% catch
+%     disp('No Grav Data on Chan 5!')
+% end
+% 
+% try   
+%     plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_5(:,2), Asph_Avg_Append_Array_5(:,3), 'kx', 'MarkerSize', 15, 'Linewidth', 5)
+% catch
+%     disp('No Asph Data on Chan 5!')
+% end
+% 
+% try
+%     plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_5(:,2), Gras_Avg_Append_Array_5(:,3), 'gx', 'MarkerSize', 15, 'Linewidth', 5)
+% catch
+%     disp('No Gras Data on Chan 5!')
+% end
 
 axis('equal')
 axis off
@@ -1374,25 +1052,15 @@ view([pi/2 0 90])
 
 hold on
 
-MCA_plotter(Manual_Classfied_Areas)
-% 
-% pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
-% plot(pgon,'FaceColor',color,'FaceAlpha',0.15)
-% 
-% try
-%     pgon_2 = polyshape(to_plot_xy_roi_2(:,1),to_plot_xy_roi_2(:,2));
-%     plot(pgon_2,'FaceColor',color,'FaceAlpha',0.15)
-% catch
-%     disp('Only 1 area')
-% end
+% MCA_plotter(Manual_Classfied_Areas)
 
 xlim([x_min_lim x_max_lim]);
 ylim([y_min_lim y_max_lim]);
 
 h(1) = plot(NaN,NaN,'oc');
 h(2) = plot(NaN,NaN,'ok');
-h(3) = plot(NaN,NaN,'og');
-l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+h(3) = plot(NaN,NaN,'or');
+l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
 l.Interpreter = 'tex';
 
 ax2 = gca;

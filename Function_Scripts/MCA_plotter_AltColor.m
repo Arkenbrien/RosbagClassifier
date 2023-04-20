@@ -11,7 +11,7 @@ function MCA_plotter(Manual_Classfied_Areas)
             
             to_plot_xy_roi = Manual_Classfied_Areas.grav{grav_idx};
             pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
-            plot(pgon,'FaceColor',[0.75,0.00,0.00],'FaceAlpha', face_alpha_value)
+            plot(pgon,'FaceColor',[0.00,0.75,0.00],'FaceAlpha', face_alpha_value)
 
         end
         
@@ -28,7 +28,7 @@ function MCA_plotter(Manual_Classfied_Areas)
             
             to_plot_xy_roi = Manual_Classfied_Areas.asph{asph_idx};
             pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
-            plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
+            plot(pgon,'FaceColor',[0.00,0.50,0.50],'FaceAlpha', face_alpha_value)
 
         end
         
@@ -45,7 +45,7 @@ function MCA_plotter(Manual_Classfied_Areas)
             
             to_plot_xy_roi = Manual_Classfied_Areas.non_road_roi{asph_idx};
             pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
-            plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
+            plot(pgon,'FaceColor',[0.25,0.50,0.25],'FaceAlpha', face_alpha_value)
 
         end
         
@@ -63,7 +63,7 @@ function MCA_plotter(Manual_Classfied_Areas)
             
             to_plot_xy_roi = Manual_Classfied_Areas.road_roi{road_idx};
             pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
-            plot(pgon,'FaceColor',[0.50, 0.50, 1.00],'FaceAlpha', face_alpha_value)
+            plot(pgon,'FaceColor',[0.10, 0.50, 0.00],'FaceAlpha', face_alpha_value)
 
         end
         

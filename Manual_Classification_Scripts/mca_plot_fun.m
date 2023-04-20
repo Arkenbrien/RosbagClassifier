@@ -74,4 +74,16 @@ function mca_plot_fun(Manual_Classfied_Areas)
 
     end
     
+    if isfield(Manual_Classfied_Areas,'asph')
+
+        for plot_idx = 1:length(Manual_Classfied_Areas.asph)
+
+            xy_roi = Manual_Classfied_Areas.asph{1,plot_idx};
+            pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+            plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.75)
+
+        end
+
+    end
+    
 end

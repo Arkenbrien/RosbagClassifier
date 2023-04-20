@@ -31,8 +31,8 @@ opts.DataLines = dataLines;
 opts.Delimiter = ",";
 
 % Specify column names and types
-opts.VariableNames = ["StandDevHeightRAN", "RoughnessHeightRAN", "MinMaxRatioHeightRAN", "Min2MaxRatioHeightRAN", "MagGradientHeightRAN", "StandDevInt", "RangeInt", "MedMaxRatioInt", "Med2MaxRatioInt", "MagGradientInt", "terrain_type"];
-opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "categorical"];
+opts.VariableNames = ["StandDevHeightRAN", "RoughnessHeightRAN", "MinMaxRatioHeightRAN", "Min2MaxRatioHeightRAN", "MagGradientHeightRAN", "StandDevInt", "MeanInt", "RangeInt", "MedMaxRatioInt", "Med2MaxRatioInt", "MagGradientInt", "terrain_type"];
+opts.VariableTypes = ["double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "categorical"];
 
 % Specify file level properties
 opts.ExtraColumnsRule = "ignore";
