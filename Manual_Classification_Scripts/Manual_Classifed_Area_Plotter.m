@@ -16,27 +16,45 @@ clear all
 close all
 clc
 
-%% Requesting user for file
+%% Options
 
-root_dir = uigetdir();
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2.mat';
+pcd_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2.pcd';
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2_where_training_area.mat';
 
-%% Grabbing Manual Classification File
+%% Var Init
 
-% MANUAL_CLASSIFICATION_FILE = string(root_dir) + "/MANUAL_CLASSIFICATION/MANUAL_CLASSIFICATION.mat";
-% load(MANUAL_CLASSIFICATION_FILE)
-
-load('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Manually_Classified_Areas/sturbois_chipseal_woods_1_MANUAL_CLASSIFICATION_fixed_1.mat')
+face_alpha_value = 0.75;
+h2 = zeros(1,3);
 
 %% Grabbing compiled pcd
 
 disp('Loading PCD...')
 
-Combined_Pcd_File = string(root_dir) + "/COMPILED_PCD/COMPILED_PCD.pcd";
+ptCloudSource = pcread(pcd_file);
 
-ptCloudSource = pcread(Combined_Pcd_File);
+
+Z_max = ptCloudSource.ZLimits(2);
+
+
+point_cloud_to_plot = [ ptCloudSource.Location(:,1),  ptCloudSource.Location(:,2),  ptCloudSource.Location(:,3),  ptCloudSource.Intensity];
+
+point_cloud_to_plot(:,3) = point_cloud_to_plot(:,3) - (1.25*Z_max);
+
+ptCloudSource = pointCloud([point_cloud_to_plot(:,1),  point_cloud_to_plot(:,2),  point_cloud_to_plot(:,3)], 'Intensity', point_cloud_to_plot(:,4));
 
 ptCloudSource_figure = figure('Name','pcd','NumberTitle','off');
 
+
+axes1 = axes('Parent',ptCloudSource_figure);
+set(axes1,'XColor','none','YColor','none','ZColor','none');
+
+hold all
+
+h2(1) = plot(NaN,NaN,'s', 'Color', [0.75, 0.00, 0.00]);
+h2(2) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 0.00]);
+h2(3) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 1.00]);
+    
 axes1 = axes('Tag','PointCloud','Parent',ptCloudSource_figure);
 hold(axes1,'on');
 
@@ -45,90 +63,167 @@ axis equal
 view([0 0 90])
 
 % Set the remaining axes properties
-set(axes1,'Color','white','DataAspectRatio',[1 1 1],'XColor','black','YColor','black','ZColor','black');
+set(axes1,'Color','white','DataAspectRatio',[1 1 1],'XColor','none','YColor','none','ZColor','none');
 set(gcf,'Color','white');
 
-hold on
+axis off
+
+ax = gca;
+ax.Clipping = 'off';
+
+hold all
 
 %% Plotting Manually Defined Areas
 
+load(roi_file)
 
-if isfield(Manual_Classfied_Areas,'grav')
+hold all
     
-    for plot_idx = 1:length(Manual_Classfied_Areas.grav)
-        
-        xy_roi = Manual_Classfied_Areas.grav{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','red','FaceAlpha',0.75)
+
+% Gravel
+try
+
+    for grav_idx = 1:length(Manual_Classfied_Areas.grav)
+
+        to_plot_xy_roi = Manual_Classfied_Areas.grav{grav_idx};
+        pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
+%         shp = alphaShape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),double(ones(length(to_plot_xy_roi(:,1)),1)*Z_max));
+        plot(pgon,'FaceColor',[0.75,0.00,0.00],'FaceAlpha', face_alpha_value)
+%         plot(shp,'FaceColor',[0.75,0.00,0.00],'FaceAlpha', face_alpha_value)
         
     end
-    
+
+catch
+
+    disp('No gravel areas to plot!')
+
 end
 
-if isfield(Manual_Classfied_Areas,'chip')
-    
-    for plot_idx = 1:length(Manual_Classfied_Areas.chip)
-        
-        xy_roi = Manual_Classfied_Areas.chip{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','white','FaceAlpha',0.75)
+% Asphalt/pavement
+%     try
+
+    for asph_idx = 1:length(Manual_Classfied_Areas.asph)
+
+        to_plot_xy_roi = Manual_Classfied_Areas.asph{asph_idx};
+        pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
+%         shp = alphaShape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),double(ones(length(to_plot_xy_roi(:,1)),1)*Z_max))
+        plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
+%         plot(shp,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
+
+    end
+
+%     catch
+
+    disp('No pavement areas to plot!')
+
+%     end
+
+% Side-Of-Road
+try
+
+    for asph_idx = 1:length(Manual_Classfied_Areas.non_road)
+
+        to_plot_xy_roi = Manual_Classfied_Areas.non_road{asph_idx};
+        pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
+%         shp = alphaShape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),double(ones(length(to_plot_xy_roi(:,1)),1)*Z_max));
+        plot(pgon,'FaceColor',[0.75 ,0.25, 0.75],'FaceAlpha', face_alpha_value)
+%         plot(shp,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
         
     end
-    
+
+catch
+
+    disp('No side-of-road areas to plot!')
+
 end
 
-if isfield(Manual_Classfied_Areas,'gras')
-    
-    for plot_idx = 1:length(Manual_Classfied_Areas.gras)
-        
-        xy_roi = Manual_Classfied_Areas.gras{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','green','FaceAlpha',0.75)
+
+% gras
+try
+
+    for asph_idx = 1:length(Manual_Classfied_Areas.gras)
+
+        to_plot_xy_roi = Manual_Classfied_Areas.gras{asph_idx};
+        pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
+%         shp = alphaShape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),double(ones(length(to_plot_xy_roi(:,1)),1)*Z_max));
+        plot(pgon,'FaceColor',[0.00,1.00,0.00],'FaceAlpha', face_alpha_value)
+%         plot(shp,'FaceColor',[0.50,0.50,0.00],'FaceAlpha', face_alpha_value)
         
     end
-    
+
+catch
+
+    disp('No side-of-road areas to plot!')
+
 end
 
-if isfield(Manual_Classfied_Areas,'foli')
-    
-    for plot_idx = 1:length(Manual_Classfied_Areas.foli)
-        
-        xy_roi = Manual_Classfied_Areas.foli{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor','magenta','FaceAlpha',0.75)
-        
-    end
-    
-end
+% Other road areas
+try
 
-if isfield(Manual_Classfied_Areas,'road_roi')
-    
-    for plot_idx = 1:length(Manual_Classfied_Areas.road_roi)
-        
-        xy_roi = Manual_Classfied_Areas.road_roi{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor',[0.58, 0.50, 1.00],'FaceAlpha',0.75)
-        
-    end
-    
-end
+    for road_idx = 1:length(Manual_Classfied_Areas.road)
 
-if isfield(Manual_Classfied_Areas,'non_road_roi')
-    
-    for plot_idx = 1:length(Manual_Classfied_Areas.non_road_roi)
-        
-        xy_roi = Manual_Classfied_Areas.non_road_roi{1,plot_idx};
-        pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-        plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.75)
-        
+        to_plot_xy_roi = Manual_Classfied_Areas.road_roi{road_idx};
+        pgon = polyshape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2));
+%         shp = alphaShape(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),double(ones(length(to_plot_xy_roi(:,1)),1)*Z_max));
+        plot(pgon,'FaceColor',[0.50, 0.50, 1.00],'FaceAlpha', face_alpha_value)
+%          plot(shp,'FaceColor',[0.50, 0.50, 1.00],'FaceAlpha', face_alpha_value)
+
     end
-    
+
+catch
+
+    disp('No pavement areas to plot!')
+
 end
+% 
+% axes1 = axes('Tag','PointCloud','Parent',ptCloudSource_figure);
+% hold(axes1,'on');
+% 
+% pcshow(ptCloudSource)
+% axis equal
+% view([0 0 90])
+% 
+% % Set the remaining axes properties
+% set(axes1,'Color','white','DataAspectRatio',[1 1 1],'XColor','black','YColor','black','ZColor','black');
+% set(gcf,'Color','white');
+
 
 %% Clean UP
 
+% axis off
+% 
+% % Legend
+% h2(1) = plot(NaN,NaN,'s', 'Color', [0.75, 0.00, 0.00]);
+% h2(2) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 0.00]);
+% h2(3) = plot(NaN,NaN,'s', 'Color', [0.75 ,0.25, 0.75]);
+% l = legend(h2, {'\color[rgb]{0.75, 0.00, 0.00} Gravel',...
+%                 '\color[rgb]{0.50, 0.50, 0.00} Asphalt',...
+%                 '\color[rgb]{0.75, 0.25, 0.75} Side of Road'},...
+%                 'FontSize', 28,...
+%                 'FontWeight', 'bold',... 
+%                 'LineWidth', 4,...
+%                 'FontName', 'Monospaced');
+% l.Interpreter = 'tex';
+% 
+% hold off
+
 axis off
+
+% Legend
+h2(1) = plot(NaN,NaN,'s', 'Color', [0.75, 0.00, 0.00], 'MarkerSize', 20, 'LineWidth', 10);
+h2(2) = plot(NaN,NaN,'s', 'Color', [0.50, 0.50, 0.00], 'MarkerSize', 20, 'LineWidth', 10);
+h2(3) = plot(NaN,NaN,'s', 'Color', [0.00, 1.00, 0.00], 'MarkerSize', 20, 'LineWidth', 10);
+l = legend(h2, {'\color[rgb]{0.75, 0.00, 0.00} Gravel',...
+                '\color[rgb]{0.50, 0.50, 0.00} Asphalt',...
+                '\color[rgb]{0.00, 1.00, 0.00} Grass'},...
+                'FontSize', 28,...
+                'FontWeight', 'bold',... 
+                'LineWidth', 4);
+l.Interpreter = 'tex';
+
 hold off
+
+
 
 %% End PrograM
 

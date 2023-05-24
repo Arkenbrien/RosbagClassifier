@@ -15,26 +15,23 @@ clear all
 close all
 clc
 
-disp('>:[')
-
-
 %% Options
 
 % Which ring to grab: 1-9 = '_#.csv', 10+ = '_##.csv'
-ring_search     = 5;
+ring_search     = 2;
 
 % Which percent is going to the training array
 train_percent   = 0.7;
 
 % Which reference point
 % RANGE from LiDAR Point of origin
-range_bool      = 1;
+range_bool      = 0;
 % Height from RANSAC projected plane
-ransac_bool     = 0;
+ransac_bool     = 1;
 % Height from MLS projected plane
 mls_bool        = 0;
 
-side_select = "l"; % "c", "l"
+side_select = "c"; % "c", "l"
 
 
 %% Var Init
@@ -89,9 +86,9 @@ addpath(export_dir)
 
 % Chan_2
 % asph_2_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/combined_asphalt';
-asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/asphalt';
-grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/gravel_l';
-gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/grass_l';
+asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/asphalt';
+grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/gravel';
+gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/grass';
 % grav_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/gravel';
 
 % asph_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/asphalt_2_2023-03-29-14-55-44';
@@ -161,7 +158,7 @@ for asph_idx = 1:length(asph_match_idx)
     elseif ransac_bool
         data_to_apphend = ring_ransac_train_data_csv_import_w_cat(asph_data_files(asph_match_idx(asph_idx)).name);
     elseif mls_bool
-%         data_to_apphend = ring_mls_train_data_csv_import_w_cat(asph_data_files(asph_match_idx(asph_idx)).name);
+        data_to_apphend = ring_mls_train_data_csv_import_w_cat(asph_data_files(asph_match_idx(asph_idx)).name);
     end
     
     asph_table = [asph_table; data_to_apphend];
@@ -191,7 +188,7 @@ for gras_idx = 1:length(gras_match_idx)
     elseif ransac_bool
         data_to_apphend = ring_ransac_train_data_csv_import_w_cat(gras_data_files(gras_match_idx(gras_idx)).name);
     elseif mls_bool
-%         data_to_apphend = ring_mls_train_data_csv_import_w_cat(gras_data_files(gras_match_idx(gras_idx)).name);
+        data_to_apphend = ring_mls_train_data_csv_import_w_cat(gras_data_files(gras_match_idx(gras_idx)).name);
     end    
     gras_table = [gras_table; data_to_apphend];
     
@@ -205,7 +202,7 @@ for grav_idx = 1:length(grav_match_idx)
     elseif ransac_bool
         data_to_apphend = ring_ransac_train_data_csv_import_w_cat(grav_data_files(grav_match_idx(grav_idx)).name);
     elseif mls_bool
-%         data_to_apphend = ring_mls_train_data_csv_import_w_cat(grav_data_files(grav_match_idx(grav_idx)).name);
+        data_to_apphend = ring_mls_train_data_csv_import_w_cat(grav_data_files(grav_match_idx(grav_idx)).name);
     end    
     grav_table = [grav_table; data_to_apphend];
     

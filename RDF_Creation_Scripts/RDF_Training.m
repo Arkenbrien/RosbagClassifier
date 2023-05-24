@@ -14,7 +14,11 @@
 % The program first grabs all the desired training data files in .mat
 % format, then creates a huge table out of all the data selected and the
 % terrain types. TreeBagger then saves the data as a .mat file.
-%
+% 
+% Maximum number of splits: 107
+% Number of learners: 367
+% Number of predictors to sample: 11
+% 
 %==========================================================================
 
 %% Clearing Workspace

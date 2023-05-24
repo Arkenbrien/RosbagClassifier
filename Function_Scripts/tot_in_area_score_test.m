@@ -83,7 +83,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
     
     if isfield(Manual_Classfied_Areas, 'non_road')
         
-        for nr_idx = 1:length(Manual_Classfied_Areas.non_road_roi)    
+        for nr_idx = 1:length(Manual_Classfied_Areas.non_road)    
             
             % Var Init
             tot_num_counter = 0;
@@ -92,7 +92,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score
             for chan_idx = 1:length(used_chans)
                 
                 % Get them scores
-                if ~isempty(channel_in_nonroad_area_score{chan_idx, nr_idx})
+                if isfield(channel_in_nonroad_area_score{chan_idx, nr_idx}, 'tot_in_area')
                     
                     tot_num_counter = tot_num_counter + channel_in_nonroad_area_score{chan_idx, nr_idx}.tot_in_area;
                     tot_num_grav = tot_num_grav + channel_in_nonroad_area_score{chan_idx, nr_idx}.grav_in_nonroad;

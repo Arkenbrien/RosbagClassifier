@@ -13,12 +13,13 @@
 %% Clear Workspace
 
 clear all
-% close all
+close all
 clc
 
 %% Options
 
 load_prev_MCA_file = 1;
+use_prev_MCA_file = 0;
 
 
 %% Ask user to load previous file
@@ -36,7 +37,7 @@ load_prev_MCA_file = 1;
 
 % Ask user for location of pcd
 % [pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/*.pcd','Get PCD');
-[pcfile, pcfolder, ~] = uigetfile('*.pcd','Get PCD');
+[pcfile, pcfolder, ~] = uigetfile('/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/*.pcd','Get PCD');
 
 addpath(string(pcfolder));
 
@@ -52,7 +53,7 @@ view([0 0 90])
 if load_prev_MCA_file
     
     % Load File
-    Manual_Classfied_Areas_File = uigetfile("/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/", "Grab old MCA");
+    [Manual_Classfied_Areas_File, mca_folder] = uigetfile("/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/", "Grab old MCA");
     load(Manual_Classfied_Areas_File)
     
     mca_plot_fun(Manual_Classfied_Areas)
@@ -83,7 +84,15 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 %     
 % end
 
-Filename = string(pcfolder) + string(pcfile) + ".mat";
+if load_prev_MCA_file
+    
+    Filename = string(mca_folder) + string(Manual_Classfied_Areas_File) + "_" + string(time_now) + ".mat";
+    
+else
+    
+    Filename = string(pcfolder) + string(pcfile) + ".mat";
+    
+end
 
 
 %% Var Init
@@ -96,7 +105,7 @@ non_road_ind_start      = 1;
 road_ind_start          = 1;
 asph_ind_start          = 1;
 
-if load_prev_MCA_file
+if use_prev_MCA_file
     
     try
         grav_ind_start      = length(Manual_Classfied_Areas.grav);
@@ -129,13 +138,13 @@ if load_prev_MCA_file
         asph_ind        = 1;
     end
     try
-        non_road_ind_start  = length(Manual_Classfied_Areas.non_road_roi);
+        non_road_ind_start  = length(Manual_Classfied_Areas.non_road);
         non_road_ind        = non_road_ind_start + 1;
     catch
         non_road_ind    = 1;
     end
     try
-        road_ind_start      = length(Manual_Classfied_Areas.road_roi);
+        road_ind_start      = length(Manual_Classfied_Areas.road);
         road_ind            = road_ind_start + 1;
     catch
         road_ind        = 1;
@@ -330,7 +339,7 @@ while true
                     % Plot the shape unto the point cloud for easy
                     % identification
                     pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
-                    plot(pgon,'FaceColor',[1.00, 0.65, 0.30],'FaceAlpha',0.75)
+                    plot(pgon,'FaceColor',[0.75 ,0.25, 0.75],'FaceAlpha',0.75)
                     
                 case 7
                     
@@ -377,51 +386,6 @@ while true
     end
 
 end
-
-%% Assigning to Struct
-% 
-% try
-%     if foli_ind ~= foli_ind_start
-%         Manual_Classfied_Areas.foli = foli_roi;
-%     end
-% end
-% 
-% try
-%     if gras_ind ~= gras_ind_start
-%         Manual_Classfied_Areas.gras = gras_roi;
-%     end
-% end
-% 
-% try
-%     if grav_ind ~= grav_ind_start
-%         Manual_Classfied_Areas.grav = grav_roi;
-%     end
-% end
-% 
-% try
-%     if chip_ind ~= chip_ind_start
-%         Manual_Classfied_Areas.chip = chip_roi;
-%     end
-% end
-% 
-% try
-%     if road_ind ~= road_ind_start
-%         Manual_Classfied_Areas.road = road_roi;
-%     end
-% end
-% 
-% try
-%     if non_road_ind ~= non_road_ind_start
-%         Manual_Classfied_Areas.non_road = non_road_roi;
-%     end
-% end
-% 
-% try
-%     if asph_ind ~= asph_ind_start
-%         Manual_Classfied_Areas.asph = asph_roi;
-%     end
-% end
-
 
 %% Saving MCA file
 

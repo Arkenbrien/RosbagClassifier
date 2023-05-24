@@ -72,7 +72,7 @@ move_avg_dist           = 15;
 %% Grabs the folder with the results
 
 % Grabs the folder
-results_folder = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/', 'Grab results folder');
+results_folder = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/RDFs/', 'Grab results folder');
 % results_folder = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/DECISION_TREES/Week_Ov_01_28_2023/Test_03_All_1000D_Results';
 
 % Puts folder names in a list
@@ -492,12 +492,13 @@ hold off
 
 disp('Plotting Training vs Testing Error')
 
-tt_err_plot = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
+tt_err_plot2 = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
 
 hold all
 
 plot((1:1:length(training_error)), training_error, 'k', 'LineWidth', 3)
-plot(overall_err_array(:,1), mv_avg_overall_err_array,'r', 'LineWidth', 3)
+% plot(overall_err_array(:,1), mv_avg_overall_err_array,'r', 'LineWidth', 3)
+plot(overall_err_array(:,1), overall_err_array(:,2),'r', 'LineWidth', 3)
 
 legend('Training Error', 'Validation Error')
 xlim(x_limit)

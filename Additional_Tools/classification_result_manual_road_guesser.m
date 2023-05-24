@@ -18,7 +18,7 @@ clc
 
 %% Options
 
-load_prev_MCA_file = 0;
+load_prev_MCA_file = 1;
 
 
 %% Ask user to load previous file
@@ -346,6 +346,7 @@ try
     if non_road_ind ~= non_road_ind_start
         Manual_Classfied_Areas.non_road = non_road_roi;
     end
+    
 end
 
 try

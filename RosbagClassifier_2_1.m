@@ -5,8 +5,14 @@
 %
 %                          RosbagClassifier.m
 %
-% This program does some stupid stuff
+% This program classifies LiDAR point cloud data as gravel, asphalt, or
+% unknown, for the purpose of detecting unmakred gravel roads.
 %==========================================================================
+
+%% TEMP DEBUG - it will crash here if you press f5 lol
+
+% class_score_function_test(avg_cell_store, Manual_Classfied_Areas, options)
+
 
 %% Clear & Setup Workspace
 
@@ -16,194 +22,208 @@ format compact
 
 %% Options
 
-nn = 0;
-app = 1;
+% Export Folder
+options.export_folder_name      = '01_RDF_Training_Data_Extraction_Export'; % Reference apphended automatically...
 
-% Reference Point
-% RANGE from LiDAR Point of origin
-range_bool  = 1;
+% REFERENCE POINT
+% 'range'; 'ransac';, 'mls'
+options.reference_point         = 'range';
 
-% Height from RANSAC projected plane
-ransac_bool = 0;
-
-% Height from MLS projected plane
-mls_bool    = 0;
-
+% ARC SIZE
 % Center angle variance +- idk what you call this
-chan_2_d_ang        = 3;
-chan_3_d_ang        = 3;
-chan_4_d_ang        = 3;
-chan_5_d_ang        = 2.5;
+options.chan_2_d_ang            = 3;
+options.chan_3_d_ang            = 3;
+options.chan_4_d_ang            = 3;
+options.chan_5_d_ang            = 2.5;
 
-% RANSAC Options
-maxDistance         = 0.5;
+
+% PLOTTING OPTIONS
+% Marker size / Linewidth for plotz
+options.c2markersize            = 20;
+options.c3markersize            = 20;
+options.c4markersize            = 20;
+
+% Plotting linewidth for plotz
+options.c2linewidth             = 20;
+options.c3linewidth             = 20;
+options.c4linewidth             = 20;
+
+% which things to plot
+options.plot_all_bool           = 0;
+options.plot_avg_bool           = 1;
+options.plot_rate_bool          = 0;
+options.plot_class_rate_bool    = 0;
+
+% Legend Stuff
+options.legend_marker_size      = 20;
+options.legend_line_width       = 5;
+options.legend_font_size        = 56;
+
+options.axis_font_size          = 24;
+
+% Font Type
+options.font_type               = 'Sans Regular'; % Default Font: Sans Regular
 
 % Plotting the moving average - how many samples per average?
-move_avg_size       = 15;
-
-% Size of figures
-fig_size_array          = [10 10 3500 1600];
+options.move_avg_size           = 15;
 
 % Do we compare the data to be classified to the training data????
-data_comp_bool = 0;
+data_comp_bool                  = 0;
+
+
+% PLANE PROJECTION
+% RANSAC Options
+options.maxDistance             = 0.5;
+options.MaxNumTrials            = 10; % RANSAC Iterations
+
+% Size of figures
+fig_size_array                  = [10 10 3500 1600];
+
+% min_dist
+min_dist_23                     = 2.25;
+min_dist_34                     = 2.25;
+
+% max_dist
+max_dist_23                     = 5;
+max_dist_34                     = 6;
+
+% distance-filter
+options.dist_filt_bool          = 0;
+
+% CONFIDENCE SCORE
+
+% confidence-filter
+options.conf_filt_bool          = 1;
+
+% Adjust results based on confidence scores (not all are used, check the
+% classify_fun for implementation
+if options.reference_point == "range" || options.reference_point == "mls"
+    
+    options.c2gravconfupbound       = 0.90;
+    options.c2unknconflwbound       = 0.10;
+    
+    options.c3asphconfupbound       = 0.89;
+    options.c3gravconfupbound       = 0.80;
+    options.c3unknconflwbound       = 0.20;
+    
+    options.c4gravconfupbound       = 0.90;
+    options.c4unknconflwbound       = 0.20;
+
+elseif options.reference_point == "ransac"
+    
+    % Channel 2 Gravel
+    options.c2gravconflwbound       = 0.45;   
+    options.c2gravconfupbound       = 0.70;
+    
+    % Channel 2 Unknown
+    options.c2unknconflwbound       = 0.00;
+    options.c2unknconfupbound       = 0.55;
+    
+    % Channel 2 Asphalt
+    options.c2asphconflwbound       = 0.00;
+    options.c2asphconfupbound       = 1.00;
+    
+    % Channel 3 Gravel
+    options.c3gravconflwbound       = 0.45;
+    options.c3gravconfupbound       = 0.60;
+    
+    % Channel 3 Unknown
+    options.c3unknconflwbound       = 0.40;
+    options.c3unknconfupbound       = 0.50;
+    
+    % Channel 3 Asph
+    options.c3asphconflwbound       = 0.00;
+    options.c3asphconfupbound       = 1.00;
+    
+    % Channel 4 Gravel
+    options.c4unknconflwbound       = 0.45;
+    options.c4unknconfupbound       = 0.55;
+    
+    % Channel 4 Unknown
+    options.c4gravconflwbound       = 0.40;
+    options.c4gravconfupbound       = 0.50;
+    
+    % Channel 4 Asph
+    options.c4asphconflwbound       = 0.00;
+    options.c4asphconfupbound       = 1.00;    
+
+end
 
 
 %% RDF selection
-
-% Which RDF to load?
-
-% if range_bool
     
-
-
-% if nn
-%     
-%     chan_2_rdf_load_string = 'trainedModeltrilayeredNN20235510140440.mat';
-%     chan_3_rdf_load_string = 'trainedModelchan3trilayeredNN20232611140435.mat';
-%     chan_4_rdf_load_string = 'trainedModelchan4tirlayerNN20233111140453.mat';
-%      
-% else 
-%     
-%     chan_5_rdf_load_string = 'chan_5_trainedModel_optimized.mat';
-%     chan_4_rdf_load_string = 'chan_4_trainedModel_optimized.mat';
-%     chan_3_rdf_load_string = 'chan_3_trainedModel_optimized.mat';
-%     chan_2_rdf_load_string = 'chan_2_trainedModel_optimized.mat';
-
+if options.reference_point == "range"
     
-%     chan_5_rdf_load_string = 'chan_5_Mdl.mat';
-    chan_4_c_rdf_load_string = 'chan_4_Mdl.mat';
-    chan_3_c_rdf_load_string = 'chan_3_Mdl.mat';
-    chan_2_c_rdf_load_string = 'chan_2_Mdl.mat';
+    chan_4_c_rdf_load_string = 'chan_4_c_2.mat';
+    chan_3_c_rdf_load_string = 'chan_3_c_2.mat';
+    chan_2_c_rdf_load_string = 'chan_2_c_2.mat';
     
-    chan_4_l_rdf_load_string = 'chan_4_Mdl.mat';
-    chan_3_l_rdf_load_string = 'chan_3_Mdl.mat';
-    chan_2_l_rdf_load_string = 'chan_2_Mdl.mat';
+    chan_4_l_rdf_load_string = 'chan_4_c_2.mat';
+    chan_3_l_rdf_load_string = 'chan_3_c_2.mat';
+    chan_2_l_rdf_load_string = 'chan_2_c_2.mat';
     
-    chan_4_r_rdf_load_string = 'chan_4_Mdl.mat';
-    chan_3_r_rdf_load_string = 'chan_3_Mdl.mat';
-    chan_2_r_rdf_load_string = 'chan_2_Mdl.mat';
+    chan_4_r_rdf_load_string = 'chan_4_c_2.mat';
+    chan_3_r_rdf_load_string = 'chan_3_c_2.mat';
+    chan_2_r_rdf_load_string = 'chan_2_c_2.mat';
     
-    DvG_load_string = 'DvG.mat';
+elseif options.reference_point == "ransac"
     
-% end
-%     chan_5_rdf_load_string = 'chan_5_56_3_10_Test_07chan_5_Asph2_RANGE_TreeBagger.mat';
-%     chan_3_rdf_load_string = 'chan_3_81_3_10_Test_06chan_3_Asph2_RANGE_TreeBagger.mat';
-%     
-% elseif ransac_bool
-%     
-% %     chan_2_rdf_load_string = 'chan_2_RANSAC_rdf.mat';
-% %     chan_5_rdf_load_string = 'chan_5_RANSAC_rdf.mat';
-% %     chan_3_rdf_load_string = 'chan_3_RANSAC_rdf.mat';
-% %     chan_2_rdf_load_string = 'chan_2_RANSAC_ASPH2.mat';
-% %     chan_5_rdf_load_string = 'chan_3_RANSAC_ASPH2.mat';
-% %     chan_3_rdf_load_string = 'chan_5_RANSAC_ASPH2.mat';
-%     
-% elseif mls_bool
-%     
-%     chan_2_rdf_load_string = 'chan_2_MLS_rdf.mat';
-%     chan_5_rdf_load_string = 'chan_5_MLS_rdf.mat';
-%     chan_3_rdf_load_string = 'chan_3_MLS_rdf.mat';
+    chan_4_c_rdf_load_string = 'chan_4_c_ransac.mat';
+    chan_3_c_rdf_load_string = 'chan_3_c_ransac.mat';
+    chan_2_c_rdf_load_string = 'chan_2_c_ransac.mat';
     
-% end
-
-% roi/rosbag PAIRS - 1 ROI per file
+    chan_4_l_rdf_load_string = 'chan_4_c_ransac.mat';
+    chan_3_l_rdf_load_string = 'chan_3_c_ransac.mat';
+    chan_2_l_rdf_load_string = 'chan_2_c_ransac.mat';
+    
+    chan_4_r_rdf_load_string = 'chan_4_c_ransac.mat';
+    chan_3_r_rdf_load_string = 'chan_3_c_ransac.mat';
+    chan_2_r_rdf_load_string = 'chan_2_c_ransac.mat';
+    
+elseif options.reference_point == "mls"
+        
+    chan_4_c_rdf_load_string = 'chan_4_c_mls.mat';
+    chan_3_c_rdf_load_string = 'chan_3_c_mls.mat';
+    chan_2_c_rdf_load_string = 'chan_2_c_mls.mat';
+    
+    chan_4_l_rdf_load_string = 'chan_4_c_mls.mat';
+    chan_3_l_rdf_load_string = 'chan_3_c_mls.mat';
+    chan_2_l_rdf_load_string = 'chan_2_c_mls.mat';
+    
+    chan_4_r_rdf_load_string = 'chan_4_c_mls.mat';
+    chan_3_r_rdf_load_string = 'chan_3_c_mls.mat';
+    chan_2_r_rdf_load_string = 'chan_2_c_mls.mat';
+    
+end
 
 
 %% roi/rosbag PAIRS - 1 ROI per file
 
-% Gravel Lot 1
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_arc_width_controlol.mat.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-09-14-46-23.bag';
-% terrain_opt = 1;
-% roi_select = 1;
+% Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_4, rm_db_6
+% rm_db_1
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_1.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_1_truth_areas_v3.mat';
 
-% Gravel Lot 2, 3
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_gravel_lot_2_2rois.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-14-13-12-31.bag';
-% terrain_opt = 1;
-% roi_select = 1; % 1, 2
+% rm_db_2
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_2_truth_areas_v3.mat';
 
-% Lawn Grass 1
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-17-31_CHIP_ALL_for_grass.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-17-31_CHIP.bag';
-% terrain_opt = 4;
-% roi_select = 1;
+% rm_db_3
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_3.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_3_truth_areas_v3.mat';
 
-% Lawn Grass 2
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-21-54_CHIP_ALL_for_grass.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-21-54_CHIP.bag';
-% terrain_opt = 4;
-% roi_select = 1;
+% rm_db_4 : NOTE; 1156.8 feet traveled in rm_db_4 338.01 avg sec per scan, 463 clouds in the file
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_4.bag';
+roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_4_truth_areas_v3.mat';
 
-% Pavement 1, 2
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_pavement_1_roi.mat.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_13_2023_shortened_coach_sturbois/2023-03-13-10-56-38.bag';
-% terrain_opt = 5;
-% roi_select = 2; %1,2
+% rm_db_6
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
 
-% Lawn Grass 3
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_grass_roi.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
-% terrain_opt = 4;
-% roi_select = 1;
-
-% Pavement 3, 4 - blue_route
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
-% terrain_opt = 5;
-% roi_select = 1; %1,2,3
-
-% Gravel Lot Interception files
-% Down 1Lucin Cutoff
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/03_29_14_54_16_all.pcd_20232103130404.mat'; terrain_opt = 6; % asph2
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-54-16.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/foliage_grab_2FROMFILE2023-03-29-14-54-16.pcd_20230904140433.mat';
-% roi_file = 'down_1.pcd_FROM_FILE_2023-03-29-14-5.pcd_20230412160441.mat';
-% terrain_opt = 3; foliage
-% terrain_opt = 6;
-% roi_select = 3;
-
-% Down 2
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_2_03_29_14_57_17_25to150.pcd.pcd_20233803100451.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-57-17.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% Down 3
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_3_29_14_59_48_250to400.pcd.pcd_20234003100412.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-59-48.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% % Up 1
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_1_29_14_53_21_1tolen.pcd_20234103100425.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-53-21.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% Up 2
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag.mat'; terrain_opt = 6;
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/foliage_grab_FROM_FILE_2023-03-29-14-55-44_20230104140446.mat'; terrain_opt = 3;
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag';
-% roi_select = 1;
-
-% Up 3
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_3_14_58_13_325to450.pcd.pcd_20234303100447.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-58-13.bag';
-% roi_select = 1;
-
-
-% Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
-roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
-terrain_opt = 5;
-roi_select = 1;
-
+% Gravel Training Stuff
 % % Redmen Gravel Lot: rm_1 - rm_11
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_3.bag';
 % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_3.mat';
-% terrain_opt = 1;
-% roi_select = 1; %1,2,3
 
 
 %% Loading RDF
@@ -223,7 +243,7 @@ chan_2_r_rdf = load(chan_2_r_rdf_load_string);
 chan_3_r_rdf = load(chan_3_r_rdf_load_string);
 chan_4_r_rdf = load(chan_4_r_rdf_load_string);
 
-DvG = load(DvG_load_string);
+% DvG = load(DvG_load_string);
 disp('RDFs Loaded!')
 
 
@@ -237,48 +257,23 @@ IMU_Ref_Frame               = [0; 0.336; -0.046];
 gps_to_lidar_diff           = [(LiDAR_Ref_Frame(1) - IMU_Ref_Frame(1)), (LiDAR_Ref_Frame(2) - IMU_Ref_Frame(2)), (LiDAR_Ref_Frame(3) - IMU_Ref_Frame(3))]; 
 
 % Angle array creation
-chan_2_c_bounds     = [((90 - chan_2_d_ang) * pi/180), ((90 + chan_2_d_ang) * pi/180)];
-chan_3_c_bounds     = [((90 - chan_3_d_ang) * pi/180), ((90 + chan_3_d_ang) * pi/180)];
-chan_4_c_bounds     = [((90 - chan_4_d_ang) * pi/180), ((90 + chan_4_d_ang) * pi/180)];
-chan_5_c_bounds     = [((90 - chan_5_d_ang) * pi/180), ((90 + chan_5_d_ang) * pi/180)];
+chan_2_c_bounds     = [((90 - options.chan_2_d_ang) * pi/180), ((90 + options.chan_2_d_ang) * pi/180)];
+chan_3_c_bounds     = [((90 - options.chan_3_d_ang) * pi/180), ((90 + options.chan_3_d_ang) * pi/180)];
+chan_4_c_bounds     = [((90 - options.chan_4_d_ang) * pi/180), ((90 + options.chan_4_d_ang) * pi/180)];
+% chan_5_c_bounds     = [((90 - options.chan_5_d_ang) * pi/180), ((90 + options.chan_5_d_ang) * pi/180)];
 
-chan_2_l_bounds     = [((135 - chan_2_d_ang) * pi/180), ((135 + chan_2_d_ang) * pi/180)];
-chan_3_l_bounds     = [((135 - chan_3_d_ang) * pi/180), ((135 + chan_3_d_ang) * pi/180)];
-chan_4_l_bounds     = [((135 - chan_4_d_ang) * pi/180), ((135 + chan_4_d_ang) * pi/180)];
-chan_5_l_bounds     = [((135 - chan_5_d_ang) * pi/180), ((135 + chan_5_d_ang) * pi/180)];
+chan_2_l_bounds     = [((135 - options.chan_2_d_ang) * pi/180), ((135 + options.chan_2_d_ang) * pi/180)];
+chan_3_l_bounds     = [((135 - options.chan_3_d_ang) * pi/180), ((135 + options.chan_3_d_ang) * pi/180)];
+chan_4_l_bounds     = [((135 - options.chan_4_d_ang) * pi/180), ((135 + options.chan_4_d_ang) * pi/180)];
+% chan_5_l_bounds     = [((135 - options.chan_5_d_ang) * pi/180), ((135 + options.chan_5_d_ang) * pi/180)];
 
-chan_2_r_bounds     = [((45 - chan_2_d_ang) * pi/180), ((45 + chan_2_d_ang) * pi/180)];
-chan_3_r_bounds     = [((45 - chan_3_d_ang) * pi/180), ((45 + chan_3_d_ang) * pi/180)];
-chan_4_r_bounds     = [((45 - chan_4_d_ang) * pi/180), ((45 + chan_4_d_ang) * pi/180)];
-chan_5_r_bounds     = [((45 - chan_5_d_ang) * pi/180), ((45 + chan_5_d_ang) * pi/180)];
+chan_2_r_bounds     = [((45 - options.chan_2_d_ang) * pi/180), ((45 + options.chan_2_d_ang) * pi/180)];
+chan_3_r_bounds     = [((45 - options.chan_3_d_ang) * pi/180), ((45 + options.chan_3_d_ang) * pi/180)];
+chan_4_r_bounds     = [((45 - options.chan_4_d_ang) * pi/180), ((45 + options.chan_4_d_ang) * pi/180)];
+% chan_5_r_bounds     = [((45 - options.chan_5_d_ang) * pi/180), ((45 + options.chan_5_d_ang) * pi/180)];
 
 % Names for channel
 area_names = [];
-
-% Array Inits
-% % Chan 2
-% Grav_All_Append_Array_2   = [0 0 0]; Asph_All_Append_Array_2 = [0 0 0]; Foli_All_Append_Array_2 = [0 0 0]; Gras_All_Append_Array_2 = [0 0 0];
-% Grav_Avg_Append_Array_2   = [0 0 0]; Asph_Avg_Append_Array_2 = [0 0 0]; Foli_Avg_Append_Array_2 = [0 0 0]; Gras_Avg_Append_Array_2 = [0 0 0];
-% Unkn_All_Append_Array_2   = [0 0 0];
-% Unkn_Avg_Append_Array_2   = [0 0 0];
-% 
-% % Chan 3
-% Grav_All_Append_Array_3   = [0 0 0]; Asph_All_Append_Array_3 = [0 0 0]; Foli_All_Append_Array_3 = [0 0 0]; Gras_All_Append_Array_3 = [0 0 0];
-% Grav_Avg_Append_Array_3   = [0 0 0]; Asph_Avg_Append_Array_3 = [0 0 0]; Foli_Avg_Append_Array_3 = [0 0 0]; Gras_Avg_Append_Array_3 = [0 0 0];
-% Unkn_All_Append_Array_3   = [0 0 0];
-% Unkn_Avg_Append_Array_3   = [0 0 0];
-% 
-% % Chan 4
-% Grav_All_Append_Array_4   = [0 0 0]; Asph_All_Append_Array_4 = [0 0 0]; Foli_All_Append_Array_4 = [0 0 0]; Gras_All_Append_Array_4 = [0 0 0];
-% Grav_Avg_Append_Array_4   = [0 0 0]; Asph_Avg_Append_Array_4 = [0 0 0]; Foli_Avg_Append_Array_4 = [0 0 0]; Gras_Avg_Append_Array_4 = [0 0 0];
-% Unkn_All_Append_Array_4   = [0 0 0];
-% Unkn_Avg_Append_Array_4   = [0 0 0];
-% 
-% % Chan 5
-% Grav_All_Append_Array_5   = [0 0 0]; Asph_All_Append_Array_5 = [0 0 0]; Foli_All_Append_Array_5 = [0 0 0]; Gras_All_Append_Array_5 = [0 0 0];
-% Grav_Avg_Append_Array_5   = [0 0 0]; Asph_Avg_Append_Array_5 = [0 0 0]; Foli_Avg_Append_Array_5 = [0 0 0]; Gras_Avg_Append_Array_5 = [0 0 0];
-% Unkn_All_Append_Array_5   = [0 0 0];
-% Unkn_Avg_Append_Array_5   = [0 0 0];
 
 % Array Inits
 % Chan 2
@@ -304,7 +299,6 @@ Grav_All_Append_Array_5   = []; Asph_All_Append_Array_5 = []; Foli_All_Append_Ar
 Grav_Avg_Append_Array_5   = []; Asph_Avg_Append_Array_5 = []; Foli_Avg_Append_Array_5 = []; Gras_Avg_Append_Array_5 = [];
 Unkn_All_Append_Array_5   = [];
 Unkn_Avg_Append_Array_5   = [];
-
 
 % Other Stuff
 raw_data_export = []; save_folder = [];
@@ -359,32 +353,17 @@ lidar_pos_store             = gps_pos_store;
 time_now        = datetime("now","Format","uuuuMMddhhmmss");
 time_now        = datestr(time_now,'yyyyMMddhhmmss');
 
-export_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_3_5_" + string(time_now);
+options.export_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_3_5_" + string(time_now);
 
-if ~exist(export_dir,'dir')
-    mkdir(export_dir)
+if ~exist(string(options.export_dir),'dir')
+    mkdir(string(options.export_dir))
 end
 
 % addpath(root_dir)
 % CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
 % mkdir(CLASSIFICATION_STACK_FOLDER);
-addpath(export_dir);
+addpath(string(options.export_dir));
 
-%% ROI Setup
-
-if terrain_opt == 1
-    xy_roi          = Manual_Classfied_Areas.grav{:,roi_select};
-elseif terrain_opt == 2
-    xy_roi          = Manual_Classfied_Areas.chip{:,roi_select};
-elseif terrain_opt == 3
-    xy_roi          = Manual_Classfied_Areas.foli{:,roi_select};
-elseif terrain_opt == 4
-    xy_roi          = Manual_Classfied_Areas.gras{:,roi_select};
-elseif terrain_opt == 5
-    xy_roi          = Manual_Classfied_Areas.asph{:,roi_select};
-elseif terrain_opt == 6
-    xy_roi          = Manual_Classfied_Areas.asph_roi{:,roi_select};
-end
 
 %% Timestamps
 
@@ -426,10 +405,7 @@ pcd_class_rate = Par(int64(cloud_break));
 
 % Progress bar
 parfor_progress(cloud_break);
-
-% Par Timing
-Par.tic;
-
+classy = tic;
 % Classifying per 360 scan
 parfor cloud = 1:cloud_break
     
@@ -444,6 +420,11 @@ parfor cloud = 1:cloud_break
     abcd = [];
     table_export = [];
     
+    rate = tic;
+    
+    Yfit_2c = []; Yfit_3c = []; Yfit_4c = [];
+    Yfit_2l = []; Yfit_3l = []; Yfit_4l = []; 
+    Yfit_2r = []; Yfit_3r = []; Yfit_4r = [];
     
     %% Grabbing Data
     
@@ -492,26 +473,7 @@ parfor cloud = 1:cloud_break
     ring                        = rosReadField(current_cloud, 'ring');
     xyz_cloud(:,4)              = intensities;
     xyz_cloud(:,5)              = ring;
-    
-    
-    %% RANSAC and MLS
-    
-    if mls_bool
-        
-        % MLS
-        xyz_mll                     = [xyz_cloud(:,1) xyz_cloud(:,2) xyz_cloud(:,3)];
-        model_MLS                   = MLL_plane_proj(xyz_mll(isfinite(xyz_mll(:,1)), :));
-        abcd                        = [model_MLS.a, model_MLS.b, model_MLS.c, model_MLS.d];
-        
-    elseif ransac_bool
-        
-        % RANSAC - MATLAB
-        ptCloudSource               = pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)], 'Intensity', xyz_cloud(:,4));
-        model_RANSAC                = pcfitplane(ptCloudSource, maxDistance);
-        abcd                        = [model_RANSAC.Parameters(1), model_RANSAC.Parameters(2), model_RANSAC.Parameters(3), model_RANSAC.Parameters(4)];
-        
-    end
-    
+
     
     %% Trimming data
     
@@ -527,84 +489,202 @@ parfor cloud = 1:cloud_break
     
     %% Classification Area
     
-    % CHANNEL 2 CENT
+    if ~options.dist_filt_bool
 
-    diag_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform, cloud, export_dir, DvG, "2c")
+        % CHANNEL 2 CENT
 
-    % CHANNEL 3 CENT
+        classify_fun_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform, cloud, options, "2c");
 
-    diag_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform, cloud, export_dir, DvG, "3c")
+        % CHANNEL 3 CENT
 
-    % CHANNEL 4 CENT
-    
-    diag_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, cloud, export_dir, DvG, "4c")
+        classify_fun_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform, cloud, options, "3c");
 
-    % CHANNEL 5 CENT
-    
-        % nothing yet in chan 5 - maybe later?
+        % CHANNEL 4 CENT
 
-    % CHANNEL 2 LEFT
-    
-    diag_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, cloud, export_dir, DvG, "2l")
+        classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, cloud, options, "4c");
 
-    % CHANNEL 3 LEFT
+        % CHANNEL 5 CENT
 
-    diag_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform, cloud, export_dir, DvG, "3l")
+            % nothing yet in chan 5 - maybe later?
 
-    % CHANNEL 4 LEFT
-    
-    diag_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, cloud, export_dir, DvG, "4l")
-    
-    % CHANNEL 5 CENT
-    
-        % nothing yet in chan 5 - maybe later?
-    
-    % CHANNEL 2 RIGHT
-    
-    diag_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, cloud, export_dir, DvG, "2r")
-    
-    % CHANNEL 3 RIGHT
+        % CHANNEL 2 LEFT
 
-    diag_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform, cloud, export_dir, DvG, "3r")
-    
-    % CHANNEL 4 RIGHT
+        classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, cloud, options, "2l");
 
-    diag_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, cloud, export_dir, DvG, "4r")
+        % CHANNEL 3 LEFT
+
+        classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform, cloud, options, "3l");
+
+        % CHANNEL 4 LEFT
+
+        classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, cloud, options, "4l");
+
+        % CHANNEL 5 CENT
+
+            % nothing yet in chan 5 - maybe later?
+
+        % CHANNEL 2 RIGHT
+
+        classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, cloud, options, "2r");
+
+        % CHANNEL 3 RIGHT
+
+        classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform, cloud, options, "3r");
+
+        % CHANNEL 4 RIGHT
+
+        classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, cloud, options, "4r");
+
+        % CHANNEL 5 CENT
+
+            % nothing yet in chan 5 - maybe later?
+            
     
-    % CHANNEL 5 CENT
+
+
+    %% Distance Filtering
     
-        % nothing yet in chan 5 - maybe later?
+    % It is expected that the distances between the 
+   
+%     elseif options.dist_filt_bool
+% 
+%         %% Classification Area 2
+%         
+%         % Classify using slightly different function so that the distances can be exploited
+%         classify_fun_out_2c{cloud} = classify_fun_No_Save(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform, cloud, options, conf_filt_bool, "2c")
+%         classify_fun_out_3c{cloud} = classify_fun_No_Save(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform, cloud, options, conf_filt_bool, "3c")
+%         classify_fun_out_4c{cloud} = classify_fun_No_Save(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, cloud, options, conf_filt_bool, "4c")
+%         
+%         classify_fun_out_2l{cloud} = classify_fun_No_Save(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, cloud, options, conf_filt_bool, "2l")
+%         classify_fun_out_3l{cloud} = classify_fun_No_Save(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform, cloud, options, conf_filt_bool, "3l")
+%         classify_fun_out_4l{cloud} = classify_fun_No_Save(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, cloud, options, conf_filt_bool, "4l")
+%         
+%         classify_fun_out_2r{cloud} = classify_fun_No_Save(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, cloud, options, conf_filt_bool, "2r")
+%         classify_fun_out_3r{cloud}{cloud} = classify_fun_No_Save(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform, cloud, options, conf_filt_bool, "3r")
+%         classify_fun_out_4r = classify_fun_No_Save(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, cloud, options, conf_filt_bool, "4r")
+%         
+%         
+%         %% Getting distance between points
+%         
+%         % Mean Points
+%         c_2_mean = [mean(xyz_cloud_2(classify_fun_out_2c{cloud}.arc_idx_2c,1)), mean(xyz_cloud_2(classify_fun_out_2c{cloud}.arc_idx_2c,2)), mean(xyz_cloud_2(classify_fun_out_2c{cloud}.arc_idx_2c,3))];
+%         c_3_mean = [mean(xyz_cloud_3(classify_fun_out_3c{cloud}.arc_idx_3c,1)), mean(xyz_cloud_3(classify_fun_out_3c{cloud}.arc_idx_3c,2)), mean(xyz_cloud_3(classify_fun_out_3c{cloud}.arc_idx_3c,3))];
+%         c_4_mean = [mean(xyz_cloud_4(classify_fun_out_4c{cloud}.arc_idx_4c,1)), mean(xyz_cloud_4(classify_fun_out_4c{cloud}.arc_idx_4c,2)), mean(xyz_cloud_4(classify_fun_out_4c{cloud}.arc_idx_4c,3))];
+% 
+%         l_2_mean = [mean(xyz_cloud_2(classify_fun_out_2l{cloud}.arc_idx_2l,1)), mean(xyz_cloud_2(classify_fun_out_2l{cloud}.arc_idx_2l,2)), mean(xyz_cloud_2(classify_fun_out_2l{cloud}.arc_idx_2l,3))];
+%         l_3_mean = [mean(xyz_cloud_3(classify_fun_out_3l{cloud}.arc_idx_3l,1)), mean(xyz_cloud_3(classify_fun_out_3l{cloud}.arc_idx_3l,2)), mean(xyz_cloud_3(classify_fun_out_3l{cloud}.arc_idx_3l,3))];
+%         l_4_mean = [mean(xyz_cloud_4(classify_fun_out_4l{cloud}.arc_idx_4l,1)), mean(xyz_cloud_4(classify_fun_out_4l{cloud}.arc_idx_4l,2)), mean(xyz_cloud_4(classify_fun_out_4l{cloud}.arc_idx_4l,3))];
+% 
+%         r_2_mean = [mean(xyz_cloud_2(classify_fun_out_2r{cloud}.arc_idx_2r,1)), mean(xyz_cloud_2(classify_fun_out_2r{cloud}.arc_idx_2r,2)), mean(xyz_cloud_2(classify_fun_out_2r{cloud}.arc_idx_2r,3))];
+%         r_3_mean = [mean(xyz_cloud_3(classify_fun_out_3r{cloud}.arc_idx_3r,1)), mean(xyz_cloud_3(classify_fun_out_3r{cloud}.arc_idx_3r,2)), mean(xyz_cloud_3(classify_fun_out_3r{cloud}.arc_idx_3r,3))];
+%         r_4_mean = [mean(xyz_cloud_4(classify_fun_out_4r{cloud}.arc_idx_4r,1)), mean(xyz_cloud_4(classify_fun_out_4r{cloud}.arc_idx_4r,2)), mean(xyz_cloud_4(classify_fun_out_4r{cloud}.arc_idx_4r,3))];
+% 
+%         % center 
+%         c_23_dist{cloud} = sqrt( (c_2_mean(1) - c_3_mean(1))^2 + (c_2_mean(2) - c_3_mean(2))^2 + (c_2_mean(3) - c_3_mean(3))^2);
+%         c_34_dist{cloud} = sqrt( (c_4_mean(1) - c_3_mean(1))^2 + (c_4_mean(2) - c_3_mean(2))^2 + (c_4_mean(3) - c_3_mean(3))^2);
+% 
+%         % left 
+%         l_23_dist{cloud} = sqrt( (c_2_mean(1) - c_3_mean(1))^2 + (c_2_mean(2) - c_3_mean(2))^2 + (c_2_mean(3) - c_3_mean(3))^2);
+%         l_34_dist{cloud} = sqrt( (c_4_mean(1) - c_3_mean(1))^2 + (c_4_mean(2) - c_3_mean(2))^2 + (c_4_mean(3) - c_3_mean(3))^2);
+% 
+%         % right 
+%         r_23_dist{cloud} = sqrt( (c_2_mean(1) - c_3_mean(1))^2 + (c_2_mean(2) - c_3_mean(2))^2 + (c_2_mean(3) - c_3_mean(3))^2);
+%         r_34_dist{cloud} = sqrt( (c_4_mean(1) - c_3_mean(1))^2 + (c_4_mean(2) - c_3_mean(2))^2 + (c_4_mean(3) - c_3_mean(3))^2);
+% 
+%         %% Consecutive point logic
+% 
+%         % Center
+%         if ~isequal(classify_fun_out_2c{cloud}.Yfit, classify_fun_out_3c{cloud}.Yfit) && c_23_dist{cloud} <= min_dist_23 || ~isequal(classify_fun_out_2c{cloud}.Yfit, classify_fun_out_3c{cloud}.Yfit) && c_23_dist{cloud} >= max_dist_23
+% 
+%             Yfit_2c = categorical("unknown");
+%             Yfit_3c = categorical("unknown");
+% 
+%         end
+% 
+%         if ~isequal(classify_fun_out_3c{cloud}.Yfit, classify_fun_out_4c{cloud}.Yfit) && c_34_dist{cloud} <= min_dist_34 || ~isequal(classify_fun_out_3c{cloud}.Yfit, classify_fun_out_4c{cloud}.Yfit) && c_23_dist{cloud} >= max_dist_34
+% 
+%             Yfit_3c = categorical("unknown");
+%             Yfit_4c = categorical("unknown");
+% 
+%         end
+% 
+%         % Left
+%         if ~isequal(classify_fun_out_2l{cloud}.Yfit, classify_fun_out_3l{cloud}.Yfit) && l_23_dist{cloud} <= min_dist_23 || ~isequal(classify_fun_out_2l{cloud}.Yfit, classify_fun_out_3l{cloud}.Yfit) && l_23_dist{cloud} >= max_dist_23
+% 
+%             Yfit_2l = categorical("unknown");
+%             Yfit_3l = categorical("unknown");
+% 
+%         end
+% 
+%         if ~isequal(classify_fun_out_3l{cloud}.Yfit, classify_fun_out_4l{cloud}.Yfit) && l_34_dist{cloud} <= min_dist_34 || ~isequal(classify_fun_out_3l{cloud}.Yfit, classify_fun_out_4l{cloud}.Yfit) && l_23_dist{cloud} >= max_dist_34
+% 
+%             Yfit_3l = categorical("unknown");
+%             Yfit_4l = categorical("unknown");
+% 
+%         end
+% 
+%         % Right
+%         if ~isequal(classify_fun_out_2r{cloud}.Yfit, classify_fun_out_3r{cloud}.Yfit) && r_23_dist{cloud} <= min_dist_23 || ~isequal(classify_fun_out_2r{cloud}.Yfit, classify_fun_out_3r{cloud}.Yfit) && r_23_dist{cloud} >= max_dist_23
+% 
+%             Yfit_2c = categorical("unknown");
+%             Yfit_3c = categorical("unknown");
+% 
+%         end
+% 
+%         if ~isequal(classify_fun_out_3r{cloud}.Yfit, classify_fun_out_4r{cloud}.Yfit) && r_34_dist{cloud} <= min_dist_34 || ~isequal(classify_fun_out_3r{cloud}.Yfit, classify_fun_out_4r{cloud}.Yfit) && r_23_dist{cloud} >= max_dist_34
+% 
+%             Yfit_3r = categorical("unknown");
+%             Yfit_4r = categorical("unknown");
+% 
+%         end
+% 
+%         %% Saving the Data for the above area
+% 
+%         RosbagClassifier_parsave_tform(classify_fun_out_2c.Classification_FileName_2c, Yfit_2c, [], [], xyz_cloud_2(arc_idx_2c,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_3c.Classification_FileName_3c, Yfit_3c, [], [], xyz_cloud_3(arc_idx_3c,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_4c.Classification_FileName_4c, Yfit_4c, [], [], xyz_cloud_4(arc_idx_4c,:), tform);
+% 
+%         RosbagClassifier_parsave_tform(classify_fun_out_2l.Classification_FileName_2l, Yfit_2l, [], [], xyz_cloud_2(arc_idx_2l,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_3l.Classification_FileName_3l, Yfit_3l, [], [], xyz_cloud_3(arc_idx_3l,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_4l.Classification_FileName_4l, Yfit_4l, [], [], xyz_cloud_4(arc_idx_4l,:), tform);
+% 
+%         RosbagClassifier_parsave_tform(classify_fun_out_2r.Classification_FileName_2r, Yfit_2r, [], [], xyz_cloud_2(arc_idx_2r,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_3r.Classification_FileName_3r, Yfit_3r, [], [], xyz_cloud_3(arc_idx_3r,:), tform);
+%         RosbagClassifier_parsave_tform(classify_fun_out_4r.Classification_FileName_4r, Yfit_4r, [], [], xyz_cloud_4(arc_idx_4r,:), tform);
+        
+        
+    end  % distance filtering
     
     
     %% Weightbar
     
     % Progress Bar
 	parfor_progress;
-    
-    % Timing Track
-    pcd_class_rate(cloud) = Par.toc;
+
+    pcd_class_rate_rate{cloud} = toc(rate);
     
     
 end
 
-stop(pcd_class_rate)
 
 parfor_progress(0);
 
 disp('Classification Complete!')
 
+disp(toc(classy))
+
 %% Quickly export the discovered features into a table
 
-if data_comp_bool
-    
+% if data_comp_bool
+%     
 %     export_chans(chan_2_c_table_export, chan_3_c_table_export, chan_4_c_table_export, terrain_opt);
-    
-end
+%     
+% end
 
 
 %% Load the Classification folder and grab the results
 
-classification_list             = dir(fullfile(export_dir,'/*.mat'));
+classification_list             = dir(fullfile(string(options.export_dir),'/*.mat'));
 
 num_files                       = length(classification_list);
 
@@ -645,7 +725,7 @@ for class_idx = 1:1:num_files
     try
         label = cellstr(label);
     catch
-            warning('Label may be incorrectly formatted')
+        warning('Label may be incorrectly formatted')
     end
 
 
@@ -755,6 +835,7 @@ close(load_result_bar)
 
 disp('Files loaded!')
 
+
 %% Arrays to single struct
 
 if ~isempty(Grav_Avg_Append_Array_2) || ~isempty(Asph_Avg_Append_Array_2) || ~isempty(Unkn_Avg_Append_Array_2)
@@ -789,10 +870,6 @@ end
 % 
 % end
 
-%% Score the Results
-
-class_score_function_test(avg_cell_store, Manual_Classfied_Areas)
-
 
 %% Get Plot Limits
 
@@ -800,11 +877,14 @@ disp('Plotting Results')
 
 try
     
-    x_min_lim = min([Grav_All_Append_Array_2(:,1); Asph_All_Append_Array_2(:,1); Gras_All_Append_Array_2(:,1)]) - 5;
-    x_max_lim = max([Grav_All_Append_Array_2(:,1); Asph_All_Append_Array_2(:,1); Gras_All_Append_Array_2(:,1)]) + 5;
+    x_min_lim = min([Grav_All_Append_Array_2(:,1); Asph_All_Append_Array_2(:,1); Unkn_All_Append_Array_2(:,1)]) - 5;
+    x_max_lim = max([Grav_All_Append_Array_2(:,1); Asph_All_Append_Array_2(:,1); Unkn_All_Append_Array_2(:,1)]) + 5;
 
-    y_min_lim = min([Grav_All_Append_Array_2(:,2); Asph_All_Append_Array_2(:,2); Gras_All_Append_Array_2(:,2)]) - 5;
-    y_max_lim = max([Grav_All_Append_Array_2(:,2); Asph_All_Append_Array_2(:,2); Gras_All_Append_Array_2(:,2)]) + 5;
+    y_min_lim = min([Grav_All_Append_Array_2(:,2); Asph_All_Append_Array_2(:,2); Unkn_All_Append_Array_2(:,2)]) - 5;
+    y_max_lim = max([Grav_All_Append_Array_2(:,2); Asph_All_Append_Array_2(:,2); Unkn_All_Append_Array_2(:,2)]) + 5;
+    
+    z_min_lim = min([Grav_All_Append_Array_2(:,3); Asph_All_Append_Array_2(:,3); Unkn_All_Append_Array_2(:,3)]) - 5;
+    z_max_lim = max([Grav_All_Append_Array_2(:,3); Asph_All_Append_Array_2(:,3); Unkn_All_Append_Array_2(:,3)]) + 5;
     
     
 catch
@@ -813,318 +893,439 @@ catch
     x_max_lim = 100;
     y_min_lim = -100;
     y_max_lim = 100;
+    z_min_lim = -20;
+    z_max_lim = 20;
     
     
 end
+
+options.max_h = z_max_lim;
+
+
+%% Score the Results
+
+class_score_function_test(avg_cell_store, Manual_Classfied_Areas, options)
+
 
 
 %% Plotting All Points
 
-% All points
-result_all_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
+if options.plot_all_bool
 
-hold all
+    % All points
+    result_all_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
 
-% Channel 2
-try
-    plot3(Grav_All_Append_Array_2(:,1), Grav_All_Append_Array_2(:,2), Grav_All_Append_Array_2(:,3), 'c.', 'MarkerSize', 10)
-catch
-    disp('No Grav Data on Chan 2!')
+    hold all
+
+    % Channel 2
+    try
+        plot3(Grav_All_Append_Array_2(:,1), Grav_All_Append_Array_2(:,2), Grav_All_Append_Array_2(:,3), 'c.', 'MarkerSize', options.c2markersize)
+    catch
+        disp('No Grav Data on Chan 2!')
+    end
+
+    try
+        plot3(Asph_All_Append_Array_2(:,1), Asph_All_Append_Array_2(:,2), Asph_All_Append_Array_2(:,3), 'k.', 'MarkerSize', options.c2markersize)
+    catch
+        disp('No Asph Dataon Chan 2!')
+    end
+
+    % try
+    %     plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', options.c2markersize)
+    % catch
+    %     disp('No Gras Dataon Chan 2!')
+    % end
+
+    try
+        plot3(Unkn_All_Append_Array_2(:,1), Unkn_All_Append_Array_2(:,2), Unkn_All_Append_Array_2(:,3), 'r.', 'MarkerSize', 10)
+    catch
+        disp('No Asph Dataon Chan 2!')
+    end
+
+    % Channel 3
+    try
+        plot3(Grav_All_Append_Array_3(:,1), Grav_All_Append_Array_3(:,2), Grav_All_Append_Array_3(:,3), 'c^', 'MarkerSize', 10)
+    catch
+        disp('No Grav Data on Chan 3!')
+    end
+
+    try
+        plot3(Asph_All_Append_Array_3(:,1), Asph_All_Append_Array_3(:,2), Asph_All_Append_Array_3(:,3), 'k^', 'MarkerSize', 10)
+    catch
+        disp('No Asph Dataon Chan 3!')
+    end
+
+    % try
+    %     plot3(Gras_All_Append_Array_3(:,1), Gras_All_Append_Array_3(:,2), Gras_All_Append_Array_3(:,3), 'g^', 'MarkerSize', 10)
+    % catch
+    %     disp('No Gras Dataon Chan 3!')
+    % end
+
+    try
+        plot3(Unkn_All_Append_Array_3(:,1), Unkn_All_Append_Array_3(:,2), Unkn_All_Append_Array_3(:,3), 'r^', 'MarkerSize', 10)
+    catch
+        disp('No Asph Dataon Chan 3!')
+    end
+
+    % Channel 4
+    try
+        plot3(Grav_All_Append_Array_4(:,1), Grav_All_Append_Array_4(:,2), Grav_All_Append_Array_4(:,3), 'cv', 'MarkerSize', 10)
+    catch
+        disp('No Grav Data on Chan 4!')
+    end
+
+    try
+        plot3(Asph_All_Append_Array_4(:,1), Asph_All_Append_Array_4(:,2), Asph_All_Append_Array_4(:,3), 'kv', 'MarkerSize', 10)
+    catch
+        disp('No Asph Dataon Chan 4!')
+    end
+
+    % try
+    %     plot3(Gras_All_Append_Array_4(:,1), Gras_All_Append_Array_4(:,2), Gras_All_Append_Array_4(:,3), 'gv', 'MarkerSize', 10)
+    % catch
+    %     disp('No Gras Dataon Chan 4!')
+    % end
+
+    try
+        plot3(Unkn_All_Append_Array_4(:,1), Unkn_All_Append_Array_4(:,2), Unkn_All_Append_Array_4(:,3), 'rv', 'MarkerSize', 10)
+    catch
+        disp('No Asph Dataon Chan 4!')
+    end
+
+    % Channel 5
+    try
+        plot3(Grav_All_Append_Array_5(:,1), Grav_All_Append_Array_5(:,2), Grav_All_Append_Array_5(:,3), 'cx', 'MarkerSize', 10)
+    catch
+        disp('No Grav Data on Chan 5!')
+    end
+
+    try
+        plot3(Asph_All_Append_Array_5(:,1), Asph_All_Append_Array_5(:,2), Asph_All_Append_Array_5(:,3), 'kx', 'MarkerSize', 10)
+    catch
+        disp('No Asph Data on Chan 5!')
+    end
+
+    % try
+    %     plot3(Gras_All_Append_Array_5(:,1), Gras_All_Append_Array_5(:,2), Gras_All_Append_Array_5(:,3), 'gx', 'MarkerSize', 10)
+    % catch
+    %     disp('No Gras Data on Chan 5!')
+    % end
+
+    try
+        plot3(Unkn_All_Append_Array_5(:,1), Unkn_All_Append_Array_5(:,2), Unkn_All_Append_Array_5(:,3), 'rx', 'MarkerSize', 10)
+    catch
+        disp('No Asph Data on Chan 5!')
+    end
+
+    axis('equal')
+    axis off
+    view([pi/2 0 90])
+
+    % MCA_plotter(Manual_Classfied_Areas)
+
+    xlim([x_min_lim x_max_lim]);
+    ylim([y_min_lim y_max_lim]);
+
+    h(1) = plot(NaN,NaN,'oc');
+    h(2) = plot(NaN,NaN,'ok');
+    h(3) = plot(NaN,NaN,'or');
+    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+
+    ax = gca;
+    ax.Clipping = 'off';
+
 end
-   
-try
-    plot3(Asph_All_Append_Array_2(:,1), Asph_All_Append_Array_2(:,2), Asph_All_Append_Array_2(:,3), 'k.', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 2!')
-end
-
-% try
-%     plot3(Gras_All_Append_Array_2(:,1), Gras_All_Append_Array_2(:,2), Gras_All_Append_Array_2(:,3), 'g.', 'MarkerSize', 10)
-% catch
-%     disp('No Gras Dataon Chan 2!')
-% end
-
-try
-    plot3(Unkn_All_Append_Array_2(:,1), Unkn_All_Append_Array_2(:,2), Unkn_All_Append_Array_2(:,3), 'r.', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 2!')
-end
-
-% Channel 3
-try
-    plot3(Grav_All_Append_Array_3(:,1), Grav_All_Append_Array_3(:,2), Grav_All_Append_Array_3(:,3), 'c^', 'MarkerSize', 10)
-catch
-    disp('No Grav Data on Chan 3!')
-end
-   
-try
-    plot3(Asph_All_Append_Array_3(:,1), Asph_All_Append_Array_3(:,2), Asph_All_Append_Array_3(:,3), 'k^', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 3!')
-end
-
-% try
-%     plot3(Gras_All_Append_Array_3(:,1), Gras_All_Append_Array_3(:,2), Gras_All_Append_Array_3(:,3), 'g^', 'MarkerSize', 10)
-% catch
-%     disp('No Gras Dataon Chan 3!')
-% end
-
-try
-    plot3(Unkn_All_Append_Array_3(:,1), Unkn_All_Append_Array_3(:,2), Unkn_All_Append_Array_3(:,3), 'r^', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 3!')
-end
-
-% Channel 4
-try
-    plot3(Grav_All_Append_Array_4(:,1), Grav_All_Append_Array_4(:,2), Grav_All_Append_Array_4(:,3), 'cv', 'MarkerSize', 10)
-catch
-    disp('No Grav Data on Chan 4!')
-end
-   
-try
-    plot3(Asph_All_Append_Array_4(:,1), Asph_All_Append_Array_4(:,2), Asph_All_Append_Array_4(:,3), 'kv', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 4!')
-end
-
-% try
-%     plot3(Gras_All_Append_Array_4(:,1), Gras_All_Append_Array_4(:,2), Gras_All_Append_Array_4(:,3), 'gv', 'MarkerSize', 10)
-% catch
-%     disp('No Gras Dataon Chan 4!')
-% end
-
-try
-    plot3(Unkn_All_Append_Array_4(:,1), Unkn_All_Append_Array_4(:,2), Unkn_All_Append_Array_4(:,3), 'rv', 'MarkerSize', 10)
-catch
-    disp('No Asph Dataon Chan 4!')
-end
-
-% Channel 5
-try
-    plot3(Grav_All_Append_Array_5(:,1), Grav_All_Append_Array_5(:,2), Grav_All_Append_Array_5(:,3), 'cx', 'MarkerSize', 10)
-catch
-    disp('No Grav Data on Chan 5!')
-end
-   
-try
-    plot3(Asph_All_Append_Array_5(:,1), Asph_All_Append_Array_5(:,2), Asph_All_Append_Array_5(:,3), 'kx', 'MarkerSize', 10)
-catch
-    disp('No Asph Data on Chan 5!')
-end
-
-% try
-%     plot3(Gras_All_Append_Array_5(:,1), Gras_All_Append_Array_5(:,2), Gras_All_Append_Array_5(:,3), 'gx', 'MarkerSize', 10)
-% catch
-%     disp('No Gras Data on Chan 5!')
-% end
-
-try
-    plot3(Unkn_All_Append_Array_5(:,1), Unkn_All_Append_Array_5(:,2), Unkn_All_Append_Array_5(:,3), 'rx', 'MarkerSize', 10)
-catch
-    disp('No Asph Data on Chan 5!')
-end
-
-axis('equal')
-axis off
-view([pi/2 0 90])
-
-% MCA_plotter(Manual_Classfied_Areas)
-
-xlim([x_min_lim x_max_lim]);
-ylim([y_min_lim y_max_lim]);
-
-h(1) = plot(NaN,NaN,'oc');
-h(2) = plot(NaN,NaN,'ok');
-h(3) = plot(NaN,NaN,'or');
-l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-l.Interpreter = 'tex';
-
-ax = gca;
-ax.Clipping = 'off';
-
 
 %% Average points
 
-result_avg_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
+if options.plot_avg_bool
 
-hold all
+    result_avg_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
 
-% Channel 2
-try
-    plot3(Grav_Avg_Append_Array_2(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_2(:,3), 'co', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Grav Data on Chan 2!')
+    hold all
+
+    % Channel 2
+    try
+        plot3(Grav_Avg_Append_Array_2(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_2(:,3), 'co', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
+    catch
+        disp('No Grav Data on Chan 2!')
+    end
+
+    try   
+        plot3(Asph_Avg_Append_Array_2(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_2(:,3), 'ko', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
+    catch
+        disp('No Asph Data on Chan 2!')
+    end
+
+    % try
+    %     plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'go', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
+    % catch
+    %     disp('No Gras Data on Chan 2!')
+    % end
+
+    try
+        plot3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'ro', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
+    catch
+        disp('No Unkn Data on Chan 2!')
+    end
+
+
+    % Channel 3
+    try
+        plot3(Grav_Avg_Append_Array_3(:,1), Grav_Avg_Append_Array_3(:,2), Grav_Avg_Append_Array_3(:,3), 'co', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
+    catch
+        disp('No Grav Data on Chan 3!')
+    end
+
+    try   
+        plot3(Asph_Avg_Append_Array_3(:,1), Asph_Avg_Append_Array_3(:,2), Asph_Avg_Append_Array_3(:,3), 'ko', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
+    catch
+        disp('No Asph Data on Chan 3!')
+    end
+
+%     try
+%         plot3(Gras_Avg_Append_Array_3(:,1), Gras_Avg_Append_Array_3(:,2), Gras_Avg_Append_Array_3(:,3), 'g^', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
+%     catch
+%         disp('No Gras Data on Chan 3!')
+%     end
+
+    try
+        plot3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'ro', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
+    catch
+        disp('No Unkn Data on Chan 3!')
+    end
+
+    % Channel 4
+    try
+        plot3(Grav_Avg_Append_Array_4(:,1), Grav_Avg_Append_Array_4(:,2), Grav_Avg_Append_Array_4(:,3), 'co', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
+    catch
+        disp('No Grav Data on Chan 4!')
+    end
+
+    try   
+        plot3(Asph_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'ko', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
+    catch
+        disp('No Asph Data on Chan 4!')
+    end
+
+    % try
+    %     plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'gv', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
+    % catch
+    %     disp('No Gras Data on Chan 4!')
+    % end
+
+    try
+        plot3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'ro', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
+    catch
+        disp('No Unkn Data on Chan 4!')
+    end
+
+
+    % Channel 5
+    % try
+    %     plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_5(:,2), Grav_Avg_Append_Array_5(:,3), 'cx', 'MarkerSize', 15, 'Linewidth', 5)
+    % catch
+    %     disp('No Grav Data on Chan 5!')
+    % end
+    % 
+    % try   
+    %     plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_5(:,2), Asph_Avg_Append_Array_5(:,3), 'kx', 'MarkerSize', 15, 'Linewidth', 5)
+    % catch
+    %     disp('No Asph Data on Chan 5!')
+    % end
+    % 
+    % try
+    %     plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_5(:,2), Gras_Avg_Append_Array_5(:,3), 'gx', 'MarkerSize', 15, 'Linewidth', 5)
+    % catch
+    %     disp('No Gras Data on Chan 5!')
+    % end
+
+    axis('equal')
+    axis off
+    view([0 0 90])
+
+    hold on
+
+%     MCA_plotter(Manual_Classfied_Areas)
+
+    xlim([x_min_lim x_max_lim]);
+    ylim([y_min_lim y_max_lim]);
+
+    h(1) = plot(NaN,NaN,'oc', 'LineWidth', 20);
+    h(2) = plot(NaN,NaN,'ok', 'LineWidth', 20);
+    h(3) = plot(NaN,NaN,'or', 'LineWidth', 20);
+    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+
+    ax2 = gca;
+    ax2.Clipping = 'off';
+
 end
 
-try   
-    plot3(Asph_Avg_Append_Array_2(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_2(:,3), 'ko', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Asph Data on Chan 2!')
+%% PCD Classification Rate - INCLUDING SAVING
+
+if options.plot_rate_bool
+
+%     plot(pcd_class_rate)
+
+%     time_struct        = pcd_class_rate.par2struct;
+%     time_extract        = (time_struct.ItStop - time_struct.ItStart) / max(time_struct.Worker);
+
+    time_extract        = cell2mat(pcd_class_rate_rate);
+
+    max_time            = max(time_extract); %s
+    min_time            = min(time_extract); %s
+
+    max_Hz              = 1 / min(time_extract); %Hz
+    min_Hz              = 1 / max(time_extract); %Hz
+
+    pcd_class_rate_Hz    =  time_extract.^(-1);
+
+    Move_mean_time      = movmean(time_extract, options.move_avg_size);
+    Move_mean_Hz        = movmean(pcd_class_rate_Hz, options.move_avg_size);
+
+    rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10  1400 500]);
+
+    hold on
+
+    plot(time_extract, 'b')
+    plot(Move_mean_time, 'r', 'LineWidth', 3)
+
+    l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+
+    hold off
+    % axis('equal')
+
+    xlabel('360 Scan')
+    ylabel('Time (s)')
+
+%     ylim([min_time max_time])
+
+    hold off
+
+    % Classification Rate Hz
+
+    hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
+
+    hold all
+
+    plot(pcd_class_rate_Hz, 'b')
+    plot(Move_mean_Hz, 'r', 'LineWidth', 3)
+
+    % axis('equal')
+
+    xlabel('360 Scan')
+    ylabel('Hz')
+
+     l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
+        l.Interpreter = 'tex';
+
+    hold off
+
 end
 
-% try
-%     plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'go', 'MarkerSize', 8.5, 'Linewidth', 5)
-% catch
-%     disp('No Gras Data on Chan 2!')
-% end
+%% Plot classification rate - Classification only (classify_fun_out)
 
-try
-    plot3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'ro', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Unkn Data on Chan 2!')
+if options.plot_class_rate_bool
+    
+    plot_class_rate_fun(classify_fun_out_2c, classify_fun_out_3c, classify_fun_out_4c, classify_fun_out_2l, classify_fun_out_3l, classify_fun_out_4l, classify_fun_out_2r, classify_fun_out_3r, classify_fun_out_4r, options)
+    
+
+    
+    
 end
-
-
-% Channel 3
-try
-    plot3(Grav_Avg_Append_Array_3(:,1), Grav_Avg_Append_Array_3(:,2), Grav_Avg_Append_Array_3(:,3), 'c^', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Grav Data on Chan 3!')
-end
-
-try   
-    plot3(Asph_Avg_Append_Array_3(:,1), Asph_Avg_Append_Array_3(:,2), Asph_Avg_Append_Array_3(:,3), 'k^', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Asph Data on Chan 3!')
-end
-
-try
-    plot3(Gras_Avg_Append_Array_3(:,1), Gras_Avg_Append_Array_3(:,2), Gras_Avg_Append_Array_3(:,3), 'g^', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Gras Data on Chan 3!')
-end
-
-try
-    plot3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'r^', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Unkn Data on Chan 3!')
-end
-
-% Channel 4
-try
-    plot3(Grav_Avg_Append_Array_4(:,1), Grav_Avg_Append_Array_4(:,2), Grav_Avg_Append_Array_4(:,3), 'cv', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Grav Data on Chan 4!')
-end
-
-try   
-    plot3(Asph_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'kv', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Asph Data on Chan 4!')
-end
-
-% try
-%     plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'gv', 'MarkerSize', 8.5, 'Linewidth', 5)
-% catch
-%     disp('No Gras Data on Chan 4!')
-% end
-
-try
-    plot3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'rv', 'MarkerSize', 8.5, 'Linewidth', 5)
-catch
-    disp('No Unkn Data on Chan 4!')
-end
-
-
-% Channel 5
-% try
-%     plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_5(:,2), Grav_Avg_Append_Array_5(:,3), 'cx', 'MarkerSize', 15, 'Linewidth', 5)
-% catch
-%     disp('No Grav Data on Chan 5!')
-% end
-% 
-% try   
-%     plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_5(:,2), Asph_Avg_Append_Array_5(:,3), 'kx', 'MarkerSize', 15, 'Linewidth', 5)
-% catch
-%     disp('No Asph Data on Chan 5!')
-% end
-% 
-% try
-%     plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_5(:,2), Gras_Avg_Append_Array_5(:,3), 'gx', 'MarkerSize', 15, 'Linewidth', 5)
-% catch
-%     disp('No Gras Data on Chan 5!')
-% end
-
-axis('equal')
-axis off
-view([pi/2 0 90])
-
-hold on
-
-% MCA_plotter(Manual_Classfied_Areas)
-
-xlim([x_min_lim x_max_lim]);
-ylim([y_min_lim y_max_lim]);
-
-h(1) = plot(NaN,NaN,'oc');
-h(2) = plot(NaN,NaN,'ok');
-h(3) = plot(NaN,NaN,'or');
-l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
-l.Interpreter = 'tex';
-
-ax2 = gca;
-ax2.Clipping = 'off';
-
-
-% %% PCD Classification Rate
-% 
-% % plot(pcd_class_rate)
-% 
-% time_extract        = pcd_class_rate.par2struct;
-% time_extract        = (time_extract.ItStop - time_extract.ItStart) / max(time_extract.Worker);
-% 
-% max_time            = max(time_extract); %s
-% min_time            = min(time_extract); %s
-% 
-% max_Hz              = 1 / min(time_extract); %Hz
-% min_Hz              = 1 / max(time_extract); %Hz
-% 
-% pcd_class_rate_Hz    =  time_extract.^(-1);
-% 
-% Move_mean_time      = movmean(time_extract, move_avg_size);
-% Move_mean_Hz        = movmean(pcd_class_rate_Hz, move_avg_size);
-% 
-% rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10  1400 500]);
-% 
-% hold on
-% 
-% plot(time_extract, 'b')
-% plot(Move_mean_time, 'r', 'LineWidth', 3)
-% 
-% l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4);
-% l.Interpreter = 'tex';
-% 
-% hold off
-% % axis('equal')
-% 
-% xlabel('360 Scan')
-% ylabel('Time (s)')
-% 
-% ylim([min_time max_time])
-% 
-% hold off
-% 
-% % Classification Rate Hz
-% 
-% hz_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
-% 
-% hold all
-% 
-% plot(pcd_class_rate_Hz, 'b')
-% plot(Move_mean_Hz, 'r', 'LineWidth', 3)
-% 
-% % axis('equal')
-% 
-% xlabel('360 Scan')
-% ylabel('Hz')
-% 
-%  l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
-%     l.Interpreter = 'tex';
-% 
-% hold off
 
 
 %% End Program 
 
 disp('End Program!')
+
+
+
+
+
+%% old code dump
+
+% Gravel Lot 1
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_arc_width_controlol.mat.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-09-14-46-23.bag';
+% terrain_opt = 1;
+% roi_select = 1;
+
+% Gravel Lot 2, 3
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_gravel_lot_2_2rois.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-14-13-12-31.bag';
+% terrain_opt = 1;
+% roi_select = 1; % 1, 2
+
+% Lawn Grass 1
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-17-31_CHIP_ALL_for_grass.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-17-31_CHIP.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Lawn Grass 2
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-21-54_CHIP_ALL_for_grass.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-21-54_CHIP.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Pavement 1, 2
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_pavement_1_roi.mat.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_13_2023_shortened_coach_sturbois/2023-03-13-10-56-38.bag';
+% terrain_opt = 5;
+% roi_select = 2; %1,2
+
+% Lawn Grass 3
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_grass_roi.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
+% terrain_opt = 4;
+% roi_select = 1;
+
+% Pavement 3, 4 - blue_route
+% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
+% terrain_opt = 5;
+% roi_select = 1; %1,2,3
+
+% Gravel Lot Interception files
+% Down 1Lucin Cutoff
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/03_29_14_54_16_all.pcd_20232103130404.mat'; terrain_opt = 6; % asph2
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-54-16.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/foliage_grab_2FROMFILE2023-03-29-14-54-16.pcd_20230904140433.mat';
+% roi_file = 'down_1.pcd_FROM_FILE_2023-03-29-14-5.pcd_20230412160441.mat';
+% terrain_opt = 3; foliage
+% terrain_opt = 6;
+% roi_select = 3;
+
+% Down 2
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_2_03_29_14_57_17_25to150.pcd.pcd_20233803100451.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-57-17.bag';
+% roi_select = 1;
+% terrain_opt = 1;
+
+% Down 3
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_3_29_14_59_48_250to400.pcd.pcd_20234003100412.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-59-48.bag';
+% roi_select = 1;
+% terrain_opt = 1;
+
+% % Up 1
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_1_29_14_53_21_1tolen.pcd_20234103100425.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-53-21.bag';
+% roi_select = 1;
+% terrain_opt = 1;
+
+% Up 2
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag.mat'; terrain_opt = 6;
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/foliage_grab_FROM_FILE_2023-03-29-14-55-44_20230104140446.mat'; terrain_opt = 3;
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag';
+% roi_select = 1;
+
+% Up 3
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_3_14_58_13_325to450.pcd.pcd_20234303100447.mat';
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-58-13.bag';
+% roi_select = 1;
+

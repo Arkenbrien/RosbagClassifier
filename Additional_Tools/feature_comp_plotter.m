@@ -49,9 +49,9 @@ time_now        = datestr(time_now,'yyyyMMddhhmmss');
 % grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_train_chan2.csv'
 % asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_rm_train_chan2.csv'
 
-asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/chan_5_Grav_Asph_Gras/asph_train_chan5';
-gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/chan_5_Grav_Asph_Gras/gras_train_chan5';
-grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/chan_5_Grav_Asph_Gras/grav_train_chan5';
+asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/asph_train_chan_c_3';
+gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/gras_train_chan_c_3';
+grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/grav_train_chan_c_3';
 
 % Load csv into workspace
 gras_data = ring_train_data_csv_import_w_cat(gras_file);
@@ -97,35 +97,35 @@ asph_array = table2array(asph_data(:,1:end-1));
 
 %% Plot the data - xy chart
 
-% parfor x_axis_idx = 1:length(labels)
-%     
-%     for y_axis_idx = 1:1:length(labels)
-%         
-%         if x_axis_idx ~= y_axis_idx
-%             
-%             % Do something
-%             dat_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',28);
-%             scatter(gras_array(1:min_dat_size,x_axis_idx), gras_array(1:min_dat_size,y_axis_idx), 'g*', 'Linewidth', 10)
-%             hold on
-%             scatter(grav_array(1:min_dat_size,x_axis_idx), grav_array(1:min_dat_size,y_axis_idx), 100, 'co', 'Linewidth', 10)
-%             hold on
-%             scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'kx', 'Linewidth', 10)
-%             hold on
-% %             scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'k*')
-%             hold off
-%             xlabel(string(labels(x_axis_idx)))
-%             ylabel(string(labels(y_axis_idx)))
-%             legend({'Grass', 'Gravel', 'Asphalt'})
-%             
-%             % Save image
-%             filename = xy_export_dir + "/" + time_now + "_" + string(labels(x_axis_idx)) + "_" + string(labels(y_axis_idx)) + ".png";
-%             saveas(dat_fig, filename);
-%             
-%         end
-%         
-%     end
-%     
-% end
+parfor x_axis_idx = 1:length(labels)
+    
+    for y_axis_idx = 1:1:length(labels)
+        
+        if x_axis_idx ~= y_axis_idx
+            
+            % Do something
+            dat_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',56);
+            scatter(gras_array(1:min_dat_size,x_axis_idx), gras_array(1:min_dat_size,y_axis_idx), 'g*', 'Linewidth', 10)
+            hold on
+            scatter(grav_array(1:min_dat_size,x_axis_idx), grav_array(1:min_dat_size,y_axis_idx), 100, 'co', 'Linewidth', 10)
+            hold on
+            scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'kx', 'Linewidth', 10)
+            hold on
+%             scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'k*')
+            hold off
+            xlabel(string(labels(x_axis_idx)))
+            ylabel(string(labels(y_axis_idx)))
+            legend({'Grass', 'Gravel', 'Asphalt'}, 'FontSize', 56)
+            
+            % Save image
+            filename = xy_export_dir + "/" + time_now + "_" + string(labels(x_axis_idx)) + "_" + string(labels(y_axis_idx)) + ".png";
+            saveas(dat_fig, filename);
+            
+        end
+        
+    end
+    
+end
 
 %% Plot the data - histograms
 
