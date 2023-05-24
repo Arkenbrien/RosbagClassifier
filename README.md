@@ -10,7 +10,7 @@ To run RosbagClassifier.m, the following is needed:
 
 ===========================================================================
 
-Consecutive point cloud scans may be made using the lidar2Geo.m script found in the OU_IdeasLab_Matlab_PCD_Maker_Take_2 Repo.
+Consecutive point cloud scans may be made using the lidar2Geo.m script found in the https://github.com/OUIDEAS/Cyberbag_LatLon_Plotter Repo.
 
 This allows for creating of manually defined areas for use in scoring the classification results using the Manual_Classifier.m script. 
 
