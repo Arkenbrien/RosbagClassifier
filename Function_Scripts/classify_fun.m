@@ -124,11 +124,11 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, cloud,
         diag_out.scores = scores;
 
         %Creates pcd file name
-        n_strPadded             = sprintf('%08d', cloud);
-        Classification_FileName = string(options.export_dir) + "/" + string(chan_area) + "_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
+%         n_strPadded             = sprintf('%08d', cloud);
+%         Classification_FileName = string(options.export_dir) + "/" + string(chan_area) + "_" + string(cloud) + "_" + string(n_strPadded) + ".mat";
 
         % Saves it
-        RosbagClassifier_parsave(Classification_FileName, Yfit, [], [], xyz_cloud(arc_idx,:), tform);
+%         RosbagClassifier_parsave(Classification_FileName, Yfit, [], [], xyz_cloud(arc_idx,:), tform);
         
         
     else

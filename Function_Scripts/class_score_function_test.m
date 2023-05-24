@@ -1,4 +1,4 @@
-function class_score_function_test(avg_cell_store, Manual_Classfied_Areas, options)
+function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
 
     disp('Entered class_score_function')
 
@@ -6,10 +6,25 @@ function class_score_function_test(avg_cell_store, Manual_Classfied_Areas, optio
     
     
     %% Var Init
+    
+    avg_cell_store{2}.Grav = Avg_Arrays.grav2;
+    avg_cell_store{2}.Asph = Avg_Arrays.asph2;
+    avg_cell_store{2}.Unkn = Avg_Arrays.unkn2;
 
+    avg_cell_store{3}.Grav = Avg_Arrays.grav3;
+    avg_cell_store{3}.Asph = Avg_Arrays.asph3;
+    avg_cell_store{3}.Unkn = Avg_Arrays.unkn3;
+
+    avg_cell_store{4}.Grav = Avg_Arrays.grav4;
+    avg_cell_store{4}.Asph = Avg_Arrays.asph4;
+    avg_cell_store{4}.Unkn = Avg_Arrays.unkn4;
+    
     % Get index of non-empty cells
     used_chans = find(~cellfun(@isempty,avg_cell_store));
-
+    
+    % Getting the z max height so that the projected areas are above the point cloud 
+    z_max_lim = max([Avg_Arrays.grav2(:,3); Avg_Arrays.asph2(:,3); Avg_Arrays.unkn2(:,3)]) + 5;
+    options.max_h = z_max_lim;
     
     %% For each channel
     
