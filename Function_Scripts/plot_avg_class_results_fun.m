@@ -157,7 +157,7 @@ function plot_avg_class_results_fun(Avg_Arrays, options)
     h(1) = plot(NaN,NaN,'oc', 'LineWidth', 20);
     h(2) = plot(NaN,NaN,'ok', 'LineWidth', 20);
     h(3) = plot(NaN,NaN,'or', 'LineWidth', 20);
-    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 
     ax2 = gca;

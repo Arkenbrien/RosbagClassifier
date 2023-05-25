@@ -41,26 +41,26 @@ fig_size_array          = [10 10 3500 1600];
 % ======================================================================= %
 
 % Redmen Gravel Lot: rm_1 - rm_11 - not 4,  4 is mysteriously borked... (x.x )
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_11.bag';
-roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_11.mat';
-terrain_opt = 1;
-roi_select = 1; %1 = 1,2,3; 2 = 1,2
-side_select = 2; %1 = l, 2 = c, 3 = r
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_2.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_2.mat';
+% terrain_opt = 1;
+% roi_select = 1; %1 = 1,2,3; 2 = 1,2
+% side_select = 2; %1 = l, 2 = c, 3 = r
 
 % Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6 (not 5 tho)
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_1.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_1.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
-% % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/SoR_Looks/rm_db_6_SOR.mat'; terrain_opt = 7; 
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_6.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
+% % % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/SoR_Looks/rm_db_6_SOR.mat'; terrain_opt = 7; 
 % terrain_opt = 5;
 % roi_select = 1;
 % side_select = 2; %1 = l, 2 = c, 3 = r
 
 % Redmen Gravel Lot Grass Collection: rm_13 15 17 18 19 20 22 23 25 27 29 30 32
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_13.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_13.mat';
-% terrain_opt = 4;
-% roi_select = 1;
-% side_select = 2; %1 = l, 2 = c, 3 = r
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_32.bag';
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_32.mat';
+terrain_opt = 4;
+roi_select = 1;
+side_select = 2; %1 = l, 2 = c, 3 = r
 
 %% Variable Initiation
 
@@ -198,12 +198,12 @@ end
 
 if options.reference_point == "range"
     
-    save_folder = save_folder + "/" + string(terrain_type);
+    save_folder = save_folder + "_RANGE/" + string(terrain_type);
     disp(save_folder)
 
 elseif options.reference_point == "ransac"
     
-    save_folder = save_folder + "_RAN/" + string(terrain_type);
+    save_folder = save_folder + "_RANSAC_TEST/" + string(terrain_type);
     disp(save_folder)
     
 elseif options.reference_point == "mls" 

@@ -86,9 +86,9 @@ addpath(export_dir)
 
 % Chan_2
 % asph_2_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/combined_asphalt';
-asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/asphalt';
-grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/gravel';
-gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC/grass';
+asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/asphalt';
+grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/gravel';
+gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/grass';
 % grav_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/gravel';
 
 % asph_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/asphalt_2_2023-03-29-14-55-44';

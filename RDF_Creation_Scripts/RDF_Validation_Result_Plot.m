@@ -500,8 +500,10 @@ plot((1:1:length(training_error)), training_error, 'k', 'LineWidth', 3)
 % plot(overall_err_array(:,1), mv_avg_overall_err_array,'r', 'LineWidth', 3)
 plot(overall_err_array(:,1), overall_err_array(:,2),'r', 'LineWidth', 3)
 
-legend('Training Error', 'Validation Error')
+legend({'Training Error', 'Validation Error'}, 'FontSize', 48)
 xlim(x_limit)
+xlabel('Number of Trees')
+ylabel('Error (%)')
 grid on
 hold off
 

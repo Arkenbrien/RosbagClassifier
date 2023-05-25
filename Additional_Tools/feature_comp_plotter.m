@@ -49,9 +49,9 @@ time_now        = datestr(time_now,'yyyyMMddhhmmss');
 % grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_train_chan2.csv'
 % asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_rm_train_chan2.csv'
 
-asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/asph_train_chan_c_3';
-gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/gras_train_chan_c_3';
-grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_3_Grav_Asph_Gras/grav_train_chan_c_3';
+asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/asph_train_chan_c_2';
+gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/gras_train_chan_c_2';
+grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/grav_train_chan_c_2';
 
 % Load csv into workspace
 gras_data = ring_train_data_csv_import_w_cat(gras_file);
@@ -104,28 +104,38 @@ parfor x_axis_idx = 1:length(labels)
         if x_axis_idx ~= y_axis_idx
             
             % Do something
-            dat_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',56);
-            scatter(gras_array(1:min_dat_size,x_axis_idx), gras_array(1:min_dat_size,y_axis_idx), 'g*', 'Linewidth', 10)
+            dat_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize',24);
+            grasplot = scatter(gras_array(1:min_dat_size,x_axis_idx), gras_array(1:min_dat_size,y_axis_idx), 750, 'gx', 'MarkerFaceColor', 'g', 'LineWidth', 3)
+            grasplot.MarkerFaceAlpha = 0.5;
             hold on
-            scatter(grav_array(1:min_dat_size,x_axis_idx), grav_array(1:min_dat_size,y_axis_idx), 100, 'co', 'Linewidth', 10)
+            gravplot = scatter(grav_array(1:min_dat_size,x_axis_idx), grav_array(1:min_dat_size,y_axis_idx), 300, 'co', 'MarkerFaceColor', 'c')
+            gravplot.MarkerFaceAlpha = 0.5;
             hold on
-            scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'kx', 'Linewidth', 10)
+            asphplot = scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 300, 'ks', 'MarkerFaceColor', 'k')
+            asphplot.MarkerFaceAlpha = 0.5;
             hold on
 %             scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'k*')
-            hold off
+            hold on
             xlabel(string(labels(x_axis_idx)))
             ylabel(string(labels(y_axis_idx)))
-            legend({'Grass', 'Gravel', 'Asphalt'}, 'FontSize', 56)
+%             legend({'Grass', 'Gravel', 'Asphalt'}, 'FontSize', 56)
+            
+            hold on
+            legend_plotter()
+            hold off
+
             
             % Save image
-            filename = xy_export_dir + "/" + time_now + "_" + string(labels(x_axis_idx)) + "_" + string(labels(y_axis_idx)) + ".png";
+            filename = xy_export_dir + "/" + time_now + "_" + string(labels(x_axis_idx)) + "_" + string(labels(y_axis_idx)) + ".fig";
             saveas(dat_fig, filename);
-            
+    
         end
         
     end
     
 end
+
+
 
 %% Plot the data - histograms
 
@@ -155,7 +165,7 @@ parfor feat_idx = 1:length(labels)
     ylabel('Count')
     legend({'Grass', 'Gravel', 'Asphalt'})
     
-    filename = hist_export_dir + "/" + time_now + "_" + string(labels(feat_idx)) + "_HISTOGRAM.png";
+    filename = hist_export_dir + "/" + time_now + "_" + string(labels(feat_idx)) + "_HISTOGRAM.fig";
     saveas(hist_fig, filename);
     
 end
@@ -214,11 +224,23 @@ title('relieff')
 
 %% Importance Fig Save
 
-saveas(fssci2_fig, import_export_dir + "/fssci2_fig" + time_now + ".png")
-saveas(fscmrmr_fig, import_export_dir + "/fscmrmr_fig" + time_now + ".png")
-saveas(fscnca_fig, import_export_dir + "/fscnca_fig" + time_now +  ".png")
-saveas(relieff_fig, import_export_dir + "/relieff_fig" + time_now + ".png")
+saveas(fssci2_fig, import_export_dir + "/fssci2_fig" + time_now + ".fig")
+saveas(fscmrmr_fig, import_export_dir + "/fscmrmr_fig" + time_now + ".fig")
+saveas(fscnca_fig, import_export_dir + "/fscnca_fig" + time_now +  ".fig")
+saveas(relieff_fig, import_export_dir + "/relieff_fig" + time_now + ".fig")
 
 %% End program
 
 disp('End plot export!')
+
+
+function legend_plotter()
+
+    h(1) = plot(NaN,NaN,'oc', 'LineWidth', 20);
+    h(2) = plot(NaN,NaN,'sk', 'LineWidth', 20);
+    h(3) = plot(NaN,NaN,'xg', 'LineWidth', 20);
+    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{green} Green'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+    
+end
+
