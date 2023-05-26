@@ -9,11 +9,6 @@
 % unknown, for the purpose of detecting unmarked gravel roads.
 %==========================================================================
 
-%% TEMP DEBUG - it will crash here if you press f5 lol
-
-% class_score_function_test(avg_cell_store, Manual_Classfied_Areas, options)
-
-
 %% Clear & Setup Workspace
 
 clc; clear; close all
@@ -167,6 +162,9 @@ end
 % Other Random Options
 % Do we compare the data to be classified to the training data????
 data_comp_bool                  = 0;
+
+% Dirt v Gravel RDF:
+options.dvg_bool                = 1;
 
 
 %% RDF selection

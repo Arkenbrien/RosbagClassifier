@@ -60,7 +60,7 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
 
                     Yfit = categorical("unknown");
                     
-                elseif isequal((Yfit), 'gravel') && contains(chan_area, "2")
+                elseif isequal((Yfit), 'gravel') && contains(chan_area, "2") && options.dvg_bool
                     
                     Yfit  = DvG.Mdl.predictFcn(chan_feat_table);
                     
