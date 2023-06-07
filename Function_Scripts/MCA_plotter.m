@@ -38,7 +38,7 @@ function MCA_plotter(Manual_Classfied_Areas, max_h)
         
     end
     
-    % Side-Of-Road
+%     Side-Of-Road
     if isfield(Manual_Classfied_Areas, 'non_road')
         
         for nr_idx = 1:length(Manual_Classfied_Areas.non_road)

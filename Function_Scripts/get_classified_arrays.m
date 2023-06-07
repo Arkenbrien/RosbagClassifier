@@ -71,18 +71,18 @@ function [All_Arrays, Avg_Arrays] = get_classified_arrays(channel_2_fun_out,...
         
         % Channel 2
         if isequal(channel_3_fun_out{idx3}.Yfit, 'gravel')
-            Grav_All_Append_Array_2             = [Grav_All_Append_Array_2; xyzi];
-            Grav_Avg_Append_Array_2             = [Grav_Avg_Append_Array_2; avg_xyzi];
+            Grav_All_Append_Array_3             = [Grav_All_Append_Array_3; xyzi];
+            Grav_Avg_Append_Array_3             = [Grav_Avg_Append_Array_3; avg_xyzi];
         end
 
         if isequal(channel_3_fun_out{idx3}.Yfit, 'asphalt')
-            Asph_All_Append_Array_2             = [Asph_All_Append_Array_2; xyzi];
-            Asph_Avg_Append_Array_2             = [Asph_Avg_Append_Array_2; avg_xyzi];
+            Asph_All_Append_Array_3             = [Asph_All_Append_Array_3; xyzi];
+            Asph_Avg_Append_Array_3             = [Asph_Avg_Append_Array_3; avg_xyzi];
         end
         
         if isequal(channel_3_fun_out{idx3}.Yfit, 'unknown')
-            Unkn_All_Append_Array_2             = [Unkn_All_Append_Array_2; xyzi];
-            Unkn_Avg_Append_Array_2             = [Unkn_Avg_Append_Array_2; avg_xyzi];
+            Unkn_All_Append_Array_3             = [Unkn_All_Append_Array_3; xyzi];
+            Unkn_Avg_Append_Array_3             = [Unkn_Avg_Append_Array_3; avg_xyzi];
         end
         
     end
@@ -96,18 +96,18 @@ function [All_Arrays, Avg_Arrays] = get_classified_arrays(channel_2_fun_out,...
         
         % Channel 2
         if isequal(channel_4_fun_out{idx4}.Yfit, 'gravel')
-            Grav_All_Append_Array_2             = [Grav_All_Append_Array_2; xyzi];
-            Grav_Avg_Append_Array_2             = [Grav_Avg_Append_Array_2; avg_xyzi];
+            Grav_All_Append_Array_4             = [Grav_All_Append_Array_4; xyzi];
+            Grav_Avg_Append_Array_4             = [Grav_Avg_Append_Array_4; avg_xyzi];
         end
 
         if isequal(channel_4_fun_out{idx4}.Yfit, 'asphalt')
-            Asph_All_Append_Array_2             = [Asph_All_Append_Array_2; xyzi];
-            Asph_Avg_Append_Array_2             = [Asph_Avg_Append_Array_2; avg_xyzi];
+            Asph_All_Append_Array_4             = [Asph_All_Append_Array_4; xyzi];
+            Asph_Avg_Append_Array_4             = [Asph_Avg_Append_Array_4; avg_xyzi];
         end
         
         if isequal(channel_4_fun_out{idx4}.Yfit, 'unknown')
-            Unkn_All_Append_Array_2             = [Unkn_All_Append_Array_2; xyzi];
-            Unkn_Avg_Append_Array_2             = [Unkn_Avg_Append_Array_2; avg_xyzi];
+            Unkn_All_Append_Array_4             = [Unkn_All_Append_Array_4; xyzi];
+            Unkn_Avg_Append_Array_4             = [Unkn_Avg_Append_Array_4; avg_xyzi];
         end
         
     end

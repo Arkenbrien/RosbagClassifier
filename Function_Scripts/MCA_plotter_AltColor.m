@@ -1,11 +1,11 @@
-function MCA_plotter(Manual_Classfied_Areas, max_h)
+function MCA_plotter_AltColor(Manual_Classfied_Areas, max_h)
     %%
 %     hold all
     
     face_alpha_value = 0.15;
     
     % Gravel
-    try
+    if isfield(Manual_Classfied_Areas, 'grav')
         
         for grav_idx = 1:length(Manual_Classfied_Areas.grav)
             
@@ -15,14 +15,14 @@ function MCA_plotter(Manual_Classfied_Areas, max_h)
 
         end
         
-    catch
+    else
         
         disp('No gravel areas to plot!')
         
     end
     
     % Asphalt/pavement
-%     try
+    if isfield(Manual_Classfied_Areas, 'asph')
         
         for asph_idx = 1:length(Manual_Classfied_Areas.asph)
             
@@ -32,14 +32,14 @@ function MCA_plotter(Manual_Classfied_Areas, max_h)
 
         end
         
-%     catch
+    else
         
         disp('No pavement areas to plot!')
         
-%     end
+    end
     
     % Side-Of-Road
-    try
+    if isfield(Manual_Classfied_Areas, 'non_road')
         
         for nr_idx = 1:length(Manual_Classfied_Areas.non_road)
             
@@ -49,7 +49,7 @@ function MCA_plotter(Manual_Classfied_Areas, max_h)
 
         end
         
-    catch
+    else
         
         disp('No side-of-road areas to plot!')
         

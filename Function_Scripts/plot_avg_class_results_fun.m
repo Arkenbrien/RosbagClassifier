@@ -1,4 +1,4 @@
-function plot_avg_class_results_fun(Avg_Arrays, options)
+function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     
     %% VAR INIT
 
@@ -60,12 +60,6 @@ function plot_avg_class_results_fun(Avg_Arrays, options)
         disp('No Asph Data on Chan 2!')
     end
 
-    % try
-    %     plot3(Gras_Avg_Append_Array_2(:,1), Gras_Avg_Append_Array_2(:,2), Gras_Avg_Append_Array_2(:,3), 'go', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
-    % catch
-    %     disp('No Gras Data on Chan 2!')
-    % end
-
     try
         plot3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'ro', 'MarkerSize', options.c2markersize, 'Linewidth', options.c2linewidth)
     catch
@@ -86,12 +80,6 @@ function plot_avg_class_results_fun(Avg_Arrays, options)
         disp('No Asph Data on Chan 3!')
     end
 
-%     try
-%         plot3(Gras_Avg_Append_Array_3(:,1), Gras_Avg_Append_Array_3(:,2), Gras_Avg_Append_Array_3(:,3), 'g^', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
-%     catch
-%         disp('No Gras Data on Chan 3!')
-%     end
-
     try
         plot3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'ro', 'MarkerSize', options.c3markersize, 'Linewidth', options.c3linewidth)
     catch
@@ -111,12 +99,6 @@ function plot_avg_class_results_fun(Avg_Arrays, options)
         disp('No Asph Data on Chan 4!')
     end
 
-    % try
-    %     plot3(Gras_Avg_Append_Array_4(:,1), Gras_Avg_Append_Array_4(:,2), Gras_Avg_Append_Array_4(:,3), 'gv', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
-    % catch
-    %     disp('No Gras Data on Chan 4!')
-    % end
-
     try
         plot3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'ro', 'MarkerSize', options.c4markersize, 'Linewidth', options.c4linewidth)
     catch
@@ -124,39 +106,20 @@ function plot_avg_class_results_fun(Avg_Arrays, options)
     end
 
 
-    % Channel 5
-    % try
-    %     plot3(Grav_Avg_Append_Array_5(:,1), Grav_Avg_Append_Array_5(:,2), Grav_Avg_Append_Array_5(:,3), 'cx', 'MarkerSize', 15, 'Linewidth', 5)
-    % catch
-    %     disp('No Grav Data on Chan 5!')
-    % end
-    % 
-    % try   
-    %     plot3(Asph_Avg_Append_Array_5(:,1), Asph_Avg_Append_Array_5(:,2), Asph_Avg_Append_Array_5(:,3), 'kx', 'MarkerSize', 15, 'Linewidth', 5)
-    % catch
-    %     disp('No Asph Data on Chan 5!')
-    % end
-    % 
-    % try
-    %     plot3(Gras_Avg_Append_Array_5(:,1), Gras_Avg_Append_Array_5(:,2), Gras_Avg_Append_Array_5(:,3), 'gx', 'MarkerSize', 15, 'Linewidth', 5)
-    % catch
-    %     disp('No Gras Data on Chan 5!')
-    % end
-
     axis('equal')
     axis off
     view([0 0 90])
 
     hold on
 
-%     MCA_plotter(Manual_Classfied_Areas)
+    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
 
     xlim([x_min_lim x_max_lim]);
     ylim([y_min_lim y_max_lim]);
 
-    h(1) = plot(NaN,NaN,'oc', 'LineWidth', 20);
-    h(2) = plot(NaN,NaN,'ok', 'LineWidth', 20);
-    h(3) = plot(NaN,NaN,'or', 'LineWidth', 20);
+    h(1) = plot(NaN,NaN,'oc', 'LineWidth', 25);
+    h(2) = plot(NaN,NaN,'ok', 'LineWidth', 25);
+    h(3) = plot(NaN,NaN,'or', 'LineWidth', 25);
     l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 

@@ -10,16 +10,13 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 % DvG.c2 = Mdl;
 
 % Filename
-model_name = 'chan_4_c_ransac.mat';
+model_name = 'chan_2_r_range.mat';
 
 % Overalldir
 file_ovrl_name = string(model_name);
 
 % Save
 save(file_ovrl_name, 'Mdl')
-
-
-
 
 
 

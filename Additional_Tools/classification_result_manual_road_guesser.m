@@ -18,7 +18,7 @@ clc
 
 %% Options
 
-load_prev_MCA_file = 1;
+% NO OPTIONS FOR YOU! :D
 
 
 %% Ask user to load previous file
@@ -80,7 +80,11 @@ fig = open(figfile);
 axis equal
 view([0 0 90])
 
-Filename = string(figfolder) + string(figfile) + ".mat";
+currentEpochTime = floor(posixtime(datetime('now', 'TimeZone', 'UTC')));
+
+% disp(['Current Epoch Time: ' num2str(currentEpochTime)]);
+
+export_filename = string(figfolder) + string(figfile) + "_" + string(currentEpochTime) + "_MANUALLY_CLASSIFIED.mat";
 
 axis on
 
@@ -108,7 +112,7 @@ while true
     disp('Select terrain type')
     dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf', 'Asph'};
     [indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'SelectionMode','single');
-    
+    disp(dlg_list(indx_dlg_list))
     % Selecting the zoom tool by default
     disp('Zoom to where you want, Sahib')
     zoom(fig)
@@ -365,7 +369,7 @@ switch save_ans
     case 'Yes'
         
         disp('Saving File')
-        save(Filename, 'Manual_Classfied_Areas')
+        save(export_filename, 'Manual_Classfied_Areas')
         
     case 'No'
 

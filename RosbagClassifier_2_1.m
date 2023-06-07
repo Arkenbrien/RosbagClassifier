@@ -18,18 +18,19 @@ format compact
 %% Options
 
 %
-% EXPORT OPTIONS
+% REFERENCE POINT & FILE
 %
 
-% Export Folder
-options.export_folder_name      = '01_RDF_Training_Data_Extraction_Export'; % Reference apphended automatically...
-
-%
-% REFERENCE POINT
-%
-
-% 'range'; 'ransac';, 'mls'
+% 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
+options.rosbag_number           = 6;
+
+%
+% EXPORT OPTSION
+%
+
+options.save_results_bool       = 0;
+options.export_location         = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS';
 
 %
 % ARC SIZE
@@ -41,9 +42,44 @@ options.chan_3_d_ang            = 3;
 options.chan_4_d_ang            = 3;
 options.chan_5_d_ang            = 2.5;
 
+% Center of ll arc
+options.chan_2_ll_cent_ang      = 0;
+options.chan_3_ll_cent_ang      = 0;
+options.chan_4_ll_cent_ang      = 0;
+
+% Center of l arc
+options.chan_2_l_cent_ang       = 45;
+options.chan_3_l_cent_ang       = 45;
+options.chan_4_l_cent_ang       = 45;
+
+% Center of c arc
+options.chan_2_c_cent_ang       = 90;
+options.chan_3_c_cent_ang       = 90;
+options.chan_4_c_cent_ang       = 90;
+
+% Center of r arc
+options.chan_2_r_cent_ang       = 135;
+options.chan_3_r_cent_ang       = 135;
+options.chan_4_r_cent_ang       = 135;
+
+% Center of rr arc
+options.chan_2_rr_cent_ang      = 180;
+options.chan_3_rr_cent_ang      = 180;
+options.chan_4_rr_cent_ang      = 180;
+
+
 %
 % PLOTTING OPTIONS
 %
+
+% which things to plot
+options.plot_all_bool           = 0;
+options.plot_avg_bool           = 1;
+options.plot_area_results_bool  = 0;
+options.plot_rate_bool          = 0;
+options.plot_class_rate_bool    = 0;
+options.plot_conf_bool          = 0;
+options.plot_perchan_conf_bool  = 0;
 
 % Marker size / Linewidth for plotz
 options.c2markersize            = 20;
@@ -54,12 +90,6 @@ options.c4markersize            = 20;
 options.c2linewidth             = 20;
 options.c3linewidth             = 20;
 options.c4linewidth             = 20;
-
-% which things to plot
-options.plot_all_bool           = 0;
-options.plot_avg_bool           = 1;
-options.plot_rate_bool          = 0;
-options.plot_class_rate_bool    = 0;
 
 % Legend Stuff
 options.legend_marker_size      = 20;
@@ -85,7 +115,7 @@ options.maxDistance             = 0.5;
 options.MaxNumTrials            = 10; % RANSAC Iterations
 
 %
-% DISTAND FILTER
+% DISTANCE FILTER
 %
 
 % distance-filter
@@ -105,66 +135,20 @@ options.max_dist_34             = 6;
 % confidence-filter
 options.conf_filt_bool          = 1;
 
-% Adjust results based on confidence scores (not all are used, check the
-% classify_fun for implementation
-if options.reference_point == "range" || options.reference_point == "mls"
+if options.conf_filt_bool
     
-    options.c2gravconfupbound       = 0.90;
-    options.c2unknconflwbound       = 0.10;
+    options = get_confs(options);
     
-    options.c3asphconfupbound       = 0.89;
-    options.c3gravconfupbound       = 0.80;
-    options.c3unknconflwbound       = 0.20;
-    
-    options.c4gravconfupbound       = 0.90;
-    options.c4unknconflwbound       = 0.20;
-
-elseif options.reference_point == "ransac"
-    
-    % Channel 2 Gravel
-    options.c2gravconflwbound       = 0.45;   
-    options.c2gravconfupbound       = 0.70;
-    
-    % Channel 2 Unknown
-    options.c2unknconflwbound       = 0.00;
-    options.c2unknconfupbound       = 0.55;
-    
-    % Channel 2 Asphalt
-    options.c2asphconflwbound       = 0.00;
-    options.c2asphconfupbound       = 1.00;
-    
-    % Channel 3 Gravel
-    options.c3gravconflwbound       = 0.45;
-    options.c3gravconfupbound       = 0.60;
-    
-    % Channel 3 Unknown
-    options.c3unknconflwbound       = 0.40;
-    options.c3unknconfupbound       = 0.50;
-    
-    % Channel 3 Asph
-    options.c3asphconflwbound       = 0.00;
-    options.c3asphconfupbound       = 1.00;
-    
-    % Channel 4 Gravel
-    options.c4unknconflwbound       = 0.45;
-    options.c4unknconfupbound       = 0.55;
-    
-    % Channel 4 Unknown
-    options.c4gravconflwbound       = 0.40;
-    options.c4gravconfupbound       = 0.50;
-    
-    % Channel 4 Asph
-    options.c4asphconflwbound       = 0.00;
-    options.c4asphconfupbound       = 1.00;    
-
 end
+
+% Dirt v Gravel RDF:
+options.dvg_bool                = 0;
 
 % Other Random Options
 % Do we compare the data to be classified to the training data????
 data_comp_bool                  = 0;
 
-% Dirt v Gravel RDF:
-options.dvg_bool                = 1;
+
 
 
 %% RDF selection
@@ -217,32 +201,22 @@ end
 %% roi/rosbag PAIRS - 1 ROI per file
 
 % Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_4, rm_db_6
-% rm_db_1
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_1.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_1_truth_areas_v3.mat';
-
-% rm_db_2
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_2_truth_areas_v3.mat';
-
-% rm_db_3
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_3.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_3_truth_areas_v3.mat';
-
-% rm_db_4 : NOTE; 1156.8 feet traveled in rm_db_4 338.01 avg sec per scan, 463 clouds in the file
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_4.bag';
-roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_4_truth_areas_v3.mat';
-
-% rm_db_6
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
-
-% Gravel Training Stuff
-% % Redmen Gravel Lot: rm_1 - rm_11
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_3.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_3.mat';
-
-
+if options.rosbag_number == 1
+    bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_1.bag';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_1_truth_areas_v3.mat';
+elseif options.rosbag_number == 2
+    bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_2_truth_areas_v3.mat';
+elseif options.rosbag_number == 3
+    bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_3.bag';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_3_truth_areas_v3.mat';
+elseif options.rosbag_number == 4 % NOTE; 1156.8 feet traveled in rm_db_4 338.01 avg sec per scan, 463 clouds in the file
+    bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_4.bag';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_4_truth_areas_v3.mat';
+elseif options.rosbag_number == 6
+    bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
+end
 %% Loading RDF
 
 raw_data_export = {};
@@ -277,17 +251,23 @@ gps_to_lidar_diff           = [(LiDAR_Ref_Frame(1) - IMU_Ref_Frame(1)), (LiDAR_R
 chan_2_c_bounds     = [((90 - options.chan_2_d_ang) * pi/180), ((90 + options.chan_2_d_ang) * pi/180)];
 chan_3_c_bounds     = [((90 - options.chan_3_d_ang) * pi/180), ((90 + options.chan_3_d_ang) * pi/180)];
 chan_4_c_bounds     = [((90 - options.chan_4_d_ang) * pi/180), ((90 + options.chan_4_d_ang) * pi/180)];
-% chan_5_c_bounds     = [((90 - options.chan_5_d_ang) * pi/180), ((90 + options.chan_5_d_ang) * pi/180)];
 
-chan_2_l_bounds     = [((135 - options.chan_2_d_ang) * pi/180), ((135 + options.chan_2_d_ang) * pi/180)];
-chan_3_l_bounds     = [((135 - options.chan_3_d_ang) * pi/180), ((135 + options.chan_3_d_ang) * pi/180)];
-chan_4_l_bounds     = [((135 - options.chan_4_d_ang) * pi/180), ((135 + options.chan_4_d_ang) * pi/180)];
-% chan_5_l_bounds     = [((135 - options.chan_5_d_ang) * pi/180), ((135 + options.chan_5_d_ang) * pi/180)];
+chan_2_l_bounds     = [((options.chan_2_l_cent_ang - options.chan_2_d_ang) * pi/180), ((options.chan_2_l_cent_ang + options.chan_2_d_ang) * pi/180)];
+chan_3_l_bounds     = [((options.chan_3_l_cent_ang - options.chan_3_d_ang) * pi/180), ((options.chan_3_l_cent_ang + options.chan_3_d_ang) * pi/180)];
+chan_4_l_bounds     = [((options.chan_4_l_cent_ang - options.chan_4_d_ang) * pi/180), ((options.chan_4_l_cent_ang + options.chan_4_d_ang) * pi/180)];
 
-chan_2_r_bounds     = [((45 - options.chan_2_d_ang) * pi/180), ((45 + options.chan_2_d_ang) * pi/180)];
-chan_3_r_bounds     = [((45 - options.chan_3_d_ang) * pi/180), ((45 + options.chan_3_d_ang) * pi/180)];
-chan_4_r_bounds     = [((45 - options.chan_4_d_ang) * pi/180), ((45 + options.chan_4_d_ang) * pi/180)];
-% chan_5_r_bounds     = [((45 - options.chan_5_d_ang) * pi/180), ((45 + options.chan_5_d_ang) * pi/180)];
+% chan_2_ll_bounds     = [((options.chan_2_ll_cent_ang - options.chan_2_d_ang) * pi/180), ((options.chan_2_ll_cent_ang + options.chan_2_d_ang) * pi/180)];
+% chan_3_ll_bounds     = [((options.chan_3_ll_cent_ang - options.chan_3_d_ang) * pi/180), ((options.chan_3_ll_cent_ang + options.chan_3_d_ang) * pi/180)];
+% chan_4_ll_bounds     = [((options.chan_4_ll_cent_ang - options.chan_4_d_ang) * pi/180), ((options.chan_4_ll_cent_ang + options.chan_4_d_ang) * pi/180)];
+
+chan_2_r_bounds     = [((options.chan_2_r_cent_ang  - options.chan_2_d_ang) * pi/180), ((options.chan_2_r_cent_ang  + options.chan_2_d_ang) * pi/180)];
+chan_3_r_bounds     = [((options.chan_3_r_cent_ang  - options.chan_3_d_ang) * pi/180), ((options.chan_3_r_cent_ang  + options.chan_3_d_ang) * pi/180)];
+chan_4_r_bounds     = [((options.chan_4_r_cent_ang  - options.chan_4_d_ang) * pi/180), ((options.chan_4_r_cent_ang  + options.chan_4_d_ang) * pi/180)];
+
+% chan_2_rr_bounds     = [((options.chan_2_rr_cent_ang  - options.chan_2_d_ang) * pi/180), ((options.chan_2_rr_cent_ang  + options.chan_2_d_ang) * pi/180)];
+% chan_3_rr_bounds     = [((options.chan_3_rr_cent_ang  - options.chan_3_d_ang) * pi/180), ((options.chan_3_rr_cent_ang  + options.chan_3_d_ang) * pi/180)];
+% chan_4_rr_bounds     = [((options.chan_4_rr_cent_ang  - options.chan_4_d_ang) * pi/180), ((options.chan_4_rr_cent_ang  + options.chan_4_d_ang) * pi/180)];
+
 
 % Names for channel
 area_names = [];
@@ -364,24 +344,6 @@ cloud_break                 = length(lidar_msgs);
 gps_pos_store               = zeros(cloud_break,3);
 lidar_pos_store             = gps_pos_store;
 
-
-%% Save Location
-
-time_now        = datetime("now","Format","uuuuMMddhhmmss");
-time_now        = datestr(time_now,'yyyyMMddhhmmss');
-
-options.export_dir = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Chan_2_3_5_" + string(time_now);
-
-if ~exist(string(options.export_dir),'dir')
-    mkdir(string(options.export_dir))
-end
-
-% addpath(root_dir)
-% CLASSIFICATION_STACK_FOLDER = string(root_dir) + "/CLASSIFICATION_STACK";
-% mkdir(CLASSIFICATION_STACK_FOLDER);
-addpath(string(options.export_dir));
-
-
 %% Timestamps
 
 % Matching timestamps
@@ -423,6 +385,7 @@ pcd_class_rate = Par(int64(cloud_break));
 % Progress bar
 parfor_progress(cloud_break);
 classy = tic;
+
 % Classifying per 360 scan
 parfor cloud = 1:cloud_break
     
@@ -520,10 +483,6 @@ parfor cloud = 1:cloud_break
 
         classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, DvG, options, "4c");
 
-        % CHANNEL 5 CENT
-
-            % nothing yet in chan 5 - maybe later?
-
         % CHANNEL 2 LEFT
 
         classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, DvG, options, "2l");
@@ -536,10 +495,6 @@ parfor cloud = 1:cloud_break
 
         classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, DvG, options, "4l");
 
-        % CHANNEL 5 CENT
-
-            % nothing yet in chan 5 - maybe later?
-
         % CHANNEL 2 RIGHT
 
         classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, DvG, options, "2r");
@@ -551,11 +506,31 @@ parfor cloud = 1:cloud_break
         % CHANNEL 4 RIGHT
 
         classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, DvG, options, "4r");
-
-        % CHANNEL 5 CENT
-
-            % nothing yet in chan 5 - maybe later?
-
+        
+%         % CHANNEL 2 LLEFT
+% 
+%         classify_fun_out_2ll{cloud} = classify_fun(xyz_cloud_2, chan_2_ll_bounds, chan_2_l_rdf, tform, DvG, options, "2ll");
+% 
+%         % CHANNEL 3 LLEFT
+% 
+%         classify_fun_out_3ll{cloud} = classify_fun(xyz_cloud_3, chan_3_ll_bounds, chan_3_l_rdf, tform, DvG, options, "3ll");
+% 
+%         % CHANNEL 4 LLEFT
+% 
+%         classify_fun_out_4ll{cloud} = classify_fun(xyz_cloud_4, chan_4_ll_bounds, chan_4_l_rdf, tform, DvG, options, "4ll");
+% 
+%         % CHANNEL 2 RRIGHT
+% 
+%         classify_fun_out_2rr{cloud} = classify_fun(xyz_cloud_2, chan_2_rr_bounds, chan_2_r_rdf, tform, DvG, options, "2rr");
+% 
+%         % CHANNEL 3 RRIGHT
+% 
+%         classify_fun_out_3rr{cloud} = classify_fun(xyz_cloud_3, chan_3_rr_bounds, chan_3_r_rdf, tform, DvG, options, "3rr");
+% 
+%         % CHANNEL 4 RRIGHT
+% 
+%         classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform, DvG, options, "4rr");
+    
     %% Distance Filtering
     
     % It is expected that the distances between the 
@@ -582,20 +557,55 @@ disp('Classification Complete!')
 
 disp(toc(classy))
 
+
 %% Apphending all results to arrays
 
 channel_2_fun_out = [classify_fun_out_2l, classify_fun_out_2c, classify_fun_out_2r];
 channel_3_fun_out = [classify_fun_out_3l, classify_fun_out_3c, classify_fun_out_3r];
 channel_4_fun_out = [classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_4r];
 
+Results_Export.c2 = channel_2_fun_out;
+Results_Export.c3 = channel_3_fun_out;
+Results_Export.c4 = channel_4_fun_out;
+
 [All_Arrays, Avg_Arrays]    = get_classified_arrays(channel_2_fun_out,... 
                                                     channel_3_fun_out,... 
                                                     channel_4_fun_out);
 
+% channel_2_fun_out = [classify_fun_out_2ll, classify_fun_out_2l, classify_fun_out_2c, classify_fun_out_2r, classify_fun_out_2rr];
+% channel_3_fun_out = [classify_fun_out_3ll, classify_fun_out_3l, classify_fun_out_3c, classify_fun_out_3r, classify_fun_out_3rr];
+% channel_4_fun_out = [classify_fun_out_4ll, classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_4r, classify_fun_out_4rr];
+% 
+% [All_Arrays, Avg_Arrays]    = get_classified_arrays(channel_2_fun_out,... 
+%                                                     channel_3_fun_out,... 
+%                                                     channel_4_fun_out);
+
+
+%% Save all results to a .mat file
+
+if options.save_results_bool
+    
+    save_result
+    
+    currentEpochTime = posixtime(datetime('now', 'TimeZone', 'UTC'));
+    [~,bag_name,~] = fileparts(bag_file);
+    export_Results_Export_filename = options.export_location + "/" + string(bag_name) + "_" + string(options.reference_point) + "_" + string(currentEpochTime) + "_Results_Export.mat";
+    export_options_filename = options.export_location + "/" + string(bag_name) + "_" + string(options.reference_point) + "_" + string(currentEpochTime) + "_options.mat";
+    
+    save(export_Results_Export_filename, 'Results_Export')
+    save(export_options_filename, 'options')
+    
+    disp('Results Saved!')
+    
+end
 
 %% Score the Results
 
-class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
+if options.plot_area_results_bool
+    
+    class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
+    
+end
 
 
 %% Plotting All Points
@@ -611,10 +621,25 @@ end
 
 if options.plot_avg_bool
     
-    plot_avg_class_results_fun(Avg_Arrays, options)
+    plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     
 end
 
+%% Average points with confs
+
+if options.plot_conf_bool
+    
+    plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
+    
+end
+
+%% Average points with confs per channel
+
+if options.plot_perchan_conf_bool
+    
+    plot_avg_class_perchan_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
+    
+end
 
 %% PCD Classification Rate - INCLUDING SAVING
 
@@ -639,86 +664,4 @@ end
 disp('End Program!')
 
 
-%% old code dump
-
-% Gravel Lot 1
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_arc_width_controlol.mat.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-09-14-46-23.bag';
-% terrain_opt = 1;
-% roi_select = 1;
-
-% Gravel Lot 2, 3
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_gravel_lot_2_2rois.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/gravel_lot/2023-03-14-13-12-31.bag';
-% terrain_opt = 1;
-% roi_select = 1; % 1, 2
-
-% Lawn Grass 1
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-17-31_CHIP_ALL_for_grass.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-17-31_CHIP.bag';
-% terrain_opt = 4;
-% roi_select = 1;
-
-% Lawn Grass 2
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/TRAINING_PCD_EXPORT/Manual_Classified_PCD_2022-10-20-10-21-54_CHIP_ALL_for_grass.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/Armitage_Shortened_Bags/2022-10-20-10-21-54_CHIP.bag';
-% terrain_opt = 4;
-% roi_select = 1;
-
-% Pavement 1, 2
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_pavement_1_roi.mat.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/03_13_2023_shortened_coach_sturbois/2023-03-13-10-56-38.bag';
-% terrain_opt = 5;
-% roi_select = 2; %1,2
-
-% Lawn Grass 3
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_grass_roi.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
-% terrain_opt = 4;
-% roi_select = 1;
-
-% Pavement 3, 4 - blue_route
-% roi_file = '/media/autobuntu/chonk/chonk/git_repos/Rural-Road-Lane-Creator/Random_Forest/man_roi/Manual_Classified_PCD_blue_route_asphalt_roiz.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/blue_short/2023-03-15-14-09-13.bag';
-% terrain_opt = 5;
-% roi_select = 1; %1,2,3
-
-% Gravel Lot Interception files
-% Down 1Lucin Cutoff
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/03_29_14_54_16_all.pcd_20232103130404.mat'; terrain_opt = 6; % asph2
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-54-16.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/foliage_grab_2FROMFILE2023-03-29-14-54-16.pcd_20230904140433.mat';
-% roi_file = 'down_1.pcd_FROM_FILE_2023-03-29-14-5.pcd_20230412160441.mat';
-% terrain_opt = 3; foliage
-% terrain_opt = 6;
-% roi_select = 3;
-
-% Down 2
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_2_03_29_14_57_17_25to150.pcd.pcd_20233803100451.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-57-17.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% Down 3
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/Down_3_29_14_59_48_250to400.pcd.pcd_20234003100412.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Down/2023-03-29-14-59-48.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% % Up 1
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_1_29_14_53_21_1tolen.pcd_20234103100425.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-53-21.bag';
-% roi_select = 1;
-% terrain_opt = 1;
-
-% Up 2
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag.mat'; terrain_opt = 6;
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/foliage_grab_FROM_FILE_2023-03-29-14-55-44_20230104140446.mat'; terrain_opt = 3;
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-55-44.bag';
-% roi_select = 1;
-
-% Up 3
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/Up_3_14_58_13_325to450.pcd.pcd_20234303100447.mat';
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/lot_intercept/Up/2023-03-29-14-58-13.bag';
-% roi_select = 1;
 
