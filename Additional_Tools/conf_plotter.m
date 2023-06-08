@@ -8,7 +8,7 @@ clc
 
 % RANGE SETTINGS
 grav_conf_lowbound = 0.975;
-unkn_conf_lowbound = 0.90;
+unkn_conf_lowbound = 0.975;
 asph_conf_lowbound = 0.90;
 
 % RANSAC SETTINGS
@@ -21,7 +21,7 @@ asph_conf_lowbound = 0.90;
 % unkn_conf_lowbound = 0.60;
 % asph_conf_lowbound = 0.90;
 
-scale_factor = 5000;
+options.scale_factor = 10000;
 num_chans = 3;
 
 % Chan 2
@@ -42,7 +42,9 @@ Grav_CT_Append_Array_3 = []; Asph_CT_Append_Array_3 = []; Unkn_CT_Append_Array_3
 % Chan 4
 Grav_CT_Append_Array_4 = []; Asph_CT_Append_Array_4 = []; Unkn_CT_Append_Array_4 = [];
 
-% options
+%% Options
+
+
 % Marker size / Linewidth for plotz
 options.c2markersize            = 20;
 options.c3markersize            = 20;
@@ -65,10 +67,18 @@ options.fig_size_array          = [10 10 3500 1600];
 options.axis_font_size          = 24;
 options.font_type               = 'Sans Regular'; % Default Font: Sans Regular
 
+% Marker Options
+options.alpha_value             = 0;
+options.linewidth               = 2;
+options.scale_factor            = 10000;
+
 
 %% Load file & data
 
-load('1686055798.6768_rm_db_4_range_Results_Export.mat')
+% load('1686055798.6768_rm_db_4_range_Results_Export.mat')
+[matfile, matfolder, ~] = uigetfile('*Results_Export.mat','Get Results');
+load(matfile)
+disp(matfile)
 
 
 %% Select the data
@@ -231,6 +241,20 @@ waitbar(3/num_chans, load_result_bar, sprintf('Channel %d out of %d', 3, num_cha
 
 delete(load_result_bar)
 
+%% Making a struct for the individual terrain conf plots
+
+All_Avg_Array = [Asph_Avg_Append_Array_2;...
+                 Asph_Avg_Append_Array_3;...
+                 Asph_Avg_Append_Array_4;...
+                 Grav_Avg_Append_Array_2;...
+                 Grav_Avg_Append_Array_3;...
+                 Grav_Avg_Append_Array_4;...
+                 Unkn_Avg_Append_Array_2;...
+                 Unkn_Avg_Append_Array_3;...
+                 Unkn_Avg_Append_Array_4];
+
+
+
 
 
 
@@ -322,55 +346,55 @@ scatter_figure = figure('Position', options.fig_size_array, 'DefaultAxesFontSize
 % Channel 2
 hold all
 try
-    scatter3(Grav_Avg_Append_Array_2(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_2(:,7)+0.01)*scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
+    scatter3(Grav_Avg_Append_Array_2(:,1), Grav_Avg_Append_Array_2(:,2), Grav_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_2(:,7)+0.01)*options.scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'c')
 catch
     disp('No Grav Data on Chan 2!')
 end
 try   
-    scatter3(Asph_Avg_Append_Array_2(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_2(:,5)+0.01)*scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
+    scatter3(Asph_Avg_Append_Array_2(:,1), Asph_Avg_Append_Array_2(:,2), Asph_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_2(:,5)+0.01)*options.scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'k') 
 catch
     disp('No Asph Data on Chan 2!')
 end
 try
-    scatter3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_2(:,6)+0.01)*scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
+    scatter3(Unkn_Avg_Append_Array_2(:,1), Unkn_Avg_Append_Array_2(:,2), Unkn_Avg_Append_Array_2(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_2(:,6)+0.01)*options.scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'r')
 catch
     disp('No Unkn Data on Chan 2!')
 end
 
 % Channel 3
 try
-    scatter3(Grav_Avg_Append_Array_3(:,1), Grav_Avg_Append_Array_3(:,2), Grav_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_3(:,7)+0.01)*scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
+    scatter3(Grav_Avg_Append_Array_3(:,1), Grav_Avg_Append_Array_3(:,2), Grav_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_3(:,7)+0.01)*options.scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'c')
 catch
     disp('No Grav Data on Chan 3!')
 end
 
 try   
-    scatter3(Asph_Avg_Append_Array_3(:,1), Asph_Avg_Append_Array_3(:,2), Asph_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_3(:,5)+0.01)*scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
+    scatter3(Asph_Avg_Append_Array_3(:,1), Asph_Avg_Append_Array_3(:,2), Asph_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_3(:,5)+0.01)*options.scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'k') 
 catch
     disp('No Asph Data on Chan 3!')
 end
 
 try
-    scatter3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_3(:,6)+0.01)*scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
+    scatter3(Unkn_Avg_Append_Array_3(:,1), Unkn_Avg_Append_Array_3(:,2), Unkn_Avg_Append_Array_3(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_3(:,6)+0.01)*options.scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'r')
 catch
     disp('No Unkn Data on Chan 3!')
 end
 
 % Channel 4
 try
-    scatter3(Grav_Avg_Append_Array_4(:,1), Grav_Avg_Append_Array_4(:,2), Grav_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_4(:,7)+0.01)*scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
+    scatter3(Grav_Avg_Append_Array_4(:,1), Grav_Avg_Append_Array_4(:,2), Grav_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Grav_Avg_Append_Array_4(:,7)+0.01)*options.scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'c')
 catch
     disp('No Grav Data on Chan 4!')
 end
 
 try   
-    scatter3(Asph_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_4(:,5)+0.01)*scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
+    scatter3(Asph_Avg_Append_Array_4(:,1), Asph_Avg_Append_Array_4(:,2), Asph_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Asph_Avg_Append_Array_4(:,5)+0.01)*options.scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'k') 
 catch
     disp('No Asph Data on Chan 4!')
 end
 
 try
-    scatter3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_4(:,6)+0.01)*scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
+    scatter3(Unkn_Avg_Append_Array_4(:,1), Unkn_Avg_Append_Array_4(:,2), Unkn_Avg_Append_Array_4(:,3), 'filled', 'SizeData', ((Unkn_Avg_Append_Array_4(:,6)+0.01)*options.scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'r')
 catch
     disp('No Unkn Data on Chan 4!')
 end
@@ -396,9 +420,84 @@ ax2 = gca;
 ax2.Clipping = 'off';
 
 
+%% Plotting Asphalt Confs
+
+asph_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,5)+0.01)*options.scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'k') 
+hold on
+axis('equal')
+axis off
+view([0 0 90])
+hold on
+h = plot(NaN,NaN,'ok', 'LineWidth', 25);
+hold off
+l = legend(h, {'\color{black} Asphalt'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
+ax2 = gca;
+ax2.Clipping = 'off';
+
+
+%% Plotting Grass (UNKNOWN) Confs
+
+unkn_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,6)+0.01)*options.scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'r')
+hold on
+axis('equal')
+axis off
+view([0 0 90])
+hold on
+h = plot(NaN,NaN,'or', 'LineWidth', 25);
+l = legend(h, {'\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
+hold off
+ax2 = gca;
+ax2.Clipping = 'off';
+
+
+%% Plotting Gravel Confs
+
+grav_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,7)+0.01)*options.scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', options.alpha_value, 'MarkerEdgeColor', 'c')
+hold on
+axis('equal')
+axis off
+view([0 0 90])
+hold on
+h = plot(NaN,NaN,'oc', 'LineWidth', 25);
+l = legend(h, {'\color{cyan} Gravel'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
+hold off
+ax2 = gca;
+ax2.Clipping = 'off';
+
+
+%% Plotting All Confs
+
+all_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+hold on
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'SizeData', (((All_Avg_Array(:,7)+0.01)*options.scale_factor)*1.25), 'Marker', 'square', 'MarkerEdgeColor', 'c', 'LineWidth', options.linewidth)
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'SizeData', ((All_Avg_Array(:,6)+0.01)*options.scale_factor), 'Marker', 'o', 'MarkerEdgeColor', 'r', 'LineWidth', options.linewidth)
+scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'SizeData', ((All_Avg_Array(:,5)+0.01)*options.scale_factor), 'Marker', 'diamond', 'MarkerEdgeColor', 'k', 'LineWidth', options.linewidth) 
+axis('equal')
+axis off
+view([0 0 90])
+h(1) = plot(NaN,NaN,'c', 'LineWidth', 2, 'Marker', 'square', 'MarkerSize',50, 'LineStyle', 'none');
+h(2) = plot(NaN,NaN,'r', 'LineWidth', 2, 'Marker', 'o', 'MarkerSize',50, 'LineStyle', 'none');
+h(3) = plot(NaN,NaN,'k', 'LineWidth', 2, 'Marker', 'diamond', 'MarkerSize',50, 'LineStyle', 'none');
+legendLabels = {'\color{cyan}Grav', '\color{red}Unkn', '\color{black}Asph'};
+legendLabels = cellfun(@(label) sprintf('\x2005%s', label), legendLabels, 'UniformOutput', false);
+l = legend(h, legendLabels, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+l.Interpreter = 'tex';
+% Increase the size of the legend box
+legendPos = l.Position;  % Get the current position of the legend
+legendPos(3) = legendPos(3) * 1.25;  % Increase the width of the legend box
+l.Position = legendPos;  % Set the new position for the legend
+hold off
+ax2 = gca;
+ax2.Clipping = 'off';
 
 
 %% End Program
 
-
 disp('End Program')
+

@@ -1,5 +1,5 @@
 %==========================================================================
-%                       Travis Moleski/Rhett Huston
+%                             Rhett Huston
 %
 %                     FILE CREATION DATE: 10/19/2022
 %
@@ -25,12 +25,14 @@ format compact
 options.reference_point         = 'range';
 options.rosbag_number           = 6;
 
+
 %
 % EXPORT OPTSION
 %
 
 options.save_results_bool       = 0;
-options.export_location         = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS';
+options.custom_export_bool      = 1;
+
 
 %
 % ARC SIZE
@@ -74,8 +76,8 @@ options.chan_4_rr_cent_ang      = 180;
 
 % which things to plot
 options.plot_all_bool           = 0;
-options.plot_avg_bool           = 1;
-options.plot_area_results_bool  = 0;
+options.plot_avg_bool           = 0;
+options.plot_area_results_bool  = 1;
 options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
@@ -106,6 +108,7 @@ options.font_type               = 'Sans Regular'; % Default Font: Sans Regular
 % Plotting the moving average - how many samples per average?
 options.move_avg_size           = 15;
 
+
 %
 % PLANE PROJECTION
 %
@@ -113,6 +116,7 @@ options.move_avg_size           = 15;
 % RANSAC Options
 options.maxDistance             = 0.5;
 options.MaxNumTrials            = 10; % RANSAC Iterations
+
 
 %
 % DISTANCE FILTER
@@ -127,6 +131,7 @@ options.min_dist_34             = 2.25;
 % max_dist
 options.max_dist_23             = 5;
 options.max_dist_34             = 6;
+
 
 %
 % CONFIDENCE SCORE
@@ -146,9 +151,14 @@ options.dvg_bool                = 0;
 
 % Other Random Options
 % Do we compare the data to be classified to the training data????
-data_comp_bool                  = 0;
+% data_comp_bool                  = 0;
 
 
+%% RAW results export location
+
+if options.save_results_bool
+    options.export_location = get_export_location(options);
+end
 
 
 %% RDF selection
@@ -182,7 +192,7 @@ elseif options.reference_point == "ransac"
     chan_2_r_rdf_load_string = 'chan_2_c_ransac.mat';
     
 elseif options.reference_point == "mls"
-        
+    
     chan_4_c_rdf_load_string = 'chan_4_c_mls.mat';
     chan_3_c_rdf_load_string = 'chan_3_c_mls.mat';
     chan_2_c_rdf_load_string = 'chan_2_c_mls.mat';
@@ -217,6 +227,8 @@ elseif options.rosbag_number == 6
     bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
     roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
 end
+
+
 %% Loading RDF
 
 raw_data_export = {};
@@ -343,6 +355,7 @@ disp('Messages Loaded')
 cloud_break                 = length(lidar_msgs);
 gps_pos_store               = zeros(cloud_break,3);
 lidar_pos_store             = gps_pos_store;
+
 
 %% Timestamps
 
@@ -584,9 +597,7 @@ Results_Export.c4 = channel_4_fun_out;
 %% Save all results to a .mat file
 
 if options.save_results_bool
-    
-    save_result
-    
+
     currentEpochTime = posixtime(datetime('now', 'TimeZone', 'UTC'));
     [~,bag_name,~] = fileparts(bag_file);
     export_Results_Export_filename = options.export_location + "/" + string(bag_name) + "_" + string(options.reference_point) + "_" + string(currentEpochTime) + "_Results_Export.mat";
@@ -598,6 +609,7 @@ if options.save_results_bool
     disp('Results Saved!')
     
 end
+
 
 %% Score the Results
 
@@ -625,6 +637,7 @@ if options.plot_avg_bool
     
 end
 
+
 %% Average points with confs
 
 if options.plot_conf_bool
@@ -640,6 +653,7 @@ if options.plot_perchan_conf_bool
     plot_avg_class_perchan_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     
 end
+
 
 %% PCD Classification Rate - INCLUDING SAVING
 

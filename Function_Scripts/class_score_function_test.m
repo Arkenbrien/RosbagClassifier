@@ -206,52 +206,52 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
 
         %% Other road areas (cement driveways etc)
         
-        if isfield(Manual_Classfied_Areas, 'road')
+        if isfield(Manual_Classfied_Areas, 'side_road')
 
-            for road_idx = 1:length(Manual_Classfied_Areas.road)
+            for side_road_idx = 1:length(Manual_Classfied_Areas.side_road)
 
                 % Grabs the polygon data
-                xy_roi             = Manual_Classfied_Areas.road_roi{:,road_idx};
+                xy_roi             = Manual_Classfied_Areas.side_road{:,side_road_idx};
 
                 % Grabs the indexes for all the points that lie in the polygon
                 if ~isempty(Grav_Avg_Array)
-                    grav_in_other_road = sum(inpolygon(Grav_Avg_Array(:,1), Grav_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                    grav_in_side_road = sum(inpolygon(Grav_Avg_Array(:,1), Grav_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
                 else
-                    grav_in_other_road = 0;
+                    grav_in_side_road = 0;
                 end
                 
                 if ~isempty(Asph_Avg_Array)
-                    asph_in_other_road = sum(inpolygon(Asph_Avg_Array(:,1), Asph_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                    asph_in_side_road = sum(inpolygon(Asph_Avg_Array(:,1), Asph_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
                 else
-                    asph_in_other_road = 0;
+                    asph_in_side_road = 0;
                 end
                 
                 if ~isempty(Unkn_Avg_Array)
-                    unkn_in_other_road = sum(inpolygon(Gras_Avg_Array(:,1), Gras_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                    unkn_in_side_road = sum(inpolygon(Unkn_Avg_Array(:,1), Unkn_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
                 else
-                    unkn_in_other_road = 0;
+                    unkn_in_side_road = 0;
                 end
                 
-                tot_in_area        = grav_in_other_road + asph_in_other_road + unkn_in_other_road;
+                tot_in_area        = grav_in_side_road + asph_in_side_road + unkn_in_side_road;
 
                 % Score per area
                 if tot_in_area ~= 0
 
-                    channel_in_other_road_area_score{chan_idx, road_idx}.grav_in_other_road = grav_in_other_road;
-                    channel_in_other_road_area_score{chan_idx, road_idx}.asph_in_other_road = asph_in_other_road;
-                    channel_in_other_road_area_score{chan_idx, road_idx}.unkn_in_other_road = unkn_in_other_road;
-                    channel_in_other_road_area_score{chan_idx, road_idx}.tot_in_area = tot_in_area;
+                    channel_in_side_road_area_score{chan_idx, side_road_idx}.grav_in_side_road = grav_in_side_road;
+                    channel_in_side_road_area_score{chan_idx, side_road_idx}.asph_in_side_road = asph_in_side_road;
+                    channel_in_side_road_area_score{chan_idx, side_road_idx}.unkn_in_side_road = unkn_in_side_road;
+                    channel_in_side_road_area_score{chan_idx, side_road_idx}.tot_in_area = tot_in_area;
                     
                 end
                 
-                channel_in_other_road_area_score{chan_idx, road_idx}.avg_loc    = [mean(xy_roi(:,1)) mean(xy_roi(:,2))];
+                channel_in_side_road_area_score{chan_idx, side_road_idx}.avg_loc    = [mean(xy_roi(:,1)) mean(xy_roi(:,2))];
 
             end
 
         else
 
             disp('No other paved surface areas to score!')
-            channel_in_other_road_area_score = [];
+            channel_in_side_road_area_score = [];
 
         end
         
@@ -259,17 +259,17 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
     
     %% For each area all channels
     
-    [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score] = tot_in_area_score_test(channel_in_grav_area_score, channel_in_asph_area_score, channel_in_nonroad_area_score, channel_in_other_road_area_score, used_chans, Manual_Classfied_Areas)
+    [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score] = tot_in_area_score_test(channel_in_grav_area_score, channel_in_asph_area_score, channel_in_nonroad_area_score, channel_in_side_road_area_score, used_chans, Manual_Classfied_Areas)
     
     
     %% For all areas all channels
     
-    accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score);
+    accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score);
     
     
     %% Plotting all channels' scores and areas
     
-    per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_or_score, Manual_Classfied_Areas, options)
+    per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score, Manual_Classfied_Areas, options)
 
     
     %% End Script

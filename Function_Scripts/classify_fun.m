@@ -77,7 +77,8 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
                     Yfit = categorical("gravel");
                 end
             end
-        end
+        end % End of confidence filtering
+        
         % For the purpose of this work, grass is to be classified as
         % Unknown, simply because I'm not concerned about whether or not I
         % can detect a grassy area, only seperate it from the two pavement

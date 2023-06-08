@@ -53,10 +53,10 @@ view([0 0 90])
 if load_prev_MCA_file
     
     % Load File
-    [Manual_Classfied_Areas_File, mca_folder] = uigetfile("/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/", "Grab old MCA");
+    [Manual_Classfied_Areas_File, mca_folder] = uigetfile("/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3", "Grab old MCA");
     load(Manual_Classfied_Areas_File)
     
-    mca_plot_fun(Manual_Classfied_Areas)
+    MCA_plotter(Manual_Classfied_Areas, max(ptCloudSource.Location(:,3)))
     
 end
 
@@ -68,21 +68,6 @@ disp('PCD Loaded!')
 % Time of Run
 time_now                = datetime("now","Format","uuuuMMddhhmmss");
 time_now                = datestr(time_now,'yyyyMMddhhmmss');
-
-% if load_prev_MCA_file == "Yes"
-%     
-%     [mca_dir, mca_name, mca_type] = fileparts(which(Manual_Classfied_Areas_File));
-%     
-%     Filename = string(mca_dir) + "/" + string(mca_name) + string(mca_type);
-% 
-% else
-%     
-%     MANUAL_CLASSIFICATION_FOLDER = string(root_dir) + "/MANUAL_CLASSIFICATION";
-%     mkdir(MANUAL_CLASSIFICATION_FOLDER);
-%     addpath(MANUAL_CLASSIFICATION_FOLDER);
-%     Filename = string(MANUAL_CLASSIFICATION_FOLDER) + "/MANUAL_CLASSIFICATION.mat";
-%     
-% end
 
 if load_prev_MCA_file
     
@@ -104,6 +89,7 @@ foli_ind_start          = 1;
 non_road_ind_start      = 1;
 road_ind_start          = 1;
 asph_ind_start          = 1;
+side_road_ind_start     = 1;
 
 if use_prev_MCA_file
     
@@ -149,6 +135,12 @@ if use_prev_MCA_file
     catch
         road_ind        = 1;
     end
+    try
+        side_road_ind_start      = length(Manual_Classfied_Areas.side_road);
+        side_road_ind            = side_road_ind_start + 1;
+    catch
+        side_road_ind        = 1;
+    end
     
 else
     
@@ -159,6 +151,7 @@ else
     asph_ind        = 1;
     non_road_ind    = 1;
     road_ind        = 1;
+    side_road_ind   = 1;
     
 end
 
@@ -183,7 +176,7 @@ while true
     
     % Select desired type
     disp('Select terrain type')
-    dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf', 'Asph'};
+    dlg_list                            = {'Gravel', 'Chipseal', 'Grass', 'Foliage', 'Road Surf', 'Non Road Surf', 'Asph', 'Side of Road'};
     [indx_dlg_list,~]                   = listdlg('ListString', dlg_list,'SelectionMode','single');
     
     % Selecting the zoom tool by default
@@ -354,6 +347,20 @@ while true
                     % identification
                     pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
                     plot(pgon,'FaceColor',[0.50,0.50,0.00],'FaceAlpha',0.75)
+                    
+                case 8
+                    
+                    disp('Side of Road')
+                    % Save the x y of the polygon points
+                    Manual_Classfied_Areas.side_road{side_road_ind} = xy_roi;
+
+                    % increase the index counter
+                    side_road_ind = side_road_ind + 1;
+
+                    % Plot the shape unto the point cloud for easy
+                    % identification
+                    pgon = polyshape(xy_roi(:,1),xy_roi(:,2));
+                    plot(pgon,'FaceColor',[0.50,0.50,0.50],'FaceAlpha',0.75)
                     
             end
 
