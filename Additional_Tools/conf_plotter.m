@@ -21,6 +21,11 @@ asph_conf_lowbound = 0.90;
 % unkn_conf_lowbound = 0.60;
 % asph_conf_lowbound = 0.90;
 
+% NONE SETTINGS
+% grav_conf_lowbound = 1;
+% unkn_conf_lowbound = 1;
+% asph_conf_lowbound = 1;
+
 options.scale_factor = 10000;
 num_chans = 3;
 

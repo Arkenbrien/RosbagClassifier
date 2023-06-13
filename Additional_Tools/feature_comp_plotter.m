@@ -49,9 +49,9 @@ time_now        = datestr(time_now,'yyyyMMddhhmmss');
 % grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_train_chan2.csv'
 % asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export/rm_comp/chan_2__Grav_Asph2_20234413100431/grav_rm_train_chan2.csv'
 
-asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/asph_train_chan_c_2';
-gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/gras_train_chan_c_2';
-grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANSAC/chan_c_2_Grav_Asph_Gras/grav_train_chan_c_2';
+asph_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANGE/chan_2_Grav_Asph_Gras/asph_train_chan2.csv';
+gras_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANGE/chan_2_Grav_Asph_Gras/gras_train_chan2.csv';
+grav_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export_RANGE/chan_2_Grav_Asph_Gras/grav_train_chan2.csv';
 
 % Load csv into workspace
 gras_data = ring_train_data_csv_import_w_cat(gras_file);
@@ -114,16 +114,12 @@ parfor x_axis_idx = 1:length(labels)
             asphplot = scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 300, 'ks', 'MarkerFaceColor', 'k')
             asphplot.MarkerFaceAlpha = 0.5;
             hold on
-%             scatter(asph_array(1:min_dat_size,x_axis_idx), asph_array(1:min_dat_size,y_axis_idx), 50, 'k*')
-            hold on
             xlabel(string(labels(x_axis_idx)))
             ylabel(string(labels(y_axis_idx)))
-%             legend({'Grass', 'Gravel', 'Asphalt'}, 'FontSize', 56)
             
             hold on
             legend_plotter()
             hold off
-
             
             % Save image
             filename = xy_export_dir + "/" + time_now + "_" + string(labels(x_axis_idx)) + "_" + string(labels(y_axis_idx)) + ".fig";
@@ -239,7 +235,7 @@ function legend_plotter()
     h(1) = plot(NaN,NaN,'oc', 'LineWidth', 20);
     h(2) = plot(NaN,NaN,'sk', 'LineWidth', 20);
     h(3) = plot(NaN,NaN,'xg', 'LineWidth', 20);
-    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{green} Green'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
+    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{green} Grass'}, 'FontSize', 36, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
     
 end

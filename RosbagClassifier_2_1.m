@@ -23,11 +23,11 @@ format compact
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 6;
+options.rosbag_number           = 1;
 
 
 %
-% EXPORT OPTSION
+% EXPORT
 %
 
 options.save_results_bool       = 0;
@@ -76,8 +76,8 @@ options.chan_4_rr_cent_ang      = 180;
 
 % which things to plot
 options.plot_all_bool           = 0;
-options.plot_avg_bool           = 0;
-options.plot_area_results_bool  = 1;
+options.plot_avg_bool           = 1;
+options.plot_area_results_bool  = 0;
 options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
@@ -152,6 +152,12 @@ options.dvg_bool                = 0;
 % Other Random Options
 % Do we compare the data to be classified to the training data????
 % data_comp_bool                  = 0;
+
+
+%
+% EXPERIMENTAL ROAD PREDICTION THING
+%
+
 
 
 %% RAW results export location
@@ -406,7 +412,6 @@ parfor cloud = 1:cloud_break
     
     xyz_cloud = [];
     xyzi_grab = [];
-    tform = [];
     current_cloud = [];
     intensities = [];
     ring = [];
@@ -458,7 +463,7 @@ parfor cloud = 1:cloud_break
     lidarTrajectory             = [LidarxEast, LidaryNorth, LidarzUp];
     
     % Creating the transform
-    tform                       = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
+    tform{cloud}                = rigid3d(rotate_update, [lidarTrajectory(1) lidarTrajectory(2) lidarTrajectory(3)]);
     
     % Reading the current cloud for xyz, intensity, and ring (channel) values
     xyz_cloud                   = rosReadXYZ(current_cloud);
@@ -486,39 +491,39 @@ parfor cloud = 1:cloud_break
 
         % CHANNEL 2 CENT
 
-        classify_fun_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform, DvG, options, "2c");
+        classify_fun_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform{cloud}, DvG, options, "2c");
 
         % CHANNEL 3 CENT
 
-        classify_fun_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform, DvG, options, "3c");
+        classify_fun_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform{cloud}, DvG, options, "3c");
 
         % CHANNEL 4 CENT
 
-        classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform, DvG, options, "4c");
+        classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform{cloud}, DvG, options, "4c");
 
         % CHANNEL 2 LEFT
 
-        classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform, DvG, options, "2l");
+        classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2l");
 
         % CHANNEL 3 LEFT
 
-        classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform, DvG, options, "3l");
+        classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3l");
 
         % CHANNEL 4 LEFT
 
-        classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform, DvG, options, "4l");
+        classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4l");
 
         % CHANNEL 2 RIGHT
 
-        classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform, DvG, options, "2r");
+        classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2r");
 
         % CHANNEL 3 RIGHT
 
-        classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform, DvG, options, "3r");
+        classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3r");
 
         % CHANNEL 4 RIGHT
 
-        classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform, DvG, options, "4r");
+        classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4r");
         
 %         % CHANNEL 2 LLEFT
 % 
@@ -543,10 +548,6 @@ parfor cloud = 1:cloud_break
 %         % CHANNEL 4 RRIGHT
 % 
 %         classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform, DvG, options, "4rr");
-    
-    %% Distance Filtering
-    
-    % It is expected that the distances between the 
    
     elseif options.dist_filt_bool
         
@@ -629,7 +630,7 @@ if options.plot_all_bool
 end
 
 
-%% Average points
+%% Plotting Average points
 
 if options.plot_avg_bool
     
@@ -638,7 +639,7 @@ if options.plot_avg_bool
 end
 
 
-%% Average points with confs
+%% Plotting Average points with confs
 
 if options.plot_conf_bool
     
@@ -646,7 +647,7 @@ if options.plot_conf_bool
     
 end
 
-%% Average points with confs per channel
+%% Plotting Average points with confs per channel
 
 if options.plot_perchan_conf_bool
     
@@ -655,7 +656,7 @@ if options.plot_perchan_conf_bool
 end
 
 
-%% PCD Classification Rate - INCLUDING SAVING
+%% Plotting PCD Classification Rate - INCLUDING SAVING
 
 if options.plot_rate_bool
     
@@ -664,13 +665,18 @@ if options.plot_rate_bool
 end
 
 
-%% Plot classification rate - Classification only (classify_fun_out)
+%% Plotting classification rate - Classification only (classify_fun_out)
 
 if options.plot_class_rate_bool
     
     plot_class_rate_fun(classify_fun_out_2c, classify_fun_out_3c, classify_fun_out_4c, classify_fun_out_2l, classify_fun_out_3l, classify_fun_out_4l, classify_fun_out_2r, classify_fun_out_3r, classify_fun_out_4r, options)
     
 end
+
+
+%% Plotting Auto Road Guess
+
+auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
 
 
 %% End Program 

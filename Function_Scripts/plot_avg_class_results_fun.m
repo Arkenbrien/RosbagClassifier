@@ -43,8 +43,10 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     %% Plotting
     
     % All points
-    result_avg_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
-
+    if options.plot_avg_bool
+        result_avg_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+    end
+    
     hold all
     
      % Channel 2
@@ -111,9 +113,7 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     view([0 0 90])
 
     hold on
-
-    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
-
+    
     xlim([x_min_lim x_max_lim]);
     ylim([y_min_lim y_max_lim]);
 

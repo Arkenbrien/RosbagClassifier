@@ -91,11 +91,13 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
         diag_out.Yfit = Yfit;
         diag_out.points = xyz_cloud(arc_idx,:);
         diag_out.scores = scores;
+        diag_out.num_points = length(arc_idx);
     else  
         diag_out.classify_time = 0;
         diag_out.Yfit = [];
         diag_out.points = [NaN, NaN, NaN, NaN];
         diag_out.scores = [NaN NaN NaN];
+        diag_out.num_points = NaN;
     end
 
 end
