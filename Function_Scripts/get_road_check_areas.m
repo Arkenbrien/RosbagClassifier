@@ -9,14 +9,28 @@ function road_check_areas = get_road_check_areas()
 
     %% Coordinates for each box
 
+    % ._.
+    % | | L
+    % | |
+    % ._.
+    %    .__ __.
+    %    .__ __. C
+    % ._.
+    % | |
+    % | | R
+    % ._.
+
     l_area_x = [-w -w w w];
-    l_area_y = [w l l w];
+    l_area_y = [w l*1.5 l*1.5 w];
     
     c_area_x = [w l l w];
     c_area_y = [w w -w -w];
     
     r_area_x = [-w -w w w];
-    r_area_y = [-w -l -l -w];
+    r_area_y = [-w -l*1.5 -l*1.5 -w];
+    
+    origin_point = [0, 0, 0];
+
     
     
     %% TEST PLOT
@@ -41,6 +55,8 @@ function road_check_areas = get_road_check_areas()
     road_check_areas.rx = r_area_x;
     road_check_areas.ry = r_area_y;
     road_check_areas.h = h;
+    
+    road_check_areas.origin = origin_point;
     
 end
 

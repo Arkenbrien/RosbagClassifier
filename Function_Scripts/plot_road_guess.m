@@ -4,7 +4,7 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
 
     road_guess_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     
-    face_alpha_value = 0.15
+    face_alpha_value = 0.15;
     
     %% PLOT
 
@@ -71,10 +71,13 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
     
     hold all
     
-    if options.plot_avg_bool
-        options.plot_avg_bool = 0;
+    if options.plot_avg_in_ani_bool
+        
         plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
-        options.plot_avg_bool = 1;
+        
     end
 
+    axis off
+    
+    
 end

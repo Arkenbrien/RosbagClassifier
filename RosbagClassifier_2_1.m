@@ -23,7 +23,7 @@ format compact
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 1;
+options.rosbag_number           = 3;
 
 
 %
@@ -76,12 +76,15 @@ options.chan_4_rr_cent_ang      = 180;
 
 % which things to plot
 options.plot_all_bool           = 0;
-options.plot_avg_bool           = 1;
+options.plot_avg_bool           = 0;
 options.plot_area_results_bool  = 0;
 options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
+options.plot_avg_in_ani_bool    = 0;
+options.plot_ani                = 0;
+options.save_anim_bool          = 0;
 
 % Marker size / Linewidth for plotz
 options.c2markersize            = 20;
@@ -158,7 +161,7 @@ options.dvg_bool                = 0;
 % EXPERIMENTAL ROAD PREDICTION THING
 %
 
-
+options.animate_font_size = 16;
 
 %% RAW results export location
 
@@ -433,6 +436,8 @@ parfor cloud = 1:cloud_break
     % Converting the gps coord to xyz (m)
     [xEast, yNorth, zUp]        = latlon2local(matched_stamp.Latitude, matched_stamp.Longitude, matched_stamp.Altitude, origin);
     
+    x_y_z_out{cloud}          = [xEast, yNorth, zUp];
+    
     % Grabbing the angles
     roll                        = matched_stamp.Roll;
     pitch                       = matched_stamp.Pitch;
@@ -444,7 +449,7 @@ parfor cloud = 1:cloud_break
     % Creating the rotation matrix
     rotate_update               = rotz(90-yaw)*roty(roll)*rotx(pitch);
      
-    % Offset the gps coord by the current orientation (in this case, initial) 
+    % Offset the gps coord by the current orientation
     % Converts the ground truth to lidar frame
     groundTruthTrajectory       = [xEast, yNorth, zUp] * gps2lidar ;
     
@@ -611,6 +616,10 @@ if options.save_results_bool
     
 end
 
+%% Plotting Auto Road Guess
+
+auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
+
 
 %% Score the Results
 
@@ -672,11 +681,6 @@ if options.plot_class_rate_bool
     plot_class_rate_fun(classify_fun_out_2c, classify_fun_out_3c, classify_fun_out_4c, classify_fun_out_2l, classify_fun_out_3l, classify_fun_out_4l, classify_fun_out_2r, classify_fun_out_3r, classify_fun_out_4r, options)
     
 end
-
-
-%% Plotting Auto Road Guess
-
-auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
 
 
 %% End Program 

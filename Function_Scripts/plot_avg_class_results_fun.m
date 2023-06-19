@@ -40,6 +40,7 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
 
     options.max_h = z_max_lim;
     
+    
     %% Plotting
     
     % All points
@@ -107,6 +108,7 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
         disp('No Unkn Data on Chan 4!')
     end
 
+     MCA_plotter(Manual_Classfied_Areas, options.max_h)
 
     axis('equal')
     axis off
@@ -120,10 +122,12 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     h(1) = plot(NaN,NaN,'oc', 'LineWidth', 25);
     h(2) = plot(NaN,NaN,'ok', 'LineWidth', 25);
     h(3) = plot(NaN,NaN,'or', 'LineWidth', 25);
-    l = legend(h, {'\color{cyan} Gravel','\color{black} Asphalt','\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+    l = legend(h, {'\color{cyan} Grav','\color{black} Asph','\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
     l.Interpreter = 'tex';
 
     ax2 = gca;
     ax2.Clipping = 'off';
     
+    
 end
+

@@ -99,7 +99,7 @@ h(3) = plot(NaN,NaN,'or', 'LineWidth', 20);
 h(4) = plot(NaN,NaN,'s', 'Color', [0.75,0.00,0.00], 'MarkerFaceColor', [0.75,0.00,0.00], 'MarkerSize', 30, 'LineWidth', 3); %MCA Grav
 % h(5) = plot(NaN,NaN,'s', 'Color', [0.50,0.50,0.00], 'MarkerFaceColor', [0.50,0.50,0.00], 'MarkerSize', 30, 'LineWidth', 3); %MCA Asph
 % h(6) = plot(NaN,NaN,'s', 'Color', [0.75,0.25,0.75], 'MarkerFaceColor', [0.75,0.25,0.75], 'MarkerSize', 30, 'LineWidth', 3); %MCA Unknown
-h(5) = plot(NaN,NaN,'s', 'Color', [0.00,0.75,0.00], 'MarkerFaceColor', [0.00,0.75,0.00], 'MarkerSize', 30, 'LineWidth', 3); %MCAAlt Grav
+h(5) = plot(NaN,NaN,'s', 'Color', [0.00,0.75,0.002], 'MarkerFaceColor', [0.00,0.75,0.00], 'MarkerSize', 30, 'LineWidth', 3); %MCAAlt Grav
 % h(8) = plot(NaN,NaN,'s', 'Color', [0.00,0.50,0.50], 'MarkerFaceColor', [0.00,0.50,0.50], 'MarkerSize', 30, 'LineWidth', 3); %MCAAlt Asph
 
 % l = legend(h,  {'\color{cyan} Gravel',...
