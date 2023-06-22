@@ -23,7 +23,7 @@ format compact
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 3;
+options.rosbag_number           = 1;
 
 
 %
@@ -42,32 +42,37 @@ options.custom_export_bool      = 1;
 options.chan_2_d_ang            = 3;
 options.chan_3_d_ang            = 3;
 options.chan_4_d_ang            = 3;
-options.chan_5_d_ang            = 2.5;
+options.chan_5_d_ang            = 3;
 
 % Center of ll arc
 options.chan_2_ll_cent_ang      = 0;
 options.chan_3_ll_cent_ang      = 0;
 options.chan_4_ll_cent_ang      = 0;
+options.chan_5_ll_cent_ang      = 0;
 
 % Center of l arc
 options.chan_2_l_cent_ang       = 45;
 options.chan_3_l_cent_ang       = 45;
 options.chan_4_l_cent_ang       = 45;
+options.chan_5_l_cent_ang       = 45;
 
 % Center of c arc
 options.chan_2_c_cent_ang       = 90;
 options.chan_3_c_cent_ang       = 90;
 options.chan_4_c_cent_ang       = 90;
+options.chan_5_c_cent_ang       = 90;
 
 % Center of r arc
 options.chan_2_r_cent_ang       = 135;
 options.chan_3_r_cent_ang       = 135;
 options.chan_4_r_cent_ang       = 135;
+options.chan_5_r_cent_ang       = 135;
 
 % Center of rr arc
 options.chan_2_rr_cent_ang      = 180;
 options.chan_3_rr_cent_ang      = 180;
 options.chan_4_rr_cent_ang      = 180;
+options.chan_5_rr_cent_ang      = 180;
 
 
 %
@@ -75,13 +80,14 @@ options.chan_4_rr_cent_ang      = 180;
 %
 
 % which things to plot
-options.plot_all_bool           = 0;
-options.plot_avg_bool           = 0;
+options.plot_all_bool           = 1;
+options.plot_avg_bool           = 1;
 options.plot_area_results_bool  = 0;
 options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
+options.auto_road_guesser_bool  = 0;
 options.plot_avg_in_ani_bool    = 0;
 options.plot_ani                = 0;
 options.save_anim_bool          = 0;
@@ -90,11 +96,19 @@ options.save_anim_bool          = 0;
 options.c2markersize            = 20;
 options.c3markersize            = 20;
 options.c4markersize            = 20;
+options.c5markersize            = 20;
+options.gravmarkersize          = 40;
+options.asphmarkersize          = 40;
+options.unknmarkersize          = 50;
 
 % Plotting linewidth for plotz
 options.c2linewidth             = 20;
 options.c3linewidth             = 20;
 options.c4linewidth             = 20;
+options.c5linewidth             = 20;
+options.gravlinewidth           = 20;
+options.asphlinewidth           = 20;
+options.unknlinewidth           = 5;
 
 % Legend Stuff
 options.legend_marker_size      = 20;
@@ -133,6 +147,7 @@ options.min_dist_34             = 2.25;
 
 % max_dist
 options.max_dist_23             = 5;
+options.max_dist_34             = 6;
 options.max_dist_34             = 6;
 
 
@@ -436,7 +451,7 @@ parfor cloud = 1:cloud_break
     % Converting the gps coord to xyz (m)
     [xEast, yNorth, zUp]        = latlon2local(matched_stamp.Latitude, matched_stamp.Longitude, matched_stamp.Altitude, origin);
     
-    x_y_z_out{cloud}          = [xEast, yNorth, zUp];
+    path_coord{cloud}           = [xEast, yNorth, zUp];
     
     % Grabbing the angles
     roll                        = matched_stamp.Roll;
@@ -618,7 +633,11 @@ end
 
 %% Plotting Auto Road Guess
 
-auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
+if options.auto_road_guesser_bool
+
+    auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, path_coord, options, tform)
+    
+end
 
 
 %% Score the Results
@@ -634,7 +653,7 @@ end
 
 if options.plot_all_bool
     
-    plot_all_class_results_fun(All_Arrays, options)
+    plot_all_class_results_fun(All_Arrays, path_coord, options)
 
 end
 
@@ -643,7 +662,7 @@ end
 
 if options.plot_avg_bool
     
-    plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
+    plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, path_coord, options)
     
 end
 

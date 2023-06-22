@@ -69,7 +69,7 @@ function [All_Arrays, Avg_Arrays] = get_classified_arrays(channel_2_fun_out,...
         xyzi = channel_3_fun_out{idx3}.points;
         avg_xyzi = [mean(xyzi(:,1)), mean(xyzi(:,2)), mean(xyzi(:,3)), mean(xyzi(:,4)), channel_3_fun_out{idx2}.scores];
         
-        % Channel 2
+        % Channel 3
         if isequal(channel_3_fun_out{idx3}.Yfit, 'gravel')
             Grav_All_Append_Array_3             = [Grav_All_Append_Array_3; xyzi];
             Grav_Avg_Append_Array_3             = [Grav_Avg_Append_Array_3; avg_xyzi];
@@ -94,7 +94,7 @@ function [All_Arrays, Avg_Arrays] = get_classified_arrays(channel_2_fun_out,...
         xyzi = channel_4_fun_out{idx4}.points;
         avg_xyzi = [mean(xyzi(:,1)), mean(xyzi(:,2)), mean(xyzi(:,3)), mean(xyzi(:,4)), channel_4_fun_out{idx2}.scores];
         
-        % Channel 2
+        % Channel 4
         if isequal(channel_4_fun_out{idx4}.Yfit, 'gravel')
             Grav_All_Append_Array_4             = [Grav_All_Append_Array_4; xyzi];
             Grav_Avg_Append_Array_4             = [Grav_Avg_Append_Array_4; avg_xyzi];

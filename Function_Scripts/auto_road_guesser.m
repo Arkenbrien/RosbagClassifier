@@ -1,4 +1,4 @@
-function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
+function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, path_coord, options, tform)
     
     %% VAR INIT
     
@@ -15,7 +15,7 @@ function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
     area_guess_opts.c4g_min             = 0.45;
     area_guess_opts.c4a_min             = 0.25;
     
-    area_guess_opts.d43_32_ratio_max    = 1.25;
+    area_guess_opts.d43_32_ratio_max    = 2;
     area_guess_opts.d23_min             = 0;
     area_guess_opts.d34_min             = 0;
     
@@ -68,7 +68,7 @@ function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, options, tform)
     
     %% Plot the areas
     close all
-    plot_road_guess(left_area_export, cent_area_export, right_area_export, Manual_Classfied_Areas, Avg_Arrays, options)
+    plot_road_guess(left_area_export, cent_area_export, right_area_export, Manual_Classfied_Areas, Avg_Arrays, path_coord, options)
     
     
     %% Diag test

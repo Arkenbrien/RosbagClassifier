@@ -14,7 +14,7 @@ function animate_road_guess(left_area_export, cent_area_export, right_area_expor
     road_guess_anim_fig = figure('Position', [10 10 3500/2 1600], 'DefaultAxesFontSize', options.axis_font_size);
     axis('equal')
     axis off
-    view([0 0 90])
+    view([45 0 45])
     x_min = mean(cent_area_export{1}.area(:,1)) - 5;
     x_max = mean(cent_area_export{1}.area(:,1)) + 15;
     y_min = mean(cent_area_export{1}.area(:,2)) - 20;
@@ -65,22 +65,24 @@ function animate_road_guess(left_area_export, cent_area_export, right_area_expor
         
     end
     
+
+
     
     %% Initial Plot
     
-    l_g_points = scatter3(left_area_export{1}.grav_points(:,1), left_area_export{1}.grav_points(:,2), left_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c');
-    l_a_points = scatter3(left_area_export{1}.asph_points(:,1), left_area_export{1}.asph_points(:,2), left_area_export{1}.asph_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'k');
-    l_u_points = scatter3(left_area_export{1}.unkn_points(:,1), left_area_export{1}.unkn_points(:,2), left_area_export{1}.unkn_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'r');
+    l_g_points = scatter3(left_area_export{1}.grav_points(:,1), left_area_export{1}.grav_points(:,2), left_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c', 'MarkerEdgeColor', 'c');
+    l_a_points = scatter3(left_area_export{1}.asph_points(:,1), left_area_export{1}.asph_points(:,2), left_area_export{1}.asph_points(:,3), 69, 'Marker', 's', 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k');
+    l_u_points = scatter3(left_area_export{1}.unkn_points(:,1), left_area_export{1}.unkn_points(:,2), left_area_export{1}.unkn_points(:,3), 100, 'Marker', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 2);
     l_patches = patch(left_area_export{1}.area(:,1), left_area_export{1}.area(:,2), left_area_export{1}.area(:,3), 'b', 'FaceAlpha', 0, 'EdgeColor', to_color_l);
     
-    c_g_points = scatter3(cent_area_export{1}.grav_points(:,1), cent_area_export{1}.grav_points(:,2), cent_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c');
-    c_a_points = scatter3(cent_area_export{1}.asph_points(:,1), cent_area_export{1}.asph_points(:,2), cent_area_export{1}.asph_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'k');
-    c_u_points = scatter3(cent_area_export{1}.unkn_points(:,1), cent_area_export{1}.unkn_points(:,2), cent_area_export{1}.unkn_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'r');
+    c_g_points = scatter3(cent_area_export{1}.grav_points(:,1), cent_area_export{1}.grav_points(:,2), cent_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c', 'MarkerEdgeColor', 'c');
+    c_a_points = scatter3(cent_area_export{1}.asph_points(:,1), cent_area_export{1}.asph_points(:,2), cent_area_export{1}.asph_points(:,3), 69, 'Marker', 's', 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k');
+    c_u_points = scatter3(cent_area_export{1}.unkn_points(:,1), cent_area_export{1}.unkn_points(:,2), cent_area_export{1}.unkn_points(:,3), 100, 'Marker', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 2);
     c_patches = patch(cent_area_export{1}.area(:,1), cent_area_export{1}.area(:,2), cent_area_export{1}.area(:,3), 'b', 'FaceAlpha', 0, 'EdgeColor', to_color_c);
     
-    r_g_points = scatter3(right_area_export{1}.grav_points(:,1), right_area_export{1}.grav_points(:,2), right_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c');
-    r_a_points = scatter3(right_area_export{1}.asph_points(:,1), right_area_export{1}.asph_points(:,2), right_area_export{1}.asph_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'k');
-    r_u_points = scatter3(right_area_export{1}.unkn_points(:,1), right_area_export{1}.unkn_points(:,2), right_area_export{1}.unkn_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'r');
+    r_g_points = scatter3(right_area_export{1}.grav_points(:,1), right_area_export{1}.grav_points(:,2), right_area_export{1}.grav_points(:,3), 69, 'Marker', 'o', 'MarkerFaceColor', 'c', 'MarkerEdgeColor', 'c');
+    r_a_points = scatter3(right_area_export{1}.asph_points(:,1), right_area_export{1}.asph_points(:,2), right_area_export{1}.asph_points(:,3), 69, 'Marker', 's', 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k');
+    r_u_points = scatter3(right_area_export{1}.unkn_points(:,1), right_area_export{1}.unkn_points(:,2), right_area_export{1}.unkn_points(:,3), 100, 'Marker', 'x', 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 2);
     r_patches = patch(right_area_export{1}.area(:,1), right_area_export{1}.area(:,2), right_area_export{1}.area(:,3), 'b', 'FaceAlpha', 0, 'EdgeColor', to_color_r);
 
 %     l_line_2 = plot([left_area_export{1}.origin(1), left_area_export{1}.c2_loc(1)], [left_area_export{1}.origin(2), left_area_export{1}.c2_loc(2)]);
@@ -203,6 +205,8 @@ function animate_road_guess(left_area_export, cent_area_export, right_area_expor
     if options.save_anim_bool
         close(video);
     end
+    
+    disp('Animation Saved')
     
 end
 

@@ -1,10 +1,28 @@
-function plot_road_guess(left_area_export, cent_area_export, right_area_export, Manual_Classfied_Areas, Avg_Arrays, options)
+function plot_road_guess(left_area_export, cent_area_export, right_area_export, Manual_Classfied_Areas, Avg_Arrays, path_coord, options)
 
     %% VAR INIT
 
     road_guess_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     
     face_alpha_value = 0.15;
+    
+    x_y_z_path_sym = 'b--';
+    x_y_z_path_linewidth = 20;
+    x_y_z_path_color = [0.00, 0.53, 1.00];
+
+    x_y_z_path = [];
+
+
+    %% Getting the path 
+    
+    for idx = 1:length(path_coord)
+        
+        x_y_z_path = [x_y_z_path; path_coord{idx}];
+        
+    end
+    
+    x_y_z_path = x_y_z_path * rotz(-90);
+    
     
     %% PLOT
 
@@ -66,6 +84,8 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
     hold on
     
     MCA_plotter(Manual_Classfied_Areas, 0)
+    
+    plot3(x_y_z_path(:,1), x_y_z_path(:,2), x_y_z_path(:,3)+4, x_y_z_path_sym, 'Color', x_y_z_path_color, 'LineWidth', x_y_z_path_linewidth);   
     
     hold off
     

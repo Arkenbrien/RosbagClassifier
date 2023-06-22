@@ -158,17 +158,47 @@ function area_export = check_areas(Avg_Arrays, tformed_area, tformed_origin, are
 
         if chan2_g_percent > area_guess_opts.c2g_min && chan3_g_percent > area_guess_opts.c3g_min && chan4_g_percent > area_guess_opts.c4g_min
             
-%             if tooClose || tooFar
+            if tooClose %|| tooFar
+                
+                area_export.area    = tformed_area;
+                area_export.clas    = 'unknown';
+                
+            elseif area_export.stdHeight_c2 > 1 || area_export.stdHeight_c3 > 1 || area_export.stdHeight_c4 > 1
+                
+                area_export.area    = tformed_area;
+                area_export.clas    = 'unknown'; 
+                
+            elseif area_export.stdDistance_c4 > 2.5
+                
+                area_export.area    = tformed_area;
+                area_export.clas    = 'unknown';
+            
+            elseif (area_export.DistBetween_c34 - area_export.DistBetween_c23) < -0.75
+                
+                area_export.area    = tformed_area;
+                area_export.clas    = 'unknown'; 
+                           
+            elseif area_export.d43_32_ratio > area_guess_opts.d43_32_ratio_max
+                
+                area_export.area    = tformed_area;
+                area_export.clas    = 'unknown';
+                
+%             elseif area_export.meanDistance_c4 < (area_export.meanDistance_c2 + 2.5) || area_export.meanDistance_c4 < (area_export.meanDistance_c3 + 1.0)
 %                 
 %                 area_export.area    = tformed_area;
 %                 area_export.clas    = 'unknown';
-%                 
-%             else
+
+            elseif chan2_g_percent > area_guess_opts.c2g_min && chan3_g_percent > area_guess_opts.c3g_min && chan4_a_percent > area_guess_opts.c4a_min
+
+                area_export.area    = tformed_area;
+                area_export.clas    = 'gravel';
+                
+            else
                 
                 area_export.area    = tformed_area;
                 area_export.clas    = 'gravel';
                 
-%             end
+            end
             
         elseif chan2_a_percent > area_guess_opts.c2a_min && chan3_a_percent > area_guess_opts.c3a_min && chan4_a_percent > area_guess_opts.c4a_min
 
@@ -207,7 +237,7 @@ function area_export = check_areas(Avg_Arrays, tformed_area, tformed_origin, are
         area_export.stdDistance_c2      = NaN;
         area_export.stdHeight_c2        = NaN;
         area_export.meanHeight_c2       = NaN;
-        
+
         % C3
         area_export.minDistance_c3      = NaN;
         area_export.maxDistance_c3      = NaN;
@@ -243,34 +273,12 @@ end
 
 %% Old Code
 
-%             elseif area_export.c2_height_stan_dev > 1 || area_export.c3_height_stan_dev > 1 || area_export.c4_height_stan_dev > 1
-%                 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'unknown';                
-%                 
-%             elseif (area_export.d34 - area_export.d23) < -0.75
-%                 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'unknown';
-% 
-%             elseif area_export.c4_dist_stan_dev > 2.5
-%                 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'unknown';
-%             
-%             elseif chan2_g_percent > area_guess_opts.c2g_min && chan3_g_percent > area_guess_opts.c3g_min && chan4_a_percent > area_guess_opts.c4a_min
-% 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'gravel';
+
+
+
             
-%             if area_export.d43_32_ratio > area_guess_opts.d43_32_ratio_max
-%                 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'unknown';
+
                 
-%             elseif area_export.c4_dist < (area_export.c2_dist + 2.5) || area_export.c4_dist < (area_export.c3_dist + 1.0)
-%                 
-%                 area_export.area    = tformed_area;
-%                 area_export.clas    = 'unknown';
+
 
 

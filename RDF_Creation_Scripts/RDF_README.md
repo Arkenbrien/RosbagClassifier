@@ -9,3 +9,7 @@ RDF_Training.m Loads training data and trains a series of RDFs with increasing n
 RDF_Validation.m Loads the directory with the generated RDFs and verifies each RDF with the testing data.
 
 RDF_Validation_Result_Plot.m Plots the results from RDF_Validation.m
+
+===========================================================================
+
+RDF_Training_Data_Extraction_Take2.m - Extracts training data from consecutive LiDAR points that lie on manually defined areas.

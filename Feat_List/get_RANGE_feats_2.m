@@ -1,5 +1,5 @@
 % This function just gets a great big table
-function table_export = get_RANGE_feats_2(xyzi, abcd)
+function table_export = get_RANGE_feats_2(xyzi)
     
     %% Table Header
     table_head   = {'StandDevRange',...

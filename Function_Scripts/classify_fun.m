@@ -17,10 +17,8 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
     
     
     %% Classification Function
-
     % Find points in the arc
     arc_idx = find((atan2(xyz_cloud(:,1), xyz_cloud(:,2))) > chan_bounds(1) & (atan2(xyz_cloud(:,1), xyz_cloud(:,2))) <  chan_bounds(2));
-    
     if ~isempty(arc_idx) && length(arc_idx) >= 4
         % Apply Transformation
         xyz_cloud(:,1:3)      = xyz_cloud(:,1:3) * tform.Rotation + tform.Translation;
@@ -45,13 +43,9 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
                 if isequal((Yfit), 'gravel') && contains(chan_area, "3") && scores(3) < options.c3gravconflwbound && scores(2) > options.c3unknconflwbound
                     Yfit = categorical("unknown");
                 end
-%                 if isequal((Yfit), 'unknown') && contains(chan_area, "3") && scores(2) < options.c3unknconfupbound
-%                     Yfit = categorical("gravel");
-%                 end
                 if isequal((Yfit), 'gravel') && contains(chan_area, "4") && scores(3) < options.c4gravconflwbound && scores(2) > options.c4unknconflwbound
                     Yfit = categorical("unknown");
                 end
-                
             elseif options.reference_point == "mls"
                 if isequal((Yfit), 'gravel') && contains(chan_area, "2") && scores(3) < options.c2gravconflwbound && scores(2) > options.c2unknconflwbound
                     Yfit = categorical("unknown");
@@ -62,23 +56,18 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
                 if isequal((Yfit), 'gravel') && contains(chan_area, "4") && scores(3) < options.c4gravconflwbound && scores(2) > options.c4unknconflwbound
                     Yfit = categorical("unknown");
                 end
-                
             elseif options.reference_point == "ransac"
-                % Do Something
                 if isequal((Yfit), 'grass') && contains(chan_area, "2") && scores(2) < options.c2unknconfupbound && scores(3) > options.c2gravconflwbound
                     Yfit = categorical("gravel");
                 end
-                % Do Something
                 if isequal((Yfit), 'grass') && contains(chan_area, "3") && scores(2) < options.c3unknconfupbound && scores(3) > options.c3gravconflwbound
                     Yfit = categorical("gravel");
                 end
-                % Do Something
                 if isequal((Yfit), 'grass') && contains(chan_area, "4") && scores(2) < options.c4unknconfupbound && scores(3) > options.c4gravconflwbound
                     Yfit = categorical("gravel");
                 end
             end
         end % End of confidence filtering
-        
         % For the purpose of this work, grass is to be classified as
         % Unknown, simply because I'm not concerned about whether or not I
         % can detect a grassy area, only seperate it from the two pavement
@@ -99,5 +88,4 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
         diag_out.scores = [NaN NaN NaN];
         diag_out.num_points = NaN;
     end
-
 end
