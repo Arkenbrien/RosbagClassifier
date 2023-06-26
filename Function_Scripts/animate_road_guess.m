@@ -1,5 +1,15 @@
 function animate_road_guess(left_area_export, cent_area_export, right_area_export, options)
 
+
+    %% Temp debug
+    
+%     for idx = 1:length(left_area_export)
+%         
+%         disp(left_area_export{idx})
+%         disp('===========================================================')
+%     end
+        
+        
     %% VAR INIT
     
     dt = 0.05;
@@ -53,11 +63,17 @@ function animate_road_guess(left_area_export, cent_area_export, right_area_expor
 
     if options.save_anim_bool
         
-        animation_filename = "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/ANIMATIONS/" +... 
-                            string(options.rosbag_number) +...
-                            string(options.reference_point) + "_" +...                            
-                            floor(posixtime(datetime('now'))) +... 
-                            ".avi";
+        if isfield(options, 'rosbag_number')
+            animation_filename =    "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/ANIMATIONS/" +... 
+                                    string(options.rosbag_number) +...
+                                    string(options.reference_point) + "_" +...                            
+                                    floor(posixtime(datetime('now'))) +... 
+                                    ".avi";
+        else
+            animation_filename =    "/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/ANIMATIONS/" +...
+                                    floor(posixtime(datetime('now'))) +... 
+                                    ".avi";
+        end
         
         video = VideoWriter(animation_filename, 'Motion JPEG AVI');
         video.FrameRate = 10;

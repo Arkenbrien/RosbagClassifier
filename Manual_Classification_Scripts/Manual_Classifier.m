@@ -18,7 +18,7 @@ clc
 
 %% Options
 
-load_prev_MCA_file = 1;
+load_prev_MCA_file = 0;
 use_prev_MCA_file = 0;
 
 
@@ -47,7 +47,9 @@ ptCloudSource = pcread(pcfile);
 ptCloudSource_figure = figure('Name','pcd','NumberTitle','off');
 pcshow(ptCloudSource)
 axis equal
+axis off
 view([0 0 90])
+caxis([10 50])
 
 %% Loading the old MCA file if selected
 if load_prev_MCA_file

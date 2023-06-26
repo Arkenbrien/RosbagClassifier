@@ -21,13 +21,13 @@ function road_check_areas = get_road_check_areas()
     % ._.
 
     l_area_x = [-w -w w w];
-    l_area_y = [w l*1.5 l*1.5 w];
+    l_area_y = [w+1 l*1.5 l*1.5 w+1];
     
     c_area_x = [w l l w];
     c_area_y = [w w -w -w];
     
     r_area_x = [-w -w w w];
-    r_area_y = [-w -l*1.5 -l*1.5 -w];
+    r_area_y = [-w-1 -l*1.5 -l*1.5 -w-1];
     
     origin_point = [0, 0, 0];
 

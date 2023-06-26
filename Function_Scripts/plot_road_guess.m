@@ -83,7 +83,9 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
     
     hold on
     
-    MCA_plotter(Manual_Classfied_Areas, 0)
+    if options.mca_plot
+        MCA_plotter(Manual_Classfied_Areas, 0)
+    end
     
     plot3(x_y_z_path(:,1), x_y_z_path(:,2), x_y_z_path(:,3)+4, x_y_z_path_sym, 'Color', x_y_z_path_color, 'LineWidth', x_y_z_path_linewidth);   
     

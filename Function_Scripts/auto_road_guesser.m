@@ -20,7 +20,7 @@ function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, path_coord, optio
     area_guess_opts.d34_min             = 0;
     
     area_guess_opts.stdv                = 1;
-    area_guess_opts.animate             = 1;
+    area_guess_opts.animate             = 0;
     
     area_guess_opts.close_threshold     = 1;
     area_guess_opts.far_threshold       = 3;
@@ -67,7 +67,7 @@ function auto_road_guesser(Avg_Arrays, Manual_Classfied_Areas, path_coord, optio
     
     
     %% Plot the areas
-    close all
+    
     plot_road_guess(left_area_export, cent_area_export, right_area_export, Manual_Classfied_Areas, Avg_Arrays, path_coord, options)
     
     

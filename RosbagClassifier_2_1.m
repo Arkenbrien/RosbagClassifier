@@ -9,6 +9,7 @@
 % unknown, for the purpose of detecting unmarked gravel roads.
 %==========================================================================
 
+
 %% Clear & Setup Workspace
 
 clc; clear; close all
@@ -17,13 +18,19 @@ format compact
 
 %% Options
 
+% Initilize and Get Standard Options
+options = struct();
+options = get_plot_options(options);
+options = get_arc_options(options);
+
+
 %
 % REFERENCE POINT & FILE
 %
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 1;
+options.rosbag_number           = 3;
 
 
 %
@@ -35,96 +42,21 @@ options.custom_export_bool      = 1;
 
 
 %
-% ARC SIZE
-%
-
-% Center angle variance +- idk what you call this
-options.chan_2_d_ang            = 3;
-options.chan_3_d_ang            = 3;
-options.chan_4_d_ang            = 3;
-options.chan_5_d_ang            = 3;
-
-% Center of ll arc
-options.chan_2_ll_cent_ang      = 0;
-options.chan_3_ll_cent_ang      = 0;
-options.chan_4_ll_cent_ang      = 0;
-options.chan_5_ll_cent_ang      = 0;
-
-% Center of l arc
-options.chan_2_l_cent_ang       = 45;
-options.chan_3_l_cent_ang       = 45;
-options.chan_4_l_cent_ang       = 45;
-options.chan_5_l_cent_ang       = 45;
-
-% Center of c arc
-options.chan_2_c_cent_ang       = 90;
-options.chan_3_c_cent_ang       = 90;
-options.chan_4_c_cent_ang       = 90;
-options.chan_5_c_cent_ang       = 90;
-
-% Center of r arc
-options.chan_2_r_cent_ang       = 135;
-options.chan_3_r_cent_ang       = 135;
-options.chan_4_r_cent_ang       = 135;
-options.chan_5_r_cent_ang       = 135;
-
-% Center of rr arc
-options.chan_2_rr_cent_ang      = 180;
-options.chan_3_rr_cent_ang      = 180;
-options.chan_4_rr_cent_ang      = 180;
-options.chan_5_rr_cent_ang      = 180;
-
-
-%
 % PLOTTING OPTIONS
 %
 
-% which things to plot
-options.plot_all_bool           = 1;
-options.plot_avg_bool           = 1;
+options.mca_plot                = 0;
+options.plot_all_bool           = 0;
+options.plot_avg_bool           = 0;
 options.plot_area_results_bool  = 0;
 options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
-options.auto_road_guesser_bool  = 0;
+options.auto_road_guesser_bool  = 1;
 options.plot_avg_in_ani_bool    = 0;
 options.plot_ani                = 0;
 options.save_anim_bool          = 0;
-
-% Marker size / Linewidth for plotz
-options.c2markersize            = 20;
-options.c3markersize            = 20;
-options.c4markersize            = 20;
-options.c5markersize            = 20;
-options.gravmarkersize          = 40;
-options.asphmarkersize          = 40;
-options.unknmarkersize          = 50;
-
-% Plotting linewidth for plotz
-options.c2linewidth             = 20;
-options.c3linewidth             = 20;
-options.c4linewidth             = 20;
-options.c5linewidth             = 20;
-options.gravlinewidth           = 20;
-options.asphlinewidth           = 20;
-options.unknlinewidth           = 5;
-
-% Legend Stuff
-options.legend_marker_size      = 20;
-options.legend_line_width       = 5;
-options.legend_font_size        = 56;
-
-% Size of figures
-options.fig_size_array          = [10 10 3500 1600];
-
-% Font Options
-options.axis_font_size          = 24;
-options.font_type               = 'Sans Regular'; % Default Font: Sans Regular
-
-% Plotting the moving average - how many samples per average?
-options.move_avg_size           = 15;
-
 
 %
 % PLANE PROJECTION
@@ -141,7 +73,6 @@ options.MaxNumTrials            = 10; % RANSAC Iterations
 
 % distance-filter
 options.dist_filt_bool          = 0;
-% min_dist
 options.min_dist_23             = 2.25;
 options.min_dist_34             = 2.25;
 
@@ -167,16 +98,6 @@ end
 % Dirt v Gravel RDF:
 options.dvg_bool                = 0;
 
-% Other Random Options
-% Do we compare the data to be classified to the training data????
-% data_comp_bool                  = 0;
-
-
-%
-% EXPERIMENTAL ROAD PREDICTION THING
-%
-
-options.animate_font_size = 16;
 
 %% RAW results export location
 
@@ -260,7 +181,6 @@ disp('Loading RDFs...')
 chan_2_c_rdf = load(chan_2_c_rdf_load_string);
 chan_3_c_rdf = load(chan_3_c_rdf_load_string);
 chan_4_c_rdf = load(chan_4_c_rdf_load_string);
-% chan_5_rdf = load(chan_5_rdf_load_string);
 
 chan_2_l_rdf = load(chan_2_l_rdf_load_string);
 chan_3_l_rdf = load(chan_3_l_rdf_load_string);
@@ -601,6 +521,8 @@ channel_4_fun_out = [classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_
 Results_Export.c2 = channel_2_fun_out;
 Results_Export.c3 = channel_3_fun_out;
 Results_Export.c4 = channel_4_fun_out;
+Results_Export.path_coord = path_coord;
+Results_Export.tform = tform;
 
 [All_Arrays, Avg_Arrays]    = get_classified_arrays(channel_2_fun_out,... 
                                                     channel_3_fun_out,... 
