@@ -47,18 +47,18 @@ asph_conf_lowbound = 0.90;
 % asph_conf_lowbound = 0.90;
 
 % NONE SETTINGS
-% grav_conf_lowbound = 1;
-% unkn_conf_lowbound = 1;
-% asph_conf_lowbound = 1;
+% grav_conf_lowbound = 0;
+% unkn_conf_lowbound = 0;
+% asph_conf_lowbound = 0;
 
 options                         = struct();
 options                         = get_plot_options();
-options.plot_ani                = 0;
+options.plot_ani                = 1;
 options.save_anim_bool          = 1;
 options.auto_road_guesser_bool  = 1;
 
-dot_bool                        = 0;
-grey_dots_bool                  = 1;
+dot_bool                        = 1;
+grey_dots_bool                  = 0;
 size_altered_bool               = 0;
 seperate_bool                   = 0;
 all_conf_bool                   = 0;
@@ -258,6 +258,7 @@ All_Avg_Array = [Asph_Avg_Append_Array_2;...
     Unkn_Avg_Append_Array_3;...
     Unkn_Avg_Append_Array_4];
 
+
 %% Plot animation/road guess
 
 if options.auto_road_guesser_bool
@@ -298,7 +299,7 @@ end
 
 if dot_bool
     
-    dot_figure = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+%     dot_figure = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     
     if grey_dots_bool
         
@@ -609,6 +610,7 @@ if seperate_bool
     ax2.Clipping = 'off';
     
 end
+
 
 %% Plotting All Confs
 
