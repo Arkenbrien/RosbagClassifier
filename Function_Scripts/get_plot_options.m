@@ -63,8 +63,8 @@ function options = get_plot_options(options)
     
     % MCA plot area options
     options.mca_grav_bool           = 1;
-    options.mca_asph_bool           = 0;
-    options.mca_unkn_bool           = 0;
+    options.mca_asph_bool           = 1;
+    options.mca_unkn_bool           = 1;
     options.mca_sor_bool            = 0;
     options.mca_gras_bool           = 0;
     options.mca_road_bool           = 0;

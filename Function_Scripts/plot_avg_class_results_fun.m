@@ -57,9 +57,9 @@ function plot_avg_class_results_fun(Avg_Arrays, Manual_Classfied_Areas, path_coo
     %% Plotting
     
     % All points
-    if ~options.plot_ani
-        result_avg_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
-    end
+%     if ~options.plot_ani
+%         result_avg_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+%     end
     
     hold all
     

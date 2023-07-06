@@ -259,7 +259,7 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
     
     %% For each area all channels
     
-    [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score] = tot_in_area_score_test(channel_in_grav_area_score, channel_in_asph_area_score, channel_in_nonroad_area_score, channel_in_side_road_area_score, used_chans, Manual_Classfied_Areas)
+    [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score] = tot_in_area_score_test(channel_in_grav_area_score, channel_in_asph_area_score, channel_in_nonroad_area_score, channel_in_side_road_area_score, used_chans, Manual_Classfied_Areas);
     
     
     %% For all areas all channels
@@ -269,7 +269,7 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
     
     %% Plotting all channels' scores and areas
     
-    per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score, Manual_Classfied_Areas, options)
+    per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score, Manual_Classfied_Areas, options);
 
     
     %% End Script

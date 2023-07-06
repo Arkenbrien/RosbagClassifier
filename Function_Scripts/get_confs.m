@@ -13,7 +13,7 @@ function options = get_confs(options)
 
         % Channel 2 Asphalt
         options.c2asphconflwbound       = 0.00;
-        options.c2asphconfupbound       = 1.00;
+        options.c2asphconfupbound       = 0.90;
 
         % Channel 3 Gravel
         options.c3gravconflwbound       = 0.95;
@@ -25,7 +25,7 @@ function options = get_confs(options)
 
         % Channel 3 Asph
         options.c3asphconflwbound       = 0.00;
-        options.c3asphconfupbound       = 1.00;
+        options.c3asphconfupbound       = 0.90;
 
         % Channel 4 Gravel
         options.c4gravconflwbound       = 0.90;
@@ -37,7 +37,7 @@ function options = get_confs(options)
 
         % Channel 4 Asph
         options.c4asphconflwbound       = 0.00;
-        options.c4asphconfupbound       = 1.00;
+        options.c4asphconfupbound       = 0.90;
         
         
         

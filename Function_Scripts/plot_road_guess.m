@@ -37,6 +37,10 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
             
             patch(left_area_export{area_idx}.area(:,1),left_area_export{area_idx}.area(:,2),left_area_export{area_idx}.area(:,3),[0.00,0.00,0.00], 'FaceAlpha', face_alpha_value)
             
+        elseif isequal(string(left_area_export{area_idx}.clas), 'unknown2')
+            
+            patch(left_area_export{area_idx}.area(:,1),left_area_export{area_idx}.area(:,2),left_area_export{area_idx}.area(:,3),[1.00,0.00,1.00], 'FaceAlpha', face_alpha_value)
+            
         end
      
 
@@ -52,6 +56,10 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
         elseif isequal(string(cent_area_export{area_idx}.clas), 'asphalt')
             
             patch(cent_area_export{area_idx}.area(:,1),cent_area_export{area_idx}.area(:,2),cent_area_export{area_idx}.area(:,3),[0.00,0.00,0.00], 'FaceAlpha', face_alpha_value)
+            
+        elseif isequal(string(cent_area_export{area_idx}.clas), 'unknown2')
+            
+            patch(cent_area_export{area_idx}.area(:,1),cent_area_export{area_idx}.area(:,2),cent_area_export{area_idx}.area(:,3),[1.00,0.00,1.00], 'FaceAlpha', face_alpha_value)
             
         else
             
@@ -72,6 +80,11 @@ function plot_road_guess(left_area_export, cent_area_export, right_area_export, 
         elseif isequal(string(right_area_export{area_idx}.clas), 'asphalt')
             
             patch(right_area_export{area_idx}.area(:,1),right_area_export{area_idx}.area(:,2),right_area_export{area_idx}.area(:,3),[0.00,0.00,0.00], 'FaceAlpha', face_alpha_value)
+            
+        elseif isequal(string(right_area_export{area_idx}.clas), 'unknown2')
+            
+            patch(right_area_export{area_idx}.area(:,1),right_area_export{area_idx}.area(:,2),right_area_export{area_idx}.area(:,3),[1.00,0.00,1.00], 'FaceAlpha', face_alpha_value)
+            
             
         end
      

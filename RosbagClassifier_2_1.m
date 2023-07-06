@@ -30,7 +30,7 @@ options = get_arc_options(options);
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 3;
+options.rosbag_number           = 4;
 
 
 %
@@ -47,9 +47,9 @@ options.custom_export_bool      = 1;
 
 options.mca_plot                = 0;
 options.plot_all_bool           = 0;
-options.plot_avg_bool           = 0;
+options.plot_avg_bool           = 1;
 options.plot_area_results_bool  = 0;
-options.plot_rate_bool          = 0;
+options.plot_rate_bool          = 1;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
@@ -65,6 +65,7 @@ options.save_anim_bool          = 0;
 % RANSAC Options
 options.maxDistance             = 0.5;
 options.MaxNumTrials            = 10; % RANSAC Iterations
+options.chansToProject          = [1, 2, 3, 4, 5, 6, 7];
 
 
 %
@@ -87,7 +88,7 @@ options.max_dist_34             = 6;
 %
 
 % confidence-filter
-options.conf_filt_bool          = 1;
+options.conf_filt_bool          = 0;
 
 if options.conf_filt_bool
     
@@ -96,7 +97,7 @@ if options.conf_filt_bool
 end
 
 % Dirt v Gravel RDF:
-options.dvg_bool                = 0;
+options.dvg_bool                = 1;
 
 
 %% RAW results export location
@@ -322,7 +323,7 @@ gps2lidar = [ cosd(90) sind(90) 0;
              0       0          1]; 
          
 % Setting the (gps_to_lidar_diff) offset from the lidar offset to the gps
-LidarOffset2gps = [ cosd(90) -sind(90)  0;
+LidarOffset2gps = [ cosd(90) -sind(90)   0;
                     sind(90)  cosd(90)   0;
                     0        0           1]; 
 
@@ -419,81 +420,84 @@ parfor cloud = 1:cloud_break
     xyz_cloud = xyz_cloud( ~any( isnan(xyz_cloud) | isinf(xyz_cloud), 2),:);
 %     xyz_cloud = xyz_cloud(xyz_cloud(:,1) >= 0, :);
 
-    % Channel Split
+    %% Ground Plane Removal EXPERIMENT
+    
+    plane_proj_tic              = tic;
+    rows                        = any(ismember(xyz_cloud(:, 5), options.chansToProject), 2);
+    xyz_cloud                   = xyz_cloud(rows, :);
+    [~, inlierIndices, ~]       = pcfitplane(pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)]), .25);
+    xyz_cloud                   = xyz_cloud(inlierIndices,:);
+    plane_proj_toc{cloud}       = toc(plane_proj_tic);
+
+    
+    %% Channel Split
     xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
     xyz_cloud_3 = xyz_cloud(xyz_cloud(:,5) == 2, :); % indexes start @ 0
     xyz_cloud_4 = xyz_cloud(xyz_cloud(:,5) == 3, :); % indexes start @ 0
 %     xyz_cloud_5 = xyz_cloud(xyz_cloud(:,5) == 4, :); % indexes start @ 0
     
     %% Classification Area
-    
-    if ~options.dist_filt_bool
 
-        % CHANNEL 2 CENT
+    % CHANNEL 2 CENT
 
-        classify_fun_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform{cloud}, DvG, options, "2c");
+    classify_fun_out_2c{cloud} = classify_fun(xyz_cloud_2, chan_2_c_bounds, chan_2_c_rdf, tform{cloud}, DvG, options, "2c");
 
-        % CHANNEL 3 CENT
+    % CHANNEL 3 CENT
 
-        classify_fun_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform{cloud}, DvG, options, "3c");
+    classify_fun_out_3c{cloud} = classify_fun(xyz_cloud_3, chan_3_c_bounds, chan_3_c_rdf, tform{cloud}, DvG, options, "3c");
 
-        % CHANNEL 4 CENT
+    % CHANNEL 4 CENT
 
-        classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform{cloud}, DvG, options, "4c");
+    classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform{cloud}, DvG, options, "4c");
 
-        % CHANNEL 2 LEFT
+    % CHANNEL 2 LEFT
 
-        classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2l");
+    classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2l");
 
-        % CHANNEL 3 LEFT
+    % CHANNEL 3 LEFT
 
-        classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3l");
+    classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3l");
 
-        % CHANNEL 4 LEFT
+    % CHANNEL 4 LEFT
 
-        classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4l");
+    classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4l");
 
-        % CHANNEL 2 RIGHT
+    % CHANNEL 2 RIGHT
 
-        classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2r");
+    classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2r");
 
-        % CHANNEL 3 RIGHT
+    % CHANNEL 3 RIGHT
 
-        classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3r");
+    classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3r");
 
-        % CHANNEL 4 RIGHT
+    % CHANNEL 4 RIGHT
 
-        classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4r");
+    classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4r");
         
-%         % CHANNEL 2 LLEFT
+%     % CHANNEL 2 LLEFT
 % 
-%         classify_fun_out_2ll{cloud} = classify_fun(xyz_cloud_2, chan_2_ll_bounds, chan_2_l_rdf, tform, DvG, options, "2ll");
+%     classify_fun_out_2ll{cloud} = classify_fun(xyz_cloud_2, chan_2_ll_bounds, chan_2_l_rdf, tform, DvG, options, "2ll");
 % 
-%         % CHANNEL 3 LLEFT
+%     % CHANNEL 3 LLEFT
 % 
-%         classify_fun_out_3ll{cloud} = classify_fun(xyz_cloud_3, chan_3_ll_bounds, chan_3_l_rdf, tform, DvG, options, "3ll");
+%     classify_fun_out_3ll{cloud} = classify_fun(xyz_cloud_3, chan_3_ll_bounds, chan_3_l_rdf, tform, DvG, options, "3ll");
 % 
-%         % CHANNEL 4 LLEFT
+%     % CHANNEL 4 LLEFT
 % 
-%         classify_fun_out_4ll{cloud} = classify_fun(xyz_cloud_4, chan_4_ll_bounds, chan_4_l_rdf, tform, DvG, options, "4ll");
+%     classify_fun_out_4ll{cloud} = classify_fun(xyz_cloud_4, chan_4_ll_bounds, chan_4_l_rdf, tform, DvG, options, "4ll");
 % 
-%         % CHANNEL 2 RRIGHT
+%     % CHANNEL 2 RRIGHT
 % 
-%         classify_fun_out_2rr{cloud} = classify_fun(xyz_cloud_2, chan_2_rr_bounds, chan_2_r_rdf, tform, DvG, options, "2rr");
+%     classify_fun_out_2rr{cloud} = classify_fun(xyz_cloud_2, chan_2_rr_bounds, chan_2_r_rdf, tform, DvG, options, "2rr");
 % 
-%         % CHANNEL 3 RRIGHT
+%     % CHANNEL 3 RRIGHT
 % 
-%         classify_fun_out_3rr{cloud} = classify_fun(xyz_cloud_3, chan_3_rr_bounds, chan_3_r_rdf, tform, DvG, options, "3rr");
+%     classify_fun_out_3rr{cloud} = classify_fun(xyz_cloud_3, chan_3_rr_bounds, chan_3_r_rdf, tform, DvG, options, "3rr");
 % 
-%         % CHANNEL 4 RRIGHT
+%     % CHANNEL 4 RRIGHT
 % 
-%         classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform, DvG, options, "4rr");
-   
-    elseif options.dist_filt_bool
-        
-        dist_filt_out = dist_filt_option();
-        
-    end    
+%     classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform, DvG, options, "4rr");
+ 
     
     %% Weightbar
     
@@ -606,11 +610,11 @@ if options.plot_perchan_conf_bool
 end
 
 
-%% Plotting PCD Classification Rate - INCLUDING SAVING
+%% Plotting PCD Classification Rate
 
 if options.plot_rate_bool
     
-    plot_rate_fun(pcd_class_rate_rate, options)
+    plot_rate_fun(pcd_class_rate_rate, plane_proj_toc, options)
     
 end
 

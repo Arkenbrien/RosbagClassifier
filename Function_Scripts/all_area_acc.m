@@ -37,25 +37,7 @@ function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot
     temp_unkn_acc = [];
     temp_grav_acc = [];
     
-    
-    %% Non-Road Area
-    
-%     for gras_area_idx = 1:length(tot_in_gras_score)
-%         
-%         
-%         
-%     end
-%         
-%     % Send to array
-%     acc_array(1,2) = mean();
-%     acc_array(2,2) = mean();
-%     acc_array(3,2) = mean();
-%     
-%     % Re-set vars
-%     temp_asph_acc = [];
-%     temp_gras_acc = [];
-%     temp_grav_acc = [];
-    
+
     
     %% Gravel area
     
@@ -82,12 +64,35 @@ function accuracy_table = all_area_acc(tot_in_grav_score, tot_in_asph_score, tot
     temp_unkn_acc = [];
     temp_grav_acc = [];
     
+        
+    %% Non-Road Area
+    
+    for unkn_area_idx = 1:length(tot_in_nr_score)
+        
+        temp_asph_acc = [temp_asph_acc; tot_in_nr_score{unkn_area_idx}.tot_asph_in_nr_score];
+        temp_unkn_acc = [temp_unkn_acc; tot_in_nr_score{unkn_area_idx}.tot_unkn_in_nr_score];
+        temp_grav_acc = [temp_grav_acc; tot_in_nr_score{unkn_area_idx}.tot_grav_in_nr_score];
+        
+    end
+        
+    % Send to array
+    acc_array(1,3) = mean(temp_asph_acc);
+    acc_array(2,3) = mean(temp_grav_acc);
+    acc_array(3,3) = mean(temp_unkn_acc);
+    
+    % Re-set vars
+    temp_asph_acc = [];
+    temp_gras_acc = [];
+    temp_grav_acc = [];
+    
     
     %% Convert to Acc Table
     
-    header_Top = {'Asphalt', 'Gravel'};
+    header_Top = {'Asphalt', 'Gravel', 'Unknown'};
     header_Row = {'Asphalt', 'Gravel', 'Unknown'};
-    accuracy_table = array2table(acc_array, 'VariableNames', header_Top, 'RowNames', header_Row)    
+    accuracy_table = array2table(acc_array, 'VariableNames', header_Top, 'RowNames', header_Row)
+    
+    assignin('base', 'accuracy_table', accuracy_table)
     
     %% End Script
     

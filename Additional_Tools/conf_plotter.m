@@ -53,23 +53,49 @@ asph_conf_lowbound = 0.90;
 
 options                         = struct();
 options                         = get_plot_options();
-options.plot_ani                = 1;
-options.save_anim_bool          = 1;
+options.plot_ani                = 0;
+options.save_anim_bool          = 0;
 options.auto_road_guesser_bool  = 1;
+options.plot_area_results_bool  = 1;
 
-dot_bool                        = 1;
+options.rosbag_number           = 6;
+
+dot_bool                        = 0;
 grey_dots_bool                  = 0;
 size_altered_bool               = 0;
 seperate_bool                   = 0;
 all_conf_bool                   = 0;
-
+sep_dot_fig                     = 0;
 
 %% Load file & data
 
 % load('1686055798.6768_rm_db_4_range_Results_Export.mat')
-[matfile, matfolder, ~] = uigetfile('*Results_Export.mat','Get Results');
-load(matfile)
-disp(matfile)
+% [matfile, matfolder, ~] = uigetfile('*Results_Export.mat','Get Results');
+
+% mat_file = 'rm_db_1_range_1687537308.5231_Results_Export.mat';
+% load(mat_file)
+% disp(mat_file)
+
+if options.rosbag_number == 1
+    mat_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Range_Results/final2/rm_db_1_range_1687537308.5231_Results_Export.mat';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_1_truth_areas_v3.mat';
+elseif options.rosbag_number == 2
+    mat_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Range_Results/final2/rm_db_2_range_1687537369.4199_Results_Export.mat';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_2_truth_areas_v3.mat';
+elseif options.rosbag_number == 3
+    mat_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Range_Results/final2/rm_db_3_range_1687537522.7887_Results_Export.mat';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_3_truth_areas_v3.mat';
+elseif options.rosbag_number == 4 % NOTE; 1156.8 feet traveled in rm_db_4 338.01 avg sec per scan, 463 clouds in the file
+    mat_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Range_Results/final2/rm_db_4_range_1687537686.5371_Results_Export.mat';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_4_truth_areas_v3.mat';
+elseif options.rosbag_number == 6
+    mat_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/CLASSIFICATION_RESULTS/Range_Results/final2/rm_db_6_range_1687537932.853_Results_Export.mat';
+    roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
+end
+
+load(roi_file)
+load(mat_file)
+disp(mat_file)
 
 %% Get path_coord if exists
 
@@ -258,6 +284,7 @@ All_Avg_Array = [Asph_Avg_Append_Array_2;...
     Unkn_Avg_Append_Array_3;...
     Unkn_Avg_Append_Array_4];
 
+options.max_h = max(All_Avg_Array(:,3));
 
 %% Plot animation/road guess
 
@@ -282,7 +309,6 @@ if options.auto_road_guesser_bool
     
     options.mca_plot = 0;
     options.plot_avg_in_ani_bool = 0;
-    Manual_Classfied_Areas = [];
     
     % Get the path    
     for idx = 1:length(Results_Export.path_coord)
@@ -294,12 +320,22 @@ if options.auto_road_guesser_bool
     
 end
 
+%% Plot Area Scores
+
+if options.plot_area_results_bool
+    
+    class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
+    
+end
+
 
 %%  Plot the data - just the dots
 
 if dot_bool
     
-%     dot_figure = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+    if sep_dot_fig
+        dot_figure = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+    end
     
     if grey_dots_bool
         

@@ -106,7 +106,7 @@ function [tot_in_grav_score, tot_in_asph_score, tot_in_nr_score, tot_in_sr_score
             tot_in_nr_score{nr_idx}.tot_grav_in_nr_score  = tot_num_grav / tot_num_counter * 100;
             tot_in_nr_score{nr_idx}.tot_asph_in_nr_score  = tot_num_asph / tot_num_counter * 100;
             tot_in_nr_score{nr_idx}.tot_unkn_in_nr_score  = tot_num_unkn / tot_num_counter * 100;
-            tot_in_nr_score{nr_idx}.avg_loc                     = channel_in_nonroad_area_score{1, nr_idx}.avg_loc;
+            tot_in_nr_score{nr_idx}.avg_loc               = channel_in_nonroad_area_score{1, nr_idx}.avg_loc;
             
         end
         
