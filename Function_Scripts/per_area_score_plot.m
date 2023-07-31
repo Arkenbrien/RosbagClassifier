@@ -14,8 +14,8 @@ function per_area_score_plot(tot_in_grav_score, tot_in_asph_score, tot_in_nr_sco
     
     
     %% Plotting the MCAs
-    test_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize', 48);
     
+    test_fig = figure('Position', fig_size_array, 'DefaultAxesFontSize', 48);
     MCA_plotter(Manual_Classfied_Areas, options.max_h, options)
     
     axis('equal')

@@ -3,6 +3,8 @@ function options = get_arc_options(options)
     %
     % ARC SIZE
     %
+    
+    options.c_only_bool             = 1;
 
     % Center angle variance +- idk what you call this
     options.chan_2_d_ang            = 3;

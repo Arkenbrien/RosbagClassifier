@@ -30,7 +30,8 @@ options = get_arc_options(options);
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 4;
+options.rosbag_number           = 7;
+options.llrr_bool               = 0;
 
 
 %
@@ -45,15 +46,15 @@ options.custom_export_bool      = 1;
 % PLOTTING OPTIONS
 %
 
-options.mca_plot                = 0;
+options.mca_plot                = 1;
 options.plot_all_bool           = 0;
 options.plot_avg_bool           = 1;
-options.plot_area_results_bool  = 0;
-options.plot_rate_bool          = 1;
+options.plot_area_results_bool  = 1;
+options.plot_rate_bool          = 0;
 options.plot_class_rate_bool    = 0;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
-options.auto_road_guesser_bool  = 1;
+options.auto_road_guesser_bool  = 0;
 options.plot_avg_in_ani_bool    = 0;
 options.plot_ani                = 0;
 options.save_anim_bool          = 0;
@@ -65,6 +66,7 @@ options.save_anim_bool          = 0;
 % RANSAC Options
 options.maxDistance             = 0.5;
 options.MaxNumTrials            = 10; % RANSAC Iterations
+options.grnd_pln_rmvl_bool      = 0;
 options.chansToProject          = [1, 2, 3, 4, 5, 6, 7];
 
 
@@ -88,7 +90,7 @@ options.max_dist_34             = 6;
 %
 
 % confidence-filter
-options.conf_filt_bool          = 0;
+options.conf_filt_bool          = 1;
 
 if options.conf_filt_bool
     
@@ -97,7 +99,7 @@ if options.conf_filt_bool
 end
 
 % Dirt v Gravel RDF:
-options.dvg_bool                = 1;
+options.dvg_bool                = 0;
 
 
 %% RAW results export location
@@ -172,6 +174,22 @@ elseif options.rosbag_number == 4 % NOTE; 1156.8 feet traveled in rm_db_4 338.01
 elseif options.rosbag_number == 6
     bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
     roi_file = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/Truth_Areas_v3/rm_db_6_truth_areas_v3.mat';
+    
+elseif options.rosbag_number == 7
+
+    % Redmen Gravel Lot: rm_1 - rm_11 - not 4,  4 is mysteriously borked... (x.x )
+%     bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_9.bag';
+%     roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_9.mat';
+
+    % Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6 (not 5 tho)
+%     bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_2.bag';
+%     roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_2.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
+
+
+    % Redmen Gravel Lot Grass Collection: rm_13 15 17 18 19 20 22 23 25 27 29 30 32
+%     bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_23.bag';
+%     roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_23.mat';
+
 end
 
 
@@ -213,17 +231,17 @@ chan_2_l_bounds     = [((options.chan_2_l_cent_ang - options.chan_2_d_ang) * pi/
 chan_3_l_bounds     = [((options.chan_3_l_cent_ang - options.chan_3_d_ang) * pi/180), ((options.chan_3_l_cent_ang + options.chan_3_d_ang) * pi/180)];
 chan_4_l_bounds     = [((options.chan_4_l_cent_ang - options.chan_4_d_ang) * pi/180), ((options.chan_4_l_cent_ang + options.chan_4_d_ang) * pi/180)];
 
-% chan_2_ll_bounds     = [((options.chan_2_ll_cent_ang - options.chan_2_d_ang) * pi/180), ((options.chan_2_ll_cent_ang + options.chan_2_d_ang) * pi/180)];
-% chan_3_ll_bounds     = [((options.chan_3_ll_cent_ang - options.chan_3_d_ang) * pi/180), ((options.chan_3_ll_cent_ang + options.chan_3_d_ang) * pi/180)];
-% chan_4_ll_bounds     = [((options.chan_4_ll_cent_ang - options.chan_4_d_ang) * pi/180), ((options.chan_4_ll_cent_ang + options.chan_4_d_ang) * pi/180)];
+chan_2_ll_bounds     = [((options.chan_2_ll_cent_ang - options.chan_2_d_ang) * pi/180), ((options.chan_2_ll_cent_ang + options.chan_2_d_ang) * pi/180)];
+chan_3_ll_bounds     = [((options.chan_3_ll_cent_ang - options.chan_3_d_ang) * pi/180), ((options.chan_3_ll_cent_ang + options.chan_3_d_ang) * pi/180)];
+chan_4_ll_bounds     = [((options.chan_4_ll_cent_ang - options.chan_4_d_ang) * pi/180), ((options.chan_4_ll_cent_ang + options.chan_4_d_ang) * pi/180)];
 
 chan_2_r_bounds     = [((options.chan_2_r_cent_ang  - options.chan_2_d_ang) * pi/180), ((options.chan_2_r_cent_ang  + options.chan_2_d_ang) * pi/180)];
 chan_3_r_bounds     = [((options.chan_3_r_cent_ang  - options.chan_3_d_ang) * pi/180), ((options.chan_3_r_cent_ang  + options.chan_3_d_ang) * pi/180)];
 chan_4_r_bounds     = [((options.chan_4_r_cent_ang  - options.chan_4_d_ang) * pi/180), ((options.chan_4_r_cent_ang  + options.chan_4_d_ang) * pi/180)];
 
-% chan_2_rr_bounds     = [((options.chan_2_rr_cent_ang  - options.chan_2_d_ang) * pi/180), ((options.chan_2_rr_cent_ang  + options.chan_2_d_ang) * pi/180)];
-% chan_3_rr_bounds     = [((options.chan_3_rr_cent_ang  - options.chan_3_d_ang) * pi/180), ((options.chan_3_rr_cent_ang  + options.chan_3_d_ang) * pi/180)];
-% chan_4_rr_bounds     = [((options.chan_4_rr_cent_ang  - options.chan_4_d_ang) * pi/180), ((options.chan_4_rr_cent_ang  + options.chan_4_d_ang) * pi/180)];
+chan_2_rr_bounds     = [((options.chan_2_rr_cent_ang  - options.chan_2_d_ang) * pi/180), ((options.chan_2_rr_cent_ang  + options.chan_2_d_ang) * pi/180)];
+chan_3_rr_bounds     = [((options.chan_3_rr_cent_ang  - options.chan_3_d_ang) * pi/180), ((options.chan_3_rr_cent_ang  + options.chan_3_d_ang) * pi/180)];
+chan_4_rr_bounds     = [((options.chan_4_rr_cent_ang  - options.chan_4_d_ang) * pi/180), ((options.chan_4_rr_cent_ang  + options.chan_4_d_ang) * pi/180)];
 
 
 % Names for channel
@@ -258,7 +276,7 @@ Unkn_Avg_Append_Array_5   = [];
 raw_data_export = []; save_folder = [];
 model_RANSAC = []; model_MLS = [];
 
-pcd_class_rate = [];
+pcd_class_rate = []; plane_proj_toc = [];
 
 % Legend Stuff
 h = zeros(1,3);
@@ -313,6 +331,7 @@ matchedGps_init             = gps_msgs{indexes(1)};
 
 
 %% Initilizing the starting point
+
 % Select reference point as first GPS reading (local)
 origin = [matchedGps_init.Latitude, matchedGps_init.Longitude, matchedGps_init.Altitude];
 
@@ -422,13 +441,16 @@ parfor cloud = 1:cloud_break
 
     %% Ground Plane Removal EXPERIMENT
     
-    plane_proj_tic              = tic;
-    rows                        = any(ismember(xyz_cloud(:, 5), options.chansToProject), 2);
-    xyz_cloud                   = xyz_cloud(rows, :);
-    [~, inlierIndices, ~]       = pcfitplane(pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)]), .25);
-    xyz_cloud                   = xyz_cloud(inlierIndices,:);
-    plane_proj_toc{cloud}       = toc(plane_proj_tic);
+    if options.grnd_pln_rmvl_bool
+    
+        plane_proj_tic              = tic;
+        rows                        = any(ismember(xyz_cloud(:, 5), options.chansToProject), 2);
+        xyz_cloud                   = xyz_cloud(rows, :);
+        [~, inlierIndices, ~]       = pcfitplane(pointCloud([xyz_cloud(:,1), xyz_cloud(:,2), xyz_cloud(:,3)]), .25);
+        xyz_cloud                   = xyz_cloud(inlierIndices,:);
+        plane_proj_toc{cloud}       = toc(plane_proj_tic);
 
+    end
     
     %% Channel Split
     xyz_cloud_2 = xyz_cloud(xyz_cloud(:,5) == 1, :); % indexes start @ 0
@@ -449,55 +471,62 @@ parfor cloud = 1:cloud_break
     % CHANNEL 4 CENT
 
     classify_fun_out_4c{cloud} = classify_fun(xyz_cloud_4, chan_4_c_bounds, chan_4_c_rdf, tform{cloud}, DvG, options, "4c");
+    
+    if ~options.c_only_bool
 
-    % CHANNEL 2 LEFT
+        % CHANNEL 2 LEFT
 
-    classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2l");
+        classify_fun_out_2l{cloud} = classify_fun(xyz_cloud_2, chan_2_l_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2l");
 
-    % CHANNEL 3 LEFT
+        % CHANNEL 3 LEFT
 
-    classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3l");
+        classify_fun_out_3l{cloud} = classify_fun(xyz_cloud_3, chan_3_l_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3l");
 
-    % CHANNEL 4 LEFT
+        % CHANNEL 4 LEFT
 
-    classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4l");
+        classify_fun_out_4l{cloud} = classify_fun(xyz_cloud_4, chan_4_l_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4l");
 
-    % CHANNEL 2 RIGHT
+        % CHANNEL 2 RIGHT
 
-    classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2r");
+        classify_fun_out_2r{cloud} = classify_fun(xyz_cloud_2, chan_2_r_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2r");
 
-    % CHANNEL 3 RIGHT
+        % CHANNEL 3 RIGHT
 
-    classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3r");
+        classify_fun_out_3r{cloud} = classify_fun(xyz_cloud_3, chan_3_r_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3r");
 
-    % CHANNEL 4 RIGHT
+        % CHANNEL 4 RIGHT
 
-    classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4r");
+        classify_fun_out_4r{cloud} = classify_fun(xyz_cloud_4, chan_4_r_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4r");
         
-%     % CHANNEL 2 LLEFT
-% 
-%     classify_fun_out_2ll{cloud} = classify_fun(xyz_cloud_2, chan_2_ll_bounds, chan_2_l_rdf, tform, DvG, options, "2ll");
-% 
-%     % CHANNEL 3 LLEFT
-% 
-%     classify_fun_out_3ll{cloud} = classify_fun(xyz_cloud_3, chan_3_ll_bounds, chan_3_l_rdf, tform, DvG, options, "3ll");
-% 
-%     % CHANNEL 4 LLEFT
-% 
-%     classify_fun_out_4ll{cloud} = classify_fun(xyz_cloud_4, chan_4_ll_bounds, chan_4_l_rdf, tform, DvG, options, "4ll");
-% 
-%     % CHANNEL 2 RRIGHT
-% 
-%     classify_fun_out_2rr{cloud} = classify_fun(xyz_cloud_2, chan_2_rr_bounds, chan_2_r_rdf, tform, DvG, options, "2rr");
-% 
-%     % CHANNEL 3 RRIGHT
-% 
-%     classify_fun_out_3rr{cloud} = classify_fun(xyz_cloud_3, chan_3_rr_bounds, chan_3_r_rdf, tform, DvG, options, "3rr");
-% 
-%     % CHANNEL 4 RRIGHT
-% 
-%     classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform, DvG, options, "4rr");
- 
+    end
+    
+    if options.llrr_bool
+
+        % CHANNEL 2 LLEFT
+
+        classify_fun_out_2ll{cloud} = classify_fun(xyz_cloud_2, chan_2_ll_bounds, chan_2_l_rdf, tform{cloud}, DvG, options, "2ll");
+
+        % CHANNEL 3 LLEFT
+
+        classify_fun_out_3ll{cloud} = classify_fun(xyz_cloud_3, chan_3_ll_bounds, chan_3_l_rdf, tform{cloud}, DvG, options, "3ll");
+
+        % CHANNEL 4 LLEFT
+
+        classify_fun_out_4ll{cloud} = classify_fun(xyz_cloud_4, chan_4_ll_bounds, chan_4_l_rdf, tform{cloud}, DvG, options, "4ll");
+
+        % CHANNEL 2 RRIGHT
+
+        classify_fun_out_2rr{cloud} = classify_fun(xyz_cloud_2, chan_2_rr_bounds, chan_2_r_rdf, tform{cloud}, DvG, options, "2rr");
+
+        % CHANNEL 3 RRIGHT
+
+        classify_fun_out_3rr{cloud} = classify_fun(xyz_cloud_3, chan_3_rr_bounds, chan_3_r_rdf, tform{cloud}, DvG, options, "3rr");
+
+        % CHANNEL 4 RRIGHT
+
+        classify_fun_out_4rr{cloud} = classify_fun(xyz_cloud_4, chan_4_rr_bounds, chan_4_r_rdf, tform{cloud}, DvG, options, "4rr");
+
+    end
     
     %% Weightbar
     
@@ -518,9 +547,31 @@ disp(toc(classy))
 
 %% Apphending all results to arrays
 
-channel_2_fun_out = [classify_fun_out_2l, classify_fun_out_2c, classify_fun_out_2r];
-channel_3_fun_out = [classify_fun_out_3l, classify_fun_out_3c, classify_fun_out_3r];
-channel_4_fun_out = [classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_4r];
+if options.llrr_bool
+    
+    channel_2_fun_out = [classify_fun_out_2ll, classify_fun_out_2l, classify_fun_out_2c, classify_fun_out_2r, classify_fun_out_2rr];
+    channel_3_fun_out = [classify_fun_out_3ll, classify_fun_out_3l, classify_fun_out_3c, classify_fun_out_3r, classify_fun_out_3rr];
+    channel_4_fun_out = [classify_fun_out_4ll, classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_4r, classify_fun_out_4rr];
+    
+    llrr_test_results.ll    = classify_fun_out_2ll;
+    llrr_test_results.l     = classify_fun_out_2l;
+    llrr_test_results.c     = classify_fun_out_2c;
+    llrr_test_results.r     = classify_fun_out_2r;
+    llrr_test_results.rr    = classify_fun_out_2rr;
+    
+elseif options.c_only_bool
+   
+    channel_2_fun_out = [classify_fun_out_2c];
+    channel_3_fun_out = [classify_fun_out_3c];
+    channel_4_fun_out = [classify_fun_out_4c]; 
+    
+else
+
+    channel_2_fun_out = [classify_fun_out_2l, classify_fun_out_2c, classify_fun_out_2r];
+    channel_3_fun_out = [classify_fun_out_3l, classify_fun_out_3c, classify_fun_out_3r];
+    channel_4_fun_out = [classify_fun_out_4l, classify_fun_out_4c, classify_fun_out_4r];
+    
+end
 
 Results_Export.c2 = channel_2_fun_out;
 Results_Export.c3 = channel_3_fun_out;
@@ -556,6 +607,7 @@ if options.save_results_bool
     disp('Results Saved!')
     
 end
+
 
 %% Plotting Auto Road Guess
 
@@ -600,6 +652,7 @@ if options.plot_conf_bool
     plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, options)
     
 end
+
 
 %% Plotting Average points with confs per channel
 

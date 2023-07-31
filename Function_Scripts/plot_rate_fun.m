@@ -12,6 +12,7 @@ function plot_rate_fun(pcd_class_rate_rate, plane_proj_toc, options)
     Move_mean_time_ppte = movmean(plane_proj_te, options.move_avg_size);
     Move_mean_Hz_ppte   = movmean(plane_proj_rate_Hz, options.move_avg_size);
 
+    
     %% What
     
     rate_results_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
@@ -53,20 +54,24 @@ function plot_rate_fun(pcd_class_rate_rate, plane_proj_toc, options)
     
     %% Plane Project Time
     
-    plane_proj_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
-    
-    hold all
-    
-    plot(plane_proj_rate_Hz, 'b')
-    plot(Move_mean_Hz_ppte, 'r', 'LineWidth', 3)
-    
-    xlabel('360 Scan')
-    ylabel('Hz')
+    if ~isempty(plane_proj_toc)
 
-    l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
-    l.Interpreter = 'tex';
-    
-    hold off
+        plane_proj_fig = figure('DefaultAxesFontSize', 14, 'Position', [10 10 1400 500]);
+
+        hold all
+
+        plot(plane_proj_rate_Hz, 'b')
+        plot(Move_mean_Hz_ppte, 'r', 'LineWidth', 3)
+
+        xlabel('360 Scan')
+        ylabel('Hz')
+
+        l = legend({'\color{blue} Time (s)','\color{red} Moving Avg (s)'}, 'FontSize', 14, 'FontWeight', 'bold', 'LineWidth', 4, 'Location', 'southeast');
+        l.Interpreter = 'tex';
+
+        hold off
+        
+    end
     
     
 end

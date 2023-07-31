@@ -3,6 +3,11 @@ function plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, op
     %% VAR INIT
     
     All_Avg_Array = [Avg_Arrays.grav2; Avg_Arrays.asph2; Avg_Arrays.unkn2; Avg_Arrays.grav3; Avg_Arrays.asph3; Avg_Arrays.unkn3; Avg_Arrays.grav4; Avg_Arrays.asph4; Avg_Arrays.unkn4];
+    All_Asph_Array = [Avg_Arrays.asph2; Avg_Arrays.asph3; Avg_Arrays.asph4];
+    All_Grav_Array = [Avg_Arrays.grav2; Avg_Arrays.grav3; Avg_Arrays.grav4];
+    All_Unkn_Array = [Avg_Arrays.unkn2; Avg_Arrays.unkn3; Avg_Arrays.unkn4];
+    
+    scale_factor = 1000;
     
     %% Getting Limits
     
@@ -34,9 +39,9 @@ function plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, op
     
     asph_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,5)+0.01)*1000), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
+    scatter3(All_Asph_Array(:,1), All_Asph_Array(:,2), All_Asph_Array(:,3), 'filled', 'SizeData', ((All_Asph_Array(:,5)+0.01)*scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
     hold on
-    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
+    MCA_plotter(Manual_Classfied_Areas, z_max_lim, options)
     axis('equal')
     axis off
     view([0 0 90])
@@ -51,35 +56,14 @@ function plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, op
     ax2.Clipping = 'off';
     
     
-    %% Plotting Grass (UNKNOWN) Confs
-    
-    unkn_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
-    
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,6)+0.01)*1000), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
-    hold on
-    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
-    axis('equal')
-    axis off
-    view([0 0 90])
-    xlim([x_min_lim x_max_lim]);
-    ylim([y_min_lim y_max_lim]);
-    hold on
-    h = plot(NaN,NaN,'or', 'LineWidth', 25);
-    l = legend(h, {'\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
-    l.Interpreter = 'tex';
-    hold off
-    ax2 = gca;
-    ax2.Clipping = 'off';
-    
-    
     %% Plotting Gravel Confs
     
     grav_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,7)+0.01)*1000), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
+    scatter3(All_Grav_Array(:,1), All_Grav_Array(:,2), All_Grav_Array(:,3), 'filled', 'SizeData', ((All_Grav_Array(:,7)+0.01)*scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
     hold on
 
-    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
+    MCA_plotter(Manual_Classfied_Areas, z_max_lim, options)
     axis('equal')
     axis off
     view([0 0 90])
@@ -94,14 +78,35 @@ function plot_avg_class_confs_results_fun(Avg_Arrays, Manual_Classfied_Areas, op
     ax2.Clipping = 'off';
     
     
+    %% Plotting Grass (UNKNOWN) Confs
+    
+    unkn_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
+    
+    scatter3(All_Unkn_Array(:,1), All_Unkn_Array(:,2), All_Unkn_Array(:,3), 'filled', 'SizeData', ((All_Unkn_Array(:,6)+0.01)*scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
+    hold on
+    MCA_plotter(Manual_Classfied_Areas, z_max_lim, options)
+    axis('equal')
+    axis off
+    view([0 0 90])
+    xlim([x_min_lim x_max_lim]);
+    ylim([y_min_lim y_max_lim]);
+    hold on
+    h = plot(NaN,NaN,'or', 'LineWidth', 25);
+    l = legend(h, {'\color{red} Unkn'}, 'FontSize', 100, 'FontWeight', 'bold', 'LineWidth', 4);
+    l.Interpreter = 'tex';
+    hold off
+    ax2 = gca;
+    ax2.Clipping = 'off';
+    
+    
     %% Plotting all Confs
     
     all_conf_fig = figure('Position', options.fig_size_array, 'DefaultAxesFontSize', options.axis_font_size);
     hold all
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,7)+0.01)*10000), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,5)+0.01)*10000), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
-    scatter3(All_Avg_Array(:,1), All_Avg_Array(:,2), All_Avg_Array(:,3), 'filled', 'SizeData', ((All_Avg_Array(:,6)+0.01)*10000), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
-    MCA_plotter(Manual_Classfied_Areas, z_max_lim)
+    scatter3(All_Asph_Array(:,1), All_Asph_Array(:,2), All_Asph_Array(:,3), 'filled', 'SizeData', ((All_Asph_Array(:,7)+0.01)*scale_factor), 'MarkerFaceColor', 'c', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'c')
+    scatter3(All_Grav_Array(:,1), All_Grav_Array(:,2), All_Grav_Array(:,3), 'filled', 'SizeData', ((All_Grav_Array(:,5)+0.01)*scale_factor), 'MarkerFaceColor', 'k', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'k') 
+    scatter3(All_Unkn_Array(:,1), All_Unkn_Array(:,2), All_Unkn_Array(:,3), 'filled', 'SizeData', ((All_Unkn_Array(:,6)+0.01)*scale_factor), 'MarkerFaceColor', 'r', 'MarkerFaceAlpha', 0.25, 'MarkerEdgeColor', 'r')
+    MCA_plotter(Manual_Classfied_Areas, z_max_lim, options)
     hold off
     axis('equal')
     axis off

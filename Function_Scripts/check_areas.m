@@ -48,11 +48,13 @@ function area_export = check_areas(Avg_Arrays, tformed_area, tformed_origin, are
         
     if c2_sum > 1 && c3_sum > 1 && c4_sum > 1
         
-        area_export = checkIfPointsInAllChannels(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
+%         area_export = checkIfPointsInAllChannels(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
+        area_export = checkIfPointsInAllChannelsLLRRTest(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
 
     elseif area_export.road_classes_sum > area_export.non_road_classes_sum * 5 && area_export.road_classes_sum > 2
         
-        area_export = checkIfPointsInAllChannels(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
+%         area_export = checkIfPointsInAllChannels(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
+        area_export = checkIfPointsInAllChannelsLLRRTest(Avg_Arrays, indices, area_guess_opts, tformed_area, area_export);
         
     else
 

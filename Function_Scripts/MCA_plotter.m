@@ -128,5 +128,20 @@ function MCA_plotter(Manual_Classfied_Areas, max_h, options)
         end
 
     end
+    
+    if options.mca_unkn_bool && isfield(Manual_Classfied_Areas, 'gras') && ~isfield(Manual_Classfied_Areas, 'non_road')
+
+        % Non Road
+
+            for nr_idx = 1:length(Manual_Classfied_Areas.gras)
+
+                to_plot_xy_roi = Manual_Classfied_Areas.gras{nr_idx};
+                height_array = ones(length(Manual_Classfied_Areas.gras{nr_idx}),1) * max_h;
+                patch(to_plot_xy_roi(:,1),to_plot_xy_roi(:,2),height_array,[0.75, 0.25, 0.75], 'FaceAlpha', options.mca_face_alpha_value)
+
+            end
+
+
+    end
 
 end

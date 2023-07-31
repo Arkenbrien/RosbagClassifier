@@ -23,7 +23,8 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
     used_chans = find(~cellfun(@isempty,avg_cell_store));
     
     % Getting the z max height so that the projected areas are above the point cloud 
-    z_max_lim = max([Avg_Arrays.grav2(:,3); Avg_Arrays.asph2(:,3); Avg_Arrays.unkn2(:,3)]) + 5;
+    z_max_array_find = [Avg_Arrays.grav2; Avg_Arrays.asph2; Avg_Arrays.unkn2];
+    z_max_lim = max(z_max_array_find(:,3)) + 5;
     options.max_h = z_max_lim;
     
     %% For each channel
@@ -256,6 +257,59 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
         end
         
     end
+    
+    
+    %% Non-Road (gras) == Side-Of-Road
+        
+        if isfield(Manual_Classfied_Areas, 'gras') && ~isfield(Manual_Classfied_Areas, 'non_road')
+
+            for nr_idx = 1:length(Manual_Classfied_Areas.gras)
+
+                % Grabs the polygon data
+                xy_roi              = Manual_Classfied_Areas.gras{:,nr_idx};
+
+                % Grabs the indexes for all the points that lie in the polygon
+                if ~isempty(Grav_Avg_Array)
+                    grav_in_nonroad     = sum(inpolygon(Grav_Avg_Array(:,1), Grav_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                else
+                    grav_in_nonroad = 0;
+                end
+                
+                if ~isempty(Asph_Avg_Array)
+                    asph_in_nonroad     = sum(inpolygon(Asph_Avg_Array(:,1), Asph_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                else
+                    asph_in_nonroad = 0;
+                end
+                
+                if ~isempty(Unkn_Avg_Array)
+                    unkn_in_nonroad     = sum(inpolygon(Unkn_Avg_Array(:,1), Unkn_Avg_Array(:,2), xy_roi(:,1), xy_roi(:,2)));
+                else
+                    unkn_in_nonroad = 0;
+                end
+                
+%                 tot_in_area         = grav_in_nonroad + asph_in_nonroad + gras_in_nonroad;
+                tot_in_area         = grav_in_nonroad + asph_in_nonroad + unkn_in_nonroad;
+
+                % Score per area
+                if tot_in_area ~= 0
+                    
+                    channel_in_nonroad_area_score{chan_idx, nr_idx}.grav_in_nonroad = grav_in_nonroad;
+                    channel_in_nonroad_area_score{chan_idx, nr_idx}.asph_in_nonroad = asph_in_nonroad;
+                    channel_in_nonroad_area_score{chan_idx, nr_idx}.unkn_in_nonroad = unkn_in_nonroad;
+                    channel_in_nonroad_area_score{chan_idx, nr_idx}.tot_in_area = tot_in_area;
+                    
+                end
+                
+                channel_in_nonroad_area_score{chan_idx, nr_idx}.avg_loc    = [mean(xy_roi(:,1)) mean(xy_roi(:,2))];
+
+            end
+
+        else
+
+            disp('No side-of-road areas to score!')
+            channel_in_nonroad_area_score = [];
+
+        end
     
     %% For each area all channels
     
