@@ -18,16 +18,19 @@ clc
 %% Options
 
 % Which ring to grab: 1-9 = '_#.csv', 10+ = '_##.csv'
-ring_search     = 2;
+ring_search     = 4;
 
 % Which percent is going to the training array
 train_percent   = 0.7;
 
+% How much of all training data to include
+tot_p_to_use    = 0.75;
+
 % Which reference point
 % RANGE from LiDAR Point of origin
-range_bool      = 0;
+range_bool      = 1;
 % Height from RANSAC projected plane
-ransac_bool     = 1;
+ransac_bool     = 0;
 % Height from MLS projected plane
 mls_bool        = 0;
 
@@ -67,7 +70,7 @@ end
 
 %% Export dir
 
-export_dir = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/02_RDF_Training_Data_Combiner_Splitter_Export', 'Select or create export ROOT directory');
+export_dir = uigetdir('/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/', 'Select or create export ROOT directory');
 export_dir = export_dir + "/chan_" + string(side_select) + "_" + string(ring_search) + string(tag);
 
 if ~exist(export_dir,'dir')
@@ -86,9 +89,9 @@ addpath(export_dir)
 
 % Chan_2
 % asph_2_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/combined_asphalt';
-asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/asphalt';
-grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/gravel';
-gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_RANSAC_TEST/grass';
+asph_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Range_RANGE/asphalt';
+grav_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Range_RANGE/gravel';
+gras_dir_1 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Range_RANGE/grass';
 % grav_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export_rm/gravel';
 
 % asph_dir_2 = '/media/autobuntu/chonk/chonk/git_repos/PCD_STACK_RDF_CLASSIFIER/TRAINING_DATA/01_RDF_Training_Data_Extraction_Export/asphalt_2_2023-03-29-14-55-44';
@@ -239,7 +242,7 @@ end
 %% Compile train/test table
 
 % Find number to grab (num samps/terrain type need to be equal)
-max_num_to_grab     = min([height(asph_table) height(gras_table) height(grav_table)]);
+max_num_to_grab     = int64(min([height(asph_table) height(gras_table) height(grav_table)]) * tot_p_to_use);
 % max_num_to_grab     = min([height(asph_table) height(grav_table)]);
 % max_num_to_grab     = min([height(asph_2_table) height(grav_table)]);
 % max_num_to_grab     = min([height(asph_2_table) height(grav_table) height(grav_rm_table)]);

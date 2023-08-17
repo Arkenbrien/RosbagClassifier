@@ -10,7 +10,7 @@ time_now                = datestr(time_now,'yyyyMMddhhmmss');
 % DvG.c2 = Mdl;
 
 % Filename
-model_name = 'chan_2_r_range.mat';
+model_name = 'chan_2_c_range_75pc.mat';
 
 % Overalldir
 file_ovrl_name = string(model_name);

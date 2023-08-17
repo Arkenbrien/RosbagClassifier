@@ -1,10 +1,5 @@
 %==========================================================================
-%                       Travis Moleski/Rhett Huston
-%
-%                     FILE CREATION DATE: 10/19/2022
-%
-%                          RosbagClassifier.m
-%
+
 % This program  
 %==========================================================================
 
@@ -19,7 +14,7 @@ format compact
 % 'range'; 'ransac';, 'mls'
 options.reference_point = 'range';
 
-options.export_folder_name = '01_RDF_Training_Data_Extraction_Exporaaaaat'; % Reference apphended automatically...
+options.export_folder_name = '01_RDF_Training_Data_Extraction_Range'; % Reference apphended automatically...
 
 chan_2_d_ang        = 3;
 chan_3_d_ang        = 3;
@@ -36,31 +31,33 @@ move_avg_size       = 15;
 % Size of figures
 fig_size_array          = [10 10 3500 1600];
 
+checkaronis = 0;
+
 %% ROSBAG & Region Of Interest (manually classified areas)
 
 % ======================================================================= %
 
 % Redmen Gravel Lot: rm_1 - rm_11 - not 4,  4 is mysteriously borked... (x.x )
-bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_11.bag';
-roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_11.mat';
-terrain_opt = 1;
-roi_select = 1; %1 = 1,2,3; 2 = 1,2
-side_select = 2; %1 = l, 2 = c, 3 = r
+% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_11.bag';
+% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_grav/rm_11.mat';
+% terrain_opt = 1;
+% roi_select = 1; %1 = 1,2,3; 2 = 1,2
+% side_select = 2; %1 = l, 2 = c, 3 = r
 
 % Redmen Gravel Lot Drive-by: rm_db_1 - rm_db_6 (not 5 tho)
 % bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/rm_db_6.bag';
 % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/rm_db_6.mat'; % rm_db_5 == no good, passing car ruins data plus other shenanigens; rm_db_6 = roi_1, rm_db_6_2 = roi_2
-% % % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/SoR_Looks/rm_db_6_SOR.mat'; terrain_opt = 7; 
+% % roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/drive_by/r_u_a_asph/SoR_Looks/rm_db_6_SOR.mat'; terrain_opt = 7; 
 % terrain_opt = 5;
 % roi_select = 1;
 % side_select = 2; %1 = l, 2 = c, 3 = r
 
 % Redmen Gravel Lot Grass Collection: rm_13 15 17 18 19 20 22 23 25 27 29 30 32
-% bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_32.bag';
-% roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_32.mat';
-% terrain_opt = 4;
-% roi_select = 1;
-% side_select = 2; %1 = l, 2 = c, 3 = r
+bag_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/rm_13.bag';
+roi_file = '/media/autobuntu/chonk/chonk/DATA/chonk_ROSBAG/redmen/shortened_big_one/pcd/r_u_a_gras/rm_13.mat';
+terrain_opt = 4;
+roi_select = 1;
+side_select = 2; %1 = l, 2 = c, 3 = r
 
 %% Variable Initiation
 
@@ -247,14 +244,20 @@ fprintf('Max time delta is %f sec \n',max(abs(diffs)));
 
 %% Checkaronis
 
-manual_classifier_pcd_display(roi_file, lidar_msgs, gps_msgs, terrain_opt, roi_select)
 
-disp('Waiting until ready!')
-pause
+if checkaronis
+    
+    manual_classifier_pcd_display(roi_file, lidar_msgs, gps_msgs, terrain_opt, roi_select)
 
-close all
+    disp('Waiting until ready!')
+    pause
 
-disp('Okay, Extracting Data.......')
+    close all
+
+    disp('Okay, Extracting Data.......')
+    
+end
+
 
 %% Extracting Data
 

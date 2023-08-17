@@ -30,7 +30,7 @@ options = get_arc_options(options);
 
 % 'range'; 'ransac'; 'mls';
 options.reference_point         = 'range';
-options.rosbag_number           = 7;
+options.rosbag_number           = 1;
 options.llrr_bool               = 0;
 
 
@@ -50,14 +50,14 @@ options.mca_plot                = 1;
 options.plot_all_bool           = 0;
 options.plot_avg_bool           = 1;
 options.plot_area_results_bool  = 1;
-options.plot_rate_bool          = 0;
-options.plot_class_rate_bool    = 0;
+options.plot_rate_bool          = 1;
+options.plot_class_rate_bool    = 1;
 options.plot_conf_bool          = 0;
 options.plot_perchan_conf_bool  = 0;
-options.auto_road_guesser_bool  = 0;
+options.auto_road_guesser_bool  = 1;
 options.plot_avg_in_ani_bool    = 0;
-options.plot_ani                = 0;
-options.save_anim_bool          = 0;
+options.plot_ani                = 1;
+options.save_anim_bool          = 1;
 
 %
 % PLANE PROJECTION
@@ -113,17 +113,42 @@ end
     
 if options.reference_point == "range"
     
-    chan_4_c_rdf_load_string = 'chan_4_c_2.mat';
-    chan_3_c_rdf_load_string = 'chan_3_c_2.mat';
-    chan_2_c_rdf_load_string = 'chan_2_c_2.mat';
+%     chan_4_c_rdf_load_string = 'chan_4_c_2.mat';
+%     chan_3_c_rdf_load_string = 'chan_3_c_2.mat';
+%     chan_2_c_rdf_load_string = 'chan_2_c_2.mat';
+%     
+%     chan_4_l_rdf_load_string = 'chan_4_c_2.mat';
+%     chan_3_l_rdf_load_string = 'chan_3_c_2.mat';
+%     chan_2_l_rdf_load_string = 'chan_2_c_2.mat';
+%     
+%     chan_4_r_rdf_load_string = 'chan_4_c_2.mat';
+%     chan_3_r_rdf_load_string = 'chan_3_c_2.mat';
+%     chan_2_r_rdf_load_string = 'chan_2_c_2.mat';
+
+%     chan_4_c_rdf_load_string = 'chan_4_c_range_50pc.mat';
+%     chan_3_c_rdf_load_string = 'chan_3_c_range_50pc.mat';
+%     chan_2_c_rdf_load_string = 'chan_2_c_range_50pc.mat';
+%     
+%     chan_4_l_rdf_load_string = 'chan_4_c_range_50pc.mat';
+%     chan_3_l_rdf_load_string = 'chan_3_c_range_50pc.mat';
+%     chan_2_l_rdf_load_string = 'chan_2_c_range_50pc.mat';
+%     
+%     chan_4_r_rdf_load_string = 'chan_4_c_range_50pc.mat';
+%     chan_3_r_rdf_load_string = 'chan_3_c_range_50pc.mat';
+%     chan_2_r_rdf_load_string = 'chan_2_c_range_50pc.mat';
+%     
+    chan_4_c_rdf_load_string = 'chan_4_c_range_75pc.mat';
+    chan_3_c_rdf_load_string = 'chan_3_c_range_75pc.mat';
+    chan_2_c_rdf_load_string = 'chan_2_c_range_75pc.mat';
     
-    chan_4_l_rdf_load_string = 'chan_4_c_2.mat';
-    chan_3_l_rdf_load_string = 'chan_3_c_2.mat';
-    chan_2_l_rdf_load_string = 'chan_2_c_2.mat';
+    chan_4_l_rdf_load_string = 'chan_4_c_range_75pc.mat';
+    chan_3_l_rdf_load_string = 'chan_3_c_range_75pc.mat';
+    chan_2_l_rdf_load_string = 'chan_2_c_range_75pc.mat';
     
-    chan_4_r_rdf_load_string = 'chan_4_c_2.mat';
-    chan_3_r_rdf_load_string = 'chan_3_c_2.mat';
-    chan_2_r_rdf_load_string = 'chan_2_c_2.mat';
+    chan_4_r_rdf_load_string = 'chan_4_c_range_75pc.mat';
+    chan_3_r_rdf_load_string = 'chan_3_c_range_75pc.mat';
+    chan_2_r_rdf_load_string = 'chan_2_c_range_75pc.mat';
+    
     
 elseif options.reference_point == "ransac"
     

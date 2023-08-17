@@ -14,7 +14,7 @@
 %% OPTIONS
 
 % Reference point - only range is supported atm
-% 'range'; 'ransac';, 'mls'
+% 'range'; 'ransac'; 'mls'
 options.reference_point = 'range';
 
 % Export Folder
