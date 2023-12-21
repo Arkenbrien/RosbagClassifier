@@ -4,7 +4,6 @@
 parfor_progress.txt
 /CLASSIFICATION_RESULTS
 *.png
-/Image_Dump
 *.bag
 *.xlsx
 *.ods
