@@ -1,6 +1,6 @@
 # Rosbag Classifier
 
-RosbagClassifier.m allows for classification of LiDAR data as gravel, chipseal, or grass using an RDF to examine arcs from seperate LiDAR channels. At the moment, 5 arcs from channels 2, 3, and 5 are used. Two reference points are used for extracting spacial features: Range from LiDAR PoI, and a RANSAC projected plane. Manually defined areas coresponding to the rosbag to be classified allow for determining the accuracy of the classification process. Accuracy results are plotted & saved to disk. 
+RosbagClassifier.m allows for classification of LiDAR data as gravel, chipseal, or grass using an RDF to examine arcs from seperate LiDAR channels. At the moment, 3 arcs from channels 2, 3, and 4 are used. Two reference points are used for extracting spacial features: Range from LiDAR PoI, and a RANSAC projected plane. Manually defined areas coresponding to the rosbag to be classified allow for determining the accuracy of the classification process. Accuracy results are plotted & saved to disk. 
 
 To run RosbagClassifier.m, the following is needed:
     Rosbag with LiDAR, GPS, and IMU data
