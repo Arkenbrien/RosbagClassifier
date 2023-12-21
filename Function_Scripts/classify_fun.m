@@ -36,6 +36,7 @@ function diag_out = classify_fun(xyz_cloud, chan_bounds, chan_rdf, tform, DvG, o
                     Yfit  = DvG.Mdl.predictFcn(chan_feat_table);
         end
         if options.conf_filt_bool
+%             disp('Confidence Filter Applied!')
             if options.reference_point == "range"
                 if isequal((Yfit), 'gravel') && contains(chan_area, "2") && scores(3) < options.c2gravconflwbound && scores(2) > options.c2unknconflwbound
                     Yfit = categorical("unknown");

@@ -1,14 +1,19 @@
 function options = get_confs(options)
     
     % Get Confidence Intervals
-    if options.reference_point == "range" 
+    if options.reference_point == "range"
+        
+        test_conf_g = 1;
+        test_conf_u = 1 - test_conf_g;
+        
+        disp('RANGE')
 
         % Channel 2 Gravel
-        options.c2gravconflwbound       = 0.90;   
+        options.c2gravconflwbound       = test_conf_g;   
         options.c2gravconfupbound       = 1.00;
 
         % Channel 2 Unknown
-        options.c2unknconflwbound       = 0.10;
+        options.c2unknconflwbound       = test_conf_u;
         options.c2unknconfupbound       = 1.00;
 
         % Channel 2 Asphalt
@@ -16,11 +21,11 @@ function options = get_confs(options)
         options.c2asphconfupbound       = 0.90;
 
         % Channel 3 Gravel
-        options.c3gravconflwbound       = 0.95;
+        options.c3gravconflwbound       = test_conf_g;
         options.c3gravconfupbound       = 1.00;
 
         % Channel 3 Unknown
-        options.c3unknconflwbound       = 0.30;
+        options.c3unknconflwbound       = test_conf_u;
         options.c3unknconfupbound       = 0.99;
 
         % Channel 3 Asph
@@ -28,11 +33,11 @@ function options = get_confs(options)
         options.c3asphconfupbound       = 0.90;
 
         % Channel 4 Gravel
-        options.c4gravconflwbound       = 0.90;
+        options.c4gravconflwbound       = test_conf_g;
         options.c4gravconfupbound       = 1.00;
 
         % Channel 4 Unknown
-        options.c4unknconflwbound       = 0.10;
+        options.c4unknconflwbound       = test_conf_u;
         options.c4unknconfupbound       = 1.00;
 
         % Channel 4 Asph

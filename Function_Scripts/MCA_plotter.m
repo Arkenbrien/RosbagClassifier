@@ -1,6 +1,16 @@
 function MCA_plotter(Manual_Classfied_Areas, max_h, options)
-
-    if options.mca_grav_bool
+    
+    options.mca_grav_bool           = 1;
+    options.mca_asph_bool           = 1;
+    options.mca_unkn_bool           = 1;
+    options.mca_sor_bool            = 0;
+    options.mca_gras_bool           = 0;
+    options.mca_road_bool           = 0;
+    options.mca_face_alpha_value    = 0.15;
+    options.mca_area_sym            = 's';
+    options.mca_marker_size         = 30;
+    
+    if options.mca_grav_bool == 1
 
         % Gravel
         if isfield(Manual_Classfied_Areas, 'grav')

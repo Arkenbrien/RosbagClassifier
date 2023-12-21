@@ -259,14 +259,14 @@ function class_score_function_test(Avg_Arrays, Manual_Classfied_Areas, options)
     end
     
     
-    %% Non-Road (gras) == Side-Of-Road
+    % Non-Road (gras) == Side-Of-Road
         
-        if isfield(Manual_Classfied_Areas, 'gras') && ~isfield(Manual_Classfied_Areas, 'non_road')
+        if isfield(Manual_Classfied_Areas, 'non_road')% && ~isfield(Manual_Classfied_Areas, 'non_road')
 
-            for nr_idx = 1:length(Manual_Classfied_Areas.gras)
+            for nr_idx = 1:length(Manual_Classfied_Areas.non_road)
 
                 % Grabs the polygon data
-                xy_roi              = Manual_Classfied_Areas.gras{:,nr_idx};
+                xy_roi              = Manual_Classfied_Areas.non_road{:,nr_idx};
 
                 % Grabs the indexes for all the points that lie in the polygon
                 if ~isempty(Grav_Avg_Array)
